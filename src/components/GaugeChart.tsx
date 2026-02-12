@@ -9,7 +9,7 @@ interface GaugeChartProps {
 
 const GaugeChart: React.FC<GaugeChartProps> = ({ value, title, subtitle, teamCount }) => {
   const clampedValue = Math.min(100, Math.max(0, value));
-  const angle = -90 + (clampedValue / 100) * 180;
+  const angle = -180 + (clampedValue / 100) * 180;
 
   const arcPath = (startAngle: number, endAngle: number, radius: number) => {
     const startRad = (startAngle * Math.PI) / 180;
