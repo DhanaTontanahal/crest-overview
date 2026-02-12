@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useAppState } from '@/context/AppContext';
 import { TeamData } from '@/types/maturity';
-import { Upload } from 'lucide-react';
+import { Upload, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import * as XLSX from 'xlsx';
@@ -45,17 +45,25 @@ const ExcelUpload: React.FC = () => {
     <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
       <h3 className="text-lg font-semibold text-card-foreground mb-2">Upload Data</h3>
       <p className="text-sm text-muted-foreground mb-4">
-        Upload an Excel file with columns: Team, Maturity, Performance, Agility, Stability, Platform, Pillar
+        Upload an Excel/CSV file with columns: Team, Maturity, Performance, Agility, Stability, Platform, Pillar
       </p>
-      <label>
-        <Button variant="outline" className="cursor-pointer" asChild>
-          <span>
-            <Upload className="w-4 h-4 mr-2" />
-            Choose Excel File
-            <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} className="hidden" />
-          </span>
-        </Button>
-      </label>
+      <div className="flex flex-wrap gap-3">
+        <label>
+          <Button variant="outline" className="cursor-pointer" asChild>
+            <span>
+              <Upload className="w-4 h-4 mr-2" />
+              Choose Excel File
+              <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} className="hidden" />
+            </span>
+          </Button>
+        </label>
+        <a href="/sample-template.csv" download="sample-template.csv">
+          <Button variant="secondary" size="default">
+            <Download className="w-4 h-4 mr-2" />
+            Download Sample Template
+          </Button>
+        </a>
+      </div>
     </div>
   );
 };
