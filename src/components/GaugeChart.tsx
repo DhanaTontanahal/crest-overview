@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface GaugeChartProps {
   value: number;
@@ -9,7 +9,26 @@ interface GaugeChartProps {
 
 const GaugeChart: React.FC<GaugeChartProps> = ({ value, title, subtitle, teamCount }) => {
   const clampedValue = Math.min(100, Math.max(0, value));
-  const angle = -180 + (clampedValue / 100) * 180;
+  const [animatedValue, setAnimatedValue] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 1200;
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      start = Math.round(eased * clampedValue);
+      setAnimatedValue(start);
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  }, [clampedValue]);
+
+  const angle = -180 + (animatedValue / 100) * 180;
 
   const arcPath = (startAngle: number, endAngle: number, radius: number) => {
     const startRad = (startAngle * Math.PI) / 180;
@@ -36,7 +55,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({ value, title, subtitle, teamCou
   const ny = 100 + needleLength * Math.sin(needleRad);
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
+    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       <h3 className="text-lg font-semibold text-card-foreground text-center">{title}</h3>
       <p className="text-sm text-muted-foreground text-center mb-2">{subtitle}</p>
       <svg viewBox="0 0 200 130" className="w-full max-w-[280px] mx-auto">
@@ -48,6 +67,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({ value, title, subtitle, teamCou
             stroke={seg.color}
             strokeWidth="18"
             strokeLinecap="butt"
+            className="opacity-0 animate-fade-in"
+            style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'forwards' }}
           />
         ))}
         {[0, 20, 40, 60, 80, 100].map(tick => {
@@ -61,10 +82,16 @@ const GaugeChart: React.FC<GaugeChartProps> = ({ value, title, subtitle, teamCou
             </text>
           );
         })}
-        <line x1="100" y1="100" x2={nx} y2={ny} stroke="hsl(var(--chart-orange))" strokeWidth="2.5" strokeLinecap="round" />
+        <line
+          x1="100" y1="100" x2={nx} y2={ny}
+          stroke="hsl(var(--chart-orange))"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{ transition: 'all 0.3s ease-out' }}
+        />
         <circle cx="100" cy="100" r="4" fill="hsl(var(--chart-orange))" />
         <text x="100" y="112" textAnchor="middle" fontSize="18" fontWeight="bold" fill="hsl(var(--foreground))">
-          {clampedValue}%
+          {animatedValue}%
         </text>
         <text x="100" y="123" textAnchor="middle" fontSize="9" fill="hsl(var(--muted-foreground))">
           ({teamCount} teams)

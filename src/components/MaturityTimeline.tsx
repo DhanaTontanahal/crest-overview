@@ -1,6 +1,9 @@
 import React from 'react';
 import { TimeSeriesPoint } from '@/types/maturity';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, ReferenceLine } from 'recharts';
+import {
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  Line, ComposedChart, ReferenceLine, ReferenceArea,
+} from 'recharts';
 
 interface MaturityTimelineProps {
   title: string;
@@ -21,7 +24,7 @@ const MaturityTimeline: React.FC<MaturityTimelineProps> = ({ title, subtitle, da
   const benchmarkValue = 5;
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
+    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       <h3 className="text-lg font-semibold text-card-foreground text-center">{title}</h3>
       <p className="text-sm text-muted-foreground text-center mb-4">{subtitle}</p>
       <ResponsiveContainer width="100%" height={280}>
@@ -60,14 +63,13 @@ const MaturityTimeline: React.FC<MaturityTimelineProps> = ({ title, subtitle, da
             stroke="hsl(45, 90%, 55%)"
             strokeWidth={3}
             dot={{ r: 6, fill: 'hsl(45, 90%, 55%)', stroke: 'hsl(45, 90%, 55%)' }}
+            animationDuration={1500}
+            animationEasing="ease-out"
           />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
 };
-
-// Need to import ReferenceArea
-import { ReferenceArea } from 'recharts';
 
 export default MaturityTimeline;

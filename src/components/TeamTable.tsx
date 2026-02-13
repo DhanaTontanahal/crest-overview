@@ -10,16 +10,21 @@ const getScoreColor = (score: number) => {
 };
 
 const TeamTable: React.FC = () => {
-  const { teams, selectedPlatform, selectedPillar } = useAppState();
+  const { teams, selectedPlatform, selectedPillar, selectedQuarter, user, cios } = useAppState();
 
   const filtered = teams.filter(t => {
+    if (t.quarter !== selectedQuarter) return false;
+    if (user?.role === 'supervisor' && user.cioId) {
+      const cio = cios.find(c => c.id === user.cioId);
+      if (cio && t.platform !== cio.platform) return false;
+    }
     if (selectedPlatform !== 'All' && t.platform !== selectedPlatform) return false;
     if (selectedPillar !== 'All' && t.pillar !== selectedPillar) return false;
     return true;
   });
 
   return (
-    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+    <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden transition-all duration-300 hover:shadow-md">
       <div className="p-6 pb-3">
         <h3 className="text-lg font-semibold text-card-foreground">Team Overview</h3>
         <p className="text-sm text-muted-foreground">Detailed scores for each team</p>
@@ -39,7 +44,11 @@ const TeamTable: React.FC = () => {
           </TableHeader>
           <TableBody>
             {filtered.map((team, i) => (
-              <TableRow key={i}>
+              <TableRow
+                key={i}
+                className="opacity-0 animate-fade-in"
+                style={{ animationDelay: `${i * 30}ms`, animationFillMode: 'forwards' }}
+              >
                 <TableCell className="font-medium">{team.name}</TableCell>
                 <TableCell>{team.platform}</TableCell>
                 <TableCell>{team.pillar}</TableCell>

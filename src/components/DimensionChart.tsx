@@ -26,7 +26,7 @@ const DimensionChart: React.FC<DimensionChartProps> = ({ title, subtitle, dimens
   }));
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
+    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       <h3 className="text-lg font-semibold text-card-foreground">{title}</h3>
       <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
       <ResponsiveContainer width="100%" height={dimensions.length * 60 + 40}>
@@ -49,7 +49,7 @@ const DimensionChart: React.FC<DimensionChartProps> = ({ title, subtitle, dimens
             )}
           />
           <Tooltip />
-          <Bar dataKey="average" radius={[0, 4, 4, 0]} barSize={24}>
+          <Bar dataKey="average" radius={[0, 4, 4, 0]} barSize={24} animationDuration={1200} animationEasing="ease-out">
             {data.map((_, index) => (
               <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}

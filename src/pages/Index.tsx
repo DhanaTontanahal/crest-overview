@@ -52,14 +52,14 @@ const Index: React.FC = () => {
       <DashboardHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {user.role === 'admin' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
             <ExcelUpload />
             <AdminSettings />
           </div>
         )}
 
         {user.role === 'user' && (
-          <div className="bg-card rounded-lg p-12 shadow-sm border border-border text-center">
+          <div className="bg-card rounded-lg p-12 shadow-sm border border-border text-center animate-scale-in">
             <h2 className="text-2xl font-semibold text-card-foreground mb-2">Welcome, {user.name}</h2>
             <p className="text-muted-foreground">You have read-only access. Please contact your supervisor or admin for dashboard insights.</p>
           </div>
@@ -67,9 +67,8 @@ const Index: React.FC = () => {
 
         {showDashboard && (
           <>
-            {/* Supervisor CIO label */}
             {user.role === 'supervisor' && user.cioId && (
-              <div className="bg-accent/10 border border-accent/30 rounded-lg px-4 py-3">
+              <div className="bg-accent/10 border border-accent/30 rounded-lg px-4 py-3 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
                 <p className="text-sm text-accent-foreground font-medium">
                   Viewing as CIO: {cios.find(c => c.id === user.cioId)?.name} — {cios.find(c => c.id === user.cioId)?.platform} platform
                 </p>
@@ -78,52 +77,57 @@ const Index: React.FC = () => {
 
             {/* Gauges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <GaugeChart value={avgStability} title="Team Stability" subtitle="How stable are my teams?" teamCount={filteredTeams.length} />
-              <GaugeChart value={avgMaturity} title="Overall Maturity" subtitle="How mature are my teams?" teamCount={filteredTeams.length} />
-              <GaugeChart value={avgPerformance} title="Overall Performance" subtitle="How well are teams performing?" teamCount={filteredTeams.length} />
+              {[
+                { value: avgStability, title: 'Team Stability', subtitle: 'How stable are my teams?' },
+                { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
+                { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
+              ].map((gauge, i) => (
+                <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+                  <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
+                </div>
+              ))}
             </div>
 
             {/* Dimension Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DimensionChart
-                title="Maturity Dimensions"
-                subtitle="How do the various dimensions contribute to overall maturity?"
-                dimensions={maturityDimensions}
-              />
-              <DimensionChart
-                title="Performance Metrics"
-                subtitle="How do the various metrics contribute to overall performance?"
-                dimensions={performanceMetrics}
-              />
+              <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+                <DimensionChart
+                  title="Maturity Dimensions"
+                  subtitle="How do the various dimensions contribute to overall maturity?"
+                  dimensions={maturityDimensions}
+                />
+              </div>
+              <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+                <DimensionChart
+                  title="Performance Metrics"
+                  subtitle="How do the various metrics contribute to overall performance?"
+                  dimensions={performanceMetrics}
+                />
+              </div>
             </div>
 
             {/* Timeline Charts */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <MaturityTimeline
-                title="Maturity Over Time"
-                subtitle="How does the teams' maturity change over time?"
-                data={timeSeries}
-                dataKey="maturity"
-              />
-              <MaturityTimeline
-                title="Performance Over Time"
-                subtitle="How does the teams' performance change over time?"
-                data={timeSeries}
-                dataKey="performance"
-              />
-              <MaturityTimeline
-                title="Agility Index Over Time"
-                subtitle="How does the teams' overall agility change over time?"
-                data={timeSeries}
-                dataKey="agility"
-              />
+              {[
+                { title: 'Maturity Over Time', subtitle: "How does the teams' maturity change over time?", dataKey: 'maturity' as const },
+                { title: 'Performance Over Time', subtitle: "How does the teams' performance change over time?", dataKey: 'performance' as const },
+                { title: 'Agility Index Over Time', subtitle: "How does the teams' overall agility change over time?", dataKey: 'agility' as const },
+              ].map((tl, i) => (
+                <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${0.5 + i * 0.1}s`, animationFillMode: 'forwards' }}>
+                  <MaturityTimeline title={tl.title} subtitle={tl.subtitle} data={timeSeries} dataKey={tl.dataKey} />
+                </div>
+              ))}
             </div>
 
             {/* Trending Charts */}
-            <TrendingCharts trends={quarterlyTrends} />
+            <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}>
+              <TrendingCharts trends={quarterlyTrends} />
+            </div>
 
             {/* Team Table */}
-            <TeamTable />
+            <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
+              <TeamTable />
+            </div>
           </>
         )}
       </main>
