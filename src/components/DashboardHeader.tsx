@@ -32,7 +32,7 @@ const DashboardHeader: React.FC = () => {
             <p className="text-sm opacity-80">
               {user ? (
                 <span className="flex items-center gap-1.5">
-                  {roleIcons[user.role]} {user.name} — {user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  {roleIcons[user.role]} {user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role === 'admin' ? 'Admin' : 'User'}
                 </span>
               ) : 'Organisation Health & Performance Overview'}
             </p>
