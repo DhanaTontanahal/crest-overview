@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppState } from '@/context/AppContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { LogOut, Crown, Eye, Shield, User, Building2, LayoutDashboard, ClipboardList, FileSearch } from 'lucide-react';
+import { LogOut, Crown, Eye, Shield, User, Building2 } from 'lucide-react';
 
 const roleIcons: Record<string, React.ReactNode> = {
   ltc_ceo: <Building2 className="w-4 h-4" />,
@@ -19,19 +19,14 @@ const DashboardHeader: React.FC = () => {
     selectedPillar, setSelectedPillar,
     selectedQuarter, setSelectedQuarter,
     platforms, pillars, availableQuarters,
-    activeTab, setActiveTab,
   } = useAppState();
 
   const isSuperUser = user?.role === 'superuser';
-  const isSupervisor = user?.role === 'supervisor';
-  const isTPL = user?.role === 'user';
-  const isLTCCEO = user?.role === 'ltc_ceo';
-  const showAssessmentTabs = isSuperUser || isSupervisor || isTPL || isLTCCEO;
 
   return (
     <header className="bg-primary text-primary-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Platform Maturity Dashboard</h1>
             <p className="text-sm opacity-80">
@@ -52,7 +47,7 @@ const DashboardHeader: React.FC = () => {
               </SelectContent>
             </Select>
 
-            {(isSuperUser || user?.role === 'admin') && activeTab === 'dashboard' && (
+            {(isSuperUser || user?.role === 'admin') && (
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
                 <SelectTrigger className="w-[160px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
                   <SelectValue placeholder="Platform" />
@@ -64,17 +59,15 @@ const DashboardHeader: React.FC = () => {
               </Select>
             )}
 
-            {activeTab === 'dashboard' && (
-              <Select value={selectedPillar} onValueChange={setSelectedPillar}>
-                <SelectTrigger className="w-[200px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
-                  <SelectValue placeholder="Pillar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All Pillars</SelectItem>
-                  {pillars.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            )}
+            <Select value={selectedPillar} onValueChange={setSelectedPillar}>
+              <SelectTrigger className="w-[200px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+                <SelectValue placeholder="Pillar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Pillars</SelectItem>
+                {pillars.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+              </SelectContent>
+            </Select>
 
             <Button
               variant="ghost"
@@ -86,48 +79,6 @@ const DashboardHeader: React.FC = () => {
             </Button>
           </div>
         </div>
-
-        {/* Tab Navigation */}
-        {showAssessmentTabs && (
-          <div className="flex gap-1 mt-3 border-t border-primary-foreground/20 pt-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setActiveTab('dashboard')}
-              className={`text-primary-foreground gap-1.5 ${activeTab === 'dashboard' ? 'bg-primary-foreground/20 font-semibold' : 'hover:bg-primary-foreground/10 opacity-70'}`}
-            >
-              <LayoutDashboard className="w-4 h-4" /> Dashboard
-            </Button>
-            {isTPL && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveTab('submit-assessment')}
-                className={`text-primary-foreground gap-1.5 ${activeTab === 'submit-assessment' ? 'bg-primary-foreground/20 font-semibold' : 'hover:bg-primary-foreground/10 opacity-70'}`}
-              >
-                <ClipboardList className="w-4 h-4" /> Submit Assessment
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setActiveTab('view-assessments')}
-              className={`text-primary-foreground gap-1.5 ${activeTab === 'view-assessments' ? 'bg-primary-foreground/20 font-semibold' : 'hover:bg-primary-foreground/10 opacity-70'}`}
-            >
-              <FileSearch className="w-4 h-4" /> View Assessments
-            </Button>
-            {isTPL && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveTab('review-assessment')}
-                className={`text-primary-foreground gap-1.5 ${activeTab === 'review-assessment' ? 'bg-primary-foreground/20 font-semibold' : 'hover:bg-primary-foreground/10 opacity-70'}`}
-              >
-                <Eye className="w-4 h-4" /> Peer Review
-              </Button>
-            )}
-          </div>
-        )}
       </div>
     </header>
   );
