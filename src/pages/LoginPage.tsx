@@ -3,7 +3,8 @@ import { UserRole, UserProfile } from '@/types/maturity';
 import { cios } from '@/data/dummyData';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, ChevronRight } from 'lucide-react';
+import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, ChevronRight, Download } from 'lucide-react';
+import { downloadDummyDataExcel } from '@/utils/exportDummyData';
 
 interface LoginPageProps {
   onLogin: (profile: UserProfile) => void;
@@ -144,6 +145,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               disabled={!role || (role === 'supervisor' && !cioId)}
             >
               Sign In
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={downloadDummyDataExcel}
+              className="w-full"
+            >
+              <Download className="w-4 h-4 mr-1" /> Download Sample Data
             </Button>
           </div>
         </div>
