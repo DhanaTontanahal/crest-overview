@@ -9,6 +9,9 @@ import ExcelUpload from '@/components/ExcelUpload';
 import AdminSettings from '@/components/AdminSettings';
 import TrendingCharts from '@/components/TrendingCharts';
 import LTCCEOView from '@/components/LTCCEOView';
+import UserTPLView from '@/components/UserTPLView';
+import PillarImprovement from '@/components/PillarImprovement';
+import ActionItems from '@/components/ActionItems';
 import LoginPage from '@/pages/LoginPage';
 
 const Index: React.FC = () => {
@@ -61,9 +64,8 @@ const Index: React.FC = () => {
         )}
 
         {user.role === 'user' && (
-          <div className="bg-card rounded-lg p-12 shadow-sm border border-border text-center animate-scale-in">
-            <h2 className="text-2xl font-semibold text-card-foreground mb-2">Welcome, {user.name}</h2>
-            <p className="text-muted-foreground">You have read-only access. Please contact your supervisor or admin for dashboard insights.</p>
+          <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+            <UserTPLView />
           </div>
         )}
 
@@ -132,8 +134,18 @@ const Index: React.FC = () => {
               <TrendingCharts trends={quarterlyTrends} />
             </div>
 
-            {/* Team Table */}
+            {/* Pillar Improvement */}
             <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
+              <PillarImprovement platformFilter={user.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined} />
+            </div>
+
+            {/* Action Items */}
+            <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.9s', animationFillMode: 'forwards' }}>
+              <ActionItems platformFilter={user.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined} />
+            </div>
+
+            {/* Team Table */}
+            <div className="opacity-0 animate-slide-up" style={{ animationDelay: '1.0s', animationFillMode: 'forwards' }}>
               <TeamTable />
             </div>
           </>
