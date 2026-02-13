@@ -7,7 +7,7 @@ import {
 
 const AppContext = createContext<AppState | null>(null);
 
-export const useAppState = () => {
+export const useAppState = (): AppState => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error('useAppState must be used within AppProvider');
   return ctx;
