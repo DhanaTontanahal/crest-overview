@@ -8,6 +8,7 @@ import TeamTable from '@/components/TeamTable';
 import ExcelUpload from '@/components/ExcelUpload';
 import AdminSettings from '@/components/AdminSettings';
 import TrendingCharts from '@/components/TrendingCharts';
+import LTCCEOView from '@/components/LTCCEOView';
 import LoginPage from '@/pages/LoginPage';
 
 const Index: React.FC = () => {
@@ -46,6 +47,7 @@ const Index: React.FC = () => {
   }
 
   const showDashboard = user.role === 'superuser' || user.role === 'supervisor' || user.role === 'admin';
+  const showLTCCEO = user.role === 'ltc_ceo';
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,6 +64,12 @@ const Index: React.FC = () => {
           <div className="bg-card rounded-lg p-12 shadow-sm border border-border text-center animate-scale-in">
             <h2 className="text-2xl font-semibold text-card-foreground mb-2">Welcome, {user.name}</h2>
             <p className="text-muted-foreground">You have read-only access. Please contact your supervisor or admin for dashboard insights.</p>
+          </div>
+        )}
+
+        {showLTCCEO && (
+          <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+            <LTCCEOView />
           </div>
         )}
 

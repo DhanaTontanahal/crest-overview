@@ -2,9 +2,10 @@ import React from 'react';
 import { useAppState } from '@/context/AppContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { LogOut, Crown, Eye, Shield, User } from 'lucide-react';
+import { LogOut, Crown, Eye, Shield, User, Building2 } from 'lucide-react';
 
 const roleIcons: Record<string, React.ReactNode> = {
+  ltc_ceo: <Building2 className="w-4 h-4" />,
   superuser: <Crown className="w-4 h-4" />,
   supervisor: <Eye className="w-4 h-4" />,
   admin: <Shield className="w-4 h-4" />,
@@ -32,7 +33,7 @@ const DashboardHeader: React.FC = () => {
             <p className="text-sm opacity-80">
               {user ? (
                 <span className="flex items-center gap-1.5">
-                  {roleIcons[user.role]} {user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role === 'admin' ? 'Admin' : 'User'}
+                  {roleIcons[user.role]} {user.role === 'ltc_ceo' ? 'LTC CEO' : user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role === 'admin' ? 'Admin' : 'User'}
                 </span>
               ) : 'Organisation Health & Performance Overview'}
             </p>
