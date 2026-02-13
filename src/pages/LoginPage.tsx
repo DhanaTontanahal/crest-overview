@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserRole, UserProfile } from '@/types/maturity';
-import { cios } from '@/data/dummyData';
+import { cios, defaultPlatforms } from '@/data/dummyData';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, ChevronRight, Download, Building2 } from 'lucide-react';
@@ -15,7 +15,7 @@ const roleConfig: { value: UserRole; label: string; icon: React.ReactNode; descr
   { value: 'superuser', label: 'Super User', icon: <Crown className="w-5 h-5" />, description: 'Full organization visibility across all CIOs and platforms' },
   { value: 'supervisor', label: 'Supervisor (CIO)', icon: <Eye className="w-5 h-5" />, description: 'Platform-level data for your assigned area' },
   { value: 'admin', label: 'Admin', icon: <Shield className="w-5 h-5" />, description: 'Data upload and settings management' },
-  { value: 'user', label: 'User', icon: <User className="w-5 h-5" />, description: 'Read-only access to permitted dashboards' },
+  { value: 'user', label: 'User (TPL)', icon: <User className="w-5 h-5" />, description: 'Platform lead — view your platform metrics and pillars' },
 ];
 
 const frameworkSteps = [
@@ -69,14 +69,16 @@ const howSteps = [
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [role, setRole] = useState<UserRole | ''>('');
   const [cioId, setCioId] = useState('');
+  const [userPlatform, setUserPlatform] = useState('');
 
   const handleLogin = () => {
     if (!role) return;
-    const roleLabel = role === 'ltc_ceo' ? 'LTC CEO' : role === 'superuser' ? 'Super User' : role === 'supervisor' ? 'Supervisor (CIO)' : role === 'admin' ? 'Admin' : 'User';
+    const roleLabel = role === 'ltc_ceo' ? 'LTC CEO' : role === 'superuser' ? 'Super User' : role === 'supervisor' ? 'Supervisor (CIO)' : role === 'admin' ? 'Admin' : 'Platform Lead';
     const profile: UserProfile = {
       name: roleLabel,
       role: role as UserRole,
       cioId: role === 'supervisor' ? cioId : undefined,
+      platformId: role === 'user' ? userPlatform : undefined,
     };
     onLogin(profile);
   };
@@ -104,7 +106,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           <div className="bg-card rounded-xl p-5 shadow-lg border border-border space-y-4">
             <div>
               <label className="text-sm font-medium text-card-foreground mb-1.5 block">Select Role</label>
-              <Select value={role} onValueChange={(v) => { setRole(v as UserRole); setCioId(''); }}>
+              <Select value={role} onValueChange={(v) => { setRole(v as UserRole); setCioId(''); setUserPlatform(''); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose your role" />
                 </SelectTrigger>
@@ -139,11 +141,27 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               </div>
             )}
 
+            {role === 'user' && (
+              <div className="animate-fade-in">
+                <label className="text-sm font-medium text-card-foreground mb-1.5 block">Your Platform</label>
+                <Select value={userPlatform} onValueChange={setUserPlatform}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your platform" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {defaultPlatforms.map(p => (
+                      <SelectItem key={p} value={p}>{p}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <Button
               onClick={handleLogin}
               className="w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
               size="lg"
-              disabled={!role || (role === 'supervisor' && !cioId)}
+              disabled={!role || (role === 'supervisor' && !cioId) || (role === 'user' && !userPlatform)}
             >
               Sign In
             </Button>

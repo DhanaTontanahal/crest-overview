@@ -33,7 +33,7 @@ const DashboardHeader: React.FC = () => {
             <p className="text-sm opacity-80">
               {user ? (
                 <span className="flex items-center gap-1.5">
-                  {roleIcons[user.role]} {user.role === 'ltc_ceo' ? 'LTC CEO' : user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role === 'admin' ? 'Admin' : 'User'}
+                  {roleIcons[user.role]} {user.role === 'ltc_ceo' ? 'LTC CEO' : user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role === 'admin' ? 'Admin' : `Platform Lead${user.platformId ? ` — ${user.platformId}` : ''}`}
                 </span>
               ) : 'Organisation Health & Performance Overview'}
             </p>

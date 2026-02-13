@@ -4,6 +4,8 @@ import { Building2, TrendingUp, Award, Activity, Users, ArrowUpRight, ArrowDownR
 import ChartChatBox from '@/components/ChartChatBox';
 import PlatformPillarHeatmap from '@/components/PlatformPillarHeatmap';
 import { Button } from '@/components/ui/button';
+import PillarImprovement from '@/components/PillarImprovement';
+import ActionItems from '@/components/ActionItems';
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -527,6 +529,16 @@ const LTCCEOView: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Pillar Improvement */}
+      <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.9s', animationFillMode: 'forwards' }}>
+        <PillarImprovement />
+      </div>
+
+      {/* Action Items */}
+      <div className="opacity-0 animate-slide-up" style={{ animationDelay: '1.0s', animationFillMode: 'forwards' }}>
+        <ActionItems />
       </div>
     </div>
   );
