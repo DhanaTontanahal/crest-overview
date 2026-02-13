@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useAppState } from '@/context/AppContext';
 import { Building2, TrendingUp, Award, Activity, Users, ArrowUpRight, ArrowDownRight, Minus, ChevronRight, ArrowLeft } from 'lucide-react';
 import ChartChatBox from '@/components/ChartChatBox';
+import PlatformPillarHeatmap from '@/components/PlatformPillarHeatmap';
 import { Button } from '@/components/ui/button';
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -468,8 +469,13 @@ const LTCCEOView: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
+      {/* Heatmap */}
+      <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}>
+        <PlatformPillarHeatmap onDrill={(platform, pillar) => { setDrillPlatform(platform); setDrillPillar(pillar); }} />
+      </div>
+
       {/* Platform Summary Table - clickable rows */}
-      <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-all duration-300 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}>
+      <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-all duration-300 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
         <ChartChatBox chartTitle="Platform Summary" />
         <h3 className="text-base font-semibold text-card-foreground mb-1">Platform Summary — {selectedQuarter}</h3>
         <p className="text-xs text-muted-foreground mb-4">Click any platform to drill down into pillar details</p>
