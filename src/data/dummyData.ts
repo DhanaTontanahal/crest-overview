@@ -18,7 +18,22 @@ export const defaultPillars = [
   'Dynamic and Well Controlled',
 ];
 
-export const availableQuarters = ['Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'];
+// Dynamically determine current quarter
+const getCurrentQuarter = (): string => {
+  const now = new Date();
+  const q = Math.ceil((now.getMonth() + 1) / 3);
+  return `Q${q} ${now.getFullYear()}`;
+};
+
+const getCurrentMonth = (): string => {
+  const now = new Date();
+  return now.toLocaleString('default', { month: 'long', year: 'numeric' });
+};
+
+export const currentQuarter = getCurrentQuarter();
+export const currentMonth = getCurrentMonth();
+
+export const availableQuarters = ['Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026'];
 
 const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
   const teamNames = [
@@ -77,13 +92,14 @@ export const dummyTimeSeries: TimeSeriesPoint[] = [
   { period: 'Q2 2025', maturity: 5.5, performance: 5.7, agility: 5.2 },
   { period: 'Q3 2025', maturity: 6.1, performance: 6.3, agility: 5.8 },
   { period: 'Q4 2025', maturity: 6.8, performance: 6.9, agility: 6.4 },
+  { period: 'Q1 2026', maturity: 7.2, performance: 7.3, agility: 6.9 },
 ];
 
 export const quarterlyTrends: QuarterlyTrend[] = availableQuarters.map((q, i) => ({
   quarter: q,
-  stability: 45 + i * 8,
-  maturity: 3.2 + i * 0.7,
-  performance: 3.5 + i * 0.65,
-  agility: 3.0 + i * 0.68,
-  weightedAverage: 3.3 + i * 0.67,
+  stability: 45 + i * 7,
+  maturity: 3.2 + i * 0.6,
+  performance: 3.5 + i * 0.55,
+  agility: 3.0 + i * 0.58,
+  weightedAverage: 3.3 + i * 0.57,
 }));

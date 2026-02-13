@@ -10,6 +10,7 @@ import AdminSettings from '@/components/AdminSettings';
 import TrendingCharts from '@/components/TrendingCharts';
 import LTCCEOView from '@/components/LTCCEOView';
 import UserTPLView from '@/components/UserTPLView';
+import SupervisorView from '@/components/SupervisorView';
 import PillarImprovement from '@/components/PillarImprovement';
 import ActionItems from '@/components/ActionItems';
 import AssessmentSubmit from '@/components/AssessmentSubmit';
@@ -71,7 +72,8 @@ const Index: React.FC = () => {
     ));
   };
 
-  const showDashboard = user.role === 'superuser' || user.role === 'supervisor' || user.role === 'admin';
+  const showDashboard = user.role === 'superuser' || user.role === 'admin';
+  const showSupervisor = user.role === 'supervisor';
   const showLTCCEO = user.role === 'ltc_ceo';
   const isTPL = user.role === 'user';
   const supervisorPlatform = user.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
@@ -148,16 +150,14 @@ const Index: React.FC = () => {
               </div>
             )}
 
+            {showSupervisor && supervisorPlatform && (
+              <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <SupervisorView platform={supervisorPlatform} />
+              </div>
+            )}
+
             {showDashboard && (
               <>
-                {user.role === 'supervisor' && user.cioId && (
-                  <div className="bg-accent/10 border border-accent/30 rounded-lg px-4 py-3 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-                    <p className="text-sm text-accent-foreground font-medium">
-                      Viewing as CIO: {cios.find(c => c.id === user.cioId)?.name} — {cios.find(c => c.id === user.cioId)?.platform} platform
-                    </p>
-                  </div>
-                )}
-
                 {/* Gauges */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                   {[
