@@ -1,5 +1,6 @@
 import React from 'react';
 import { DimensionScore } from '@/types/maturity';
+import ChartChatBox from '@/components/ChartChatBox';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface DimensionChartProps {
@@ -26,7 +27,8 @@ const DimensionChart: React.FC<DimensionChartProps> = ({ title, subtitle, dimens
   }));
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative">
+      <ChartChatBox chartTitle={title} />
       <h3 className="text-lg font-semibold text-card-foreground">{title}</h3>
       <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
       <ResponsiveContainer width="100%" height={dimensions.length * 60 + 40}>
