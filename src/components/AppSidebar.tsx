@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
-  Gauge, BarChart3, TrendingUp, Target, ClipboardList, FileSearch, Eye, Download, Upload, Settings,
+  Gauge, BarChart3, TrendingUp, Target, ClipboardList, FileSearch, Eye, Download, Upload, Settings, Users,
 } from 'lucide-react';
 
 const AppSidebar: React.FC = () => {
@@ -45,6 +45,7 @@ const AppSidebar: React.FC = () => {
   ];
 
   const adminItems = isAdmin ? [
+    { title: 'Personas', url: '/admin/personas', icon: Users },
     { title: 'Data Upload', url: '/admin/upload', icon: Upload },
     { title: 'Settings', url: '/admin/settings', icon: Settings },
   ] : [];

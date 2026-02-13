@@ -13,6 +13,7 @@ import ImprovementsPage from "@/pages/ImprovementsPage";
 import TeamDataPage from "@/pages/TeamDataPage";
 import { SubmitAssessmentPage, ViewAssessmentsPage, ReviewAssessmentPage } from "@/pages/AssessmentPages";
 import { AdminUploadPage, AdminSettingsPage } from "@/pages/AdminPages";
+import PersonasPage from "@/pages/PersonasPage";
 import NotFound from "./pages/NotFound";
 import LoginPage from "@/pages/LoginPage";
 
@@ -36,6 +37,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/assessments/submit" element={<SubmitAssessmentPage />} />
         <Route path="/assessments/view" element={<ViewAssessmentsPage />} />
         <Route path="/assessments/review" element={<ReviewAssessmentPage />} />
+        <Route path="/admin/personas" element={<PersonasPage />} />
         <Route path="/admin/upload" element={<AdminUploadPage />} />
         <Route path="/admin/settings" element={<AdminSettingsPage />} />
       </Route>
