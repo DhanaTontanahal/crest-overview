@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { useAppState } from '@/context/AppContext';
-import { Building2, TrendingUp, Award, Activity, Users, ArrowUpRight, ArrowDownRight, Minus, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Building2, TrendingUp, Award, Activity, Users, ArrowUpRight, ArrowDownRight, Minus, ChevronRight, ArrowLeft, ClipboardList } from 'lucide-react';
 import ChartChatBox from '@/components/ChartChatBox';
 import PlatformPillarHeatmap from '@/components/PlatformPillarHeatmap';
+import AssessmentView from '@/components/AssessmentView';
 import { Button } from '@/components/ui/button';
 import PillarImprovement from '@/components/PillarImprovement';
 import ActionItems from '@/components/ActionItems';
@@ -35,9 +36,10 @@ const TrendArrow: React.FC<{ value: number }> = ({ value }) => {
 };
 
 const LTCCEOView: React.FC = () => {
-  const { teams, selectedQuarter, quarterlyTrends, platforms, pillars } = useAppState();
+  const { teams, selectedQuarter, quarterlyTrends, platforms, pillars, assessments, setAssessments } = useAppState();
   const [drillPlatform, setDrillPlatform] = useState<string | null>(null);
   const [drillPillar, setDrillPillar] = useState<string | null>(null);
+  const [showAssessments, setShowAssessments] = useState(false);
 
   const currentTeams = useMemo(() => teams.filter(t => t.quarter === selectedQuarter), [teams, selectedQuarter]);
 
@@ -348,6 +350,19 @@ const LTCCEOView: React.FC = () => {
             </ResponsiveContainer>
           </div>
         )}
+
+        {/* Platform Assessment */}
+        <div className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up relative" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <ClipboardList className="w-5 h-5 text-primary" />
+            <h3 className="text-base font-semibold text-card-foreground">Assessment — {drillPlatform}</h3>
+          </div>
+          <AssessmentView
+            assessments={assessments}
+            canDrillDown
+            platformFilter={drillPlatform}
+          />
+        </div>
       </div>
     );
   }
@@ -539,6 +554,25 @@ const LTCCEOView: React.FC = () => {
       {/* Action Items */}
       <div className="opacity-0 animate-slide-up" style={{ animationDelay: '1.0s', animationFillMode: 'forwards' }}>
         <ActionItems />
+      </div>
+
+      {/* Assessments Overview */}
+      <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-all duration-300 opacity-0 animate-slide-up relative" style={{ animationDelay: '1.1s', animationFillMode: 'forwards' }}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-primary" />
+            <h3 className="text-base font-semibold text-card-foreground">Platform Assessments — {selectedQuarter}</h3>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setShowAssessments(!showAssessments)}>
+            {showAssessments ? 'Hide' : 'Show'} Assessments
+          </Button>
+        </div>
+        {showAssessments && (
+          <AssessmentView assessments={assessments} canDrillDown />
+        )}
+        {!showAssessments && (
+          <p className="text-sm text-muted-foreground">Click "Show Assessments" to view all platform maturity assessments with drill-down capability.</p>
+        )}
       </div>
     </div>
   );
