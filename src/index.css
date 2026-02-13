@@ -68,3 +68,8 @@
     font-family: 'Source Sans 3', system-ui, sans-serif;
   }
 }
+
+@keyframes grow-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
