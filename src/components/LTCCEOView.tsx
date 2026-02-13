@@ -360,7 +360,7 @@ const LTCCEOView: React.FC = () => {
           </div>
           <div>
             <h2 className="text-lg font-bold text-foreground">LTC CEO Consolidated View</h2>
-            <p className="text-sm text-muted-foreground">Organisation-wide health across all platforms — LTC India (subsidiary of LBG UK)</p>
+            <p className="text-sm text-muted-foreground">Organisation-wide health across all platforms</p>
           </div>
         </div>
       </div>
