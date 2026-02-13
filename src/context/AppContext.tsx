@@ -4,7 +4,7 @@ import { Assessment } from '@/data/assessmentQuestions';
 import { sampleAssessments } from '@/data/assessmentQuestions';
 import {
   dummyTeams, dummyMaturityDimensions, dummyPerformanceMetrics,
-  dummyTimeSeries, defaultPlatforms, defaultPillars, cios, quarterlyTrends, availableQuarters,
+  dummyTimeSeries, defaultPlatforms, defaultPillars, cios, quarterlyTrends, availableQuarters, currentQuarter,
 } from '@/data/dummyData';
 
 interface ExtendedAppState extends AppState {
@@ -31,7 +31,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [timeSeries, setTimeSeries] = useState<TimeSeriesPoint[]>(dummyTimeSeries);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
   const [selectedPillar, setSelectedPillar] = useState<string>('All');
-  const [selectedQuarter, setSelectedQuarter] = useState<string>('Q4 2025');
+  const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuarter);
   const [assessments, setAssessments] = useState<Assessment[]>(sampleAssessments);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
