@@ -3,7 +3,7 @@ import { UserRole, UserProfile } from '@/types/maturity';
 import { cios } from '@/data/dummyData';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, ChevronRight, Download } from 'lucide-react';
+import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, ChevronRight, Download, Building2 } from 'lucide-react';
 import { downloadDummyDataExcel } from '@/utils/exportDummyData';
 
 interface LoginPageProps {
@@ -11,6 +11,7 @@ interface LoginPageProps {
 }
 
 const roleConfig: { value: UserRole; label: string; icon: React.ReactNode; description: string }[] = [
+  { value: 'ltc_ceo', label: 'LTC CEO', icon: <Building2 className="w-5 h-5" />, description: 'Consolidated high-level view across Business Agility, Excellence & Stability' },
   { value: 'superuser', label: 'Super User', icon: <Crown className="w-5 h-5" />, description: 'Full organization visibility across all CIOs and platforms' },
   { value: 'supervisor', label: 'Supervisor (CIO)', icon: <Eye className="w-5 h-5" />, description: 'Platform-level data for your assigned area' },
   { value: 'admin', label: 'Admin', icon: <Shield className="w-5 h-5" />, description: 'Data upload and settings management' },
@@ -71,7 +72,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   const handleLogin = () => {
     if (!role) return;
-    const roleLabel = role === 'superuser' ? 'Super User' : role === 'supervisor' ? 'Supervisor (CIO)' : role === 'admin' ? 'Admin' : 'User';
+    const roleLabel = role === 'ltc_ceo' ? 'LTC CEO' : role === 'superuser' ? 'Super User' : role === 'supervisor' ? 'Supervisor (CIO)' : role === 'admin' ? 'Admin' : 'User';
     const profile: UserProfile = {
       name: roleLabel,
       role: role as UserRole,
