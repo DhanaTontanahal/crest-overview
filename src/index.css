@@ -73,3 +73,7 @@
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+@keyframes draw-circle {
+  to { stroke-dashoffset: 0; }
+}
