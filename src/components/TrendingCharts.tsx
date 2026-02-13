@@ -1,5 +1,6 @@
 import React from 'react';
 import { QuarterlyTrend } from '@/types/maturity';
+import ChartChatBox from '@/components/ChartChatBox';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, BarChart, Bar, ComposedChart, Area,
@@ -15,7 +16,8 @@ const TrendingCharts: React.FC<TrendingChartsProps> = ({ trends }) => {
       <h2 className="text-xl font-semibold text-card-foreground">Historical Trends & Trajectory</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up" style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}>
+        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}>
+          <ChartChatBox chartTitle="Stability Trends" />
           <h3 className="text-lg font-semibold text-card-foreground text-center">Stability Trends</h3>
           <p className="text-sm text-muted-foreground text-center mb-4">Quarter-over-quarter stability progression</p>
           <ResponsiveContainer width="100%" height={280}>
@@ -30,7 +32,8 @@ const TrendingCharts: React.FC<TrendingChartsProps> = ({ trends }) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+          <ChartChatBox chartTitle="Weighted Average Score" />
           <h3 className="text-lg font-semibold text-card-foreground text-center">Weighted Average Score</h3>
           <p className="text-sm text-muted-foreground text-center mb-4">Overall weighted maturity over time</p>
           <ResponsiveContainer width="100%" height={280}>
@@ -44,7 +47,8 @@ const TrendingCharts: React.FC<TrendingChartsProps> = ({ trends }) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+          <ChartChatBox chartTitle="Performance Over Time" />
           <h3 className="text-lg font-semibold text-card-foreground text-center">Performance Over Time</h3>
           <p className="text-sm text-muted-foreground text-center mb-4">Pillar performance trajectory across quarters</p>
           <ResponsiveContainer width="100%" height={280}>
@@ -61,7 +65,8 @@ const TrendingCharts: React.FC<TrendingChartsProps> = ({ trends }) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+        <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+          <ChartChatBox chartTitle="Improvement Trajectory" />
           <h3 className="text-lg font-semibold text-card-foreground text-center">Improvement Trajectory</h3>
           <p className="text-sm text-muted-foreground text-center mb-4">Score movement towards stability goals</p>
           <ResponsiveContainer width="100%" height={280}>

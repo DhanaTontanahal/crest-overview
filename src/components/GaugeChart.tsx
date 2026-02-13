@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ChartChatBox from '@/components/ChartChatBox';
 
 interface GaugeChartProps {
   value: number;
@@ -55,7 +56,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({ value, title, subtitle, teamCou
   const ny = 100 + needleLength * Math.sin(needleRad);
 
   return (
-    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+    <div className="bg-card rounded-lg p-6 shadow-sm border border-border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative">
+      <ChartChatBox chartTitle={title} />
       <h3 className="text-lg font-semibold text-card-foreground text-center">{title}</h3>
       <p className="text-sm text-muted-foreground text-center mb-2">{subtitle}</p>
       <svg viewBox="0 0 200 130" className="w-full max-w-[280px] mx-auto">
