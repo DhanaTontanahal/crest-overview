@@ -1,17 +1,27 @@
 import React from 'react';
 import { useAppState } from '@/context/AppContext';
-import { UserRole } from '@/types/maturity';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Eye, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { LogOut, Crown, Eye, Shield, User } from 'lucide-react';
 
-const roleIcons: Record<UserRole, React.ReactNode> = {
-  admin: <Shield className="w-4 h-4" />,
+const roleIcons: Record<string, React.ReactNode> = {
+  superuser: <Crown className="w-4 h-4" />,
   supervisor: <Eye className="w-4 h-4" />,
+  admin: <Shield className="w-4 h-4" />,
   user: <User className="w-4 h-4" />,
 };
 
 const DashboardHeader: React.FC = () => {
-  const { role, setRole, selectedPlatform, setSelectedPlatform, selectedPillar, setSelectedPillar, platforms, pillars } = useAppState();
+  const {
+    user, setUser,
+    selectedPlatform, setSelectedPlatform,
+    selectedPillar, setSelectedPillar,
+    selectedQuarter, setSelectedQuarter,
+    platforms, pillars, availableQuarters,
+  } = useAppState();
+
+  const isSuperUser = user?.role === 'superuser';
+  const isSupervisor = user?.role === 'supervisor';
 
   return (
     <header className="bg-primary text-primary-foreground">
@@ -19,20 +29,38 @@ const DashboardHeader: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Platform Maturity Dashboard</h1>
-            <p className="text-sm opacity-80">Organisation Health & Performance Overview</p>
+            <p className="text-sm opacity-80">
+              {user ? (
+                <span className="flex items-center gap-1.5">
+                  {roleIcons[user.role]} {user.name} — {user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                </span>
+              ) : 'Organisation Health & Performance Overview'}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-              <SelectTrigger className="w-[160px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
-                <SelectValue placeholder="Platform" />
+            <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
+              <SelectTrigger className="w-[130px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+                <SelectValue placeholder="Quarter" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All Platforms</SelectItem>
-                {platforms.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                {availableQuarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
               </SelectContent>
             </Select>
+
+            {(isSuperUser || user?.role === 'admin') && (
+              <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+                <SelectTrigger className="w-[160px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+                  <SelectValue placeholder="Platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Platforms</SelectItem>
+                  {platforms.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
+
             <Select value={selectedPillar} onValueChange={setSelectedPillar}>
-              <SelectTrigger className="w-[140px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+              <SelectTrigger className="w-[200px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
                 <SelectValue placeholder="Pillar" />
               </SelectTrigger>
               <SelectContent>
@@ -40,16 +68,15 @@ const DashboardHeader: React.FC = () => {
                 {pillars.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-              <SelectTrigger className="w-[150px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
-                <span className="flex items-center gap-2">{roleIcons[role]}<SelectValue /></span>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="supervisor">Supervisor</SelectItem>
-                <SelectItem value="user">User</SelectItem>
-              </SelectContent>
-            </Select>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setUser(null)}
+              className="text-primary-foreground hover:bg-primary-foreground/10"
+            >
+              <LogOut className="w-4 h-4 mr-1" /> Logout
+            </Button>
           </div>
         </div>
       </div>

@@ -1,4 +1,16 @@
-export type UserRole = 'admin' | 'supervisor' | 'user';
+export type UserRole = 'superuser' | 'supervisor' | 'admin' | 'user';
+
+export interface CIO {
+  id: string;
+  name: string;
+  platform: string;
+}
+
+export interface UserProfile {
+  name: string;
+  role: UserRole;
+  cioId?: string; // for supervisors, which CIO they are
+}
 
 export interface TeamData {
   name: string;
@@ -8,12 +20,13 @@ export interface TeamData {
   stability: number;
   platform: string;
   pillar: string;
+  quarter: string;
 }
 
 export interface DimensionScore {
   name: string;
   weight: number;
-  scores: number[]; // individual team scores
+  scores: number[];
   average: number;
 }
 
@@ -24,7 +37,18 @@ export interface TimeSeriesPoint {
   agility: number;
 }
 
+export interface QuarterlyTrend {
+  quarter: string;
+  stability: number;
+  maturity: number;
+  performance: number;
+  agility: number;
+  weightedAverage: number;
+}
+
 export interface AppState {
+  user: UserProfile | null;
+  setUser: (user: UserProfile | null) => void;
   role: UserRole;
   setRole: (role: UserRole) => void;
   teams: TeamData[];
@@ -33,6 +57,7 @@ export interface AppState {
   setPlatforms: (p: string[]) => void;
   pillars: string[];
   setPillars: (p: string[]) => void;
+  cios: CIO[];
   maturityDimensions: DimensionScore[];
   performanceMetrics: DimensionScore[];
   timeSeries: TimeSeriesPoint[];
@@ -41,4 +66,8 @@ export interface AppState {
   setSelectedPlatform: (p: string) => void;
   selectedPillar: string;
   setSelectedPillar: (p: string) => void;
+  selectedQuarter: string;
+  setSelectedQuarter: (q: string) => void;
+  quarterlyTrends: QuarterlyTrend[];
+  availableQuarters: string[];
 }

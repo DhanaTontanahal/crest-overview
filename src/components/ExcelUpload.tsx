@@ -29,6 +29,7 @@ const ExcelUpload: React.FC = () => {
           stability: Number(row['Stability'] || row['stability'] || 0),
           platform: String(row['Platform'] || row['platform'] || 'Unknown'),
           pillar: String(row['Pillar'] || row['pillar'] || 'Unknown'),
+          quarter: String(row['Quarter'] || row['quarter'] || 'Q4 2025'),
         }));
 
         setTeams(teams);
