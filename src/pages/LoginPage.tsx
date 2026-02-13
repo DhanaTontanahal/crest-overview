@@ -70,9 +70,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   const handleLogin = () => {
     if (!role) return;
-    const roleName = role === 'superuser' ? 'Ron' : role === 'supervisor' ? (cios.find(c => c.id === cioId)?.name || 'Supervisor') : role.charAt(0).toUpperCase() + role.slice(1);
+    const roleLabel = role === 'superuser' ? 'Super User' : role === 'supervisor' ? 'Supervisor (CIO)' : role === 'admin' ? 'Admin' : 'User';
     const profile: UserProfile = {
-      name: roleName,
+      name: roleLabel,
       role: role as UserRole,
       cioId: role === 'supervisor' ? cioId : undefined,
     };

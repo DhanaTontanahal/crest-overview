@@ -1,10 +1,10 @@
 import { TeamData, DimensionScore, TimeSeriesPoint, CIO, QuarterlyTrend } from '@/types/maturity';
 
 export const cios: CIO[] = [
-  { id: 'martin', name: 'Martin', platform: 'Consumer' },
-  { id: 'sarah', name: 'Sarah', platform: 'Commercial' },
-  { id: 'james', name: 'James', platform: 'Wealth & Investment' },
-  { id: 'lisa', name: 'Lisa', platform: 'Insurance' },
+  { id: 'cio-consumer', name: 'CIO', platform: 'Consumer' },
+  { id: 'cio-commercial', name: 'CIO', platform: 'Commercial' },
+  { id: 'cio-wealth', name: 'CIO', platform: 'Wealth & Investment' },
+  { id: 'cio-insurance', name: 'CIO', platform: 'Insurance' },
 ];
 
 export const defaultPlatforms = ['Consumer', 'Commercial', 'Wealth & Investment', 'Insurance'];
