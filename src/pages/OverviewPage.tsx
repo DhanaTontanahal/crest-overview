@@ -97,9 +97,9 @@ const OverviewPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
           {[
             { value: avgStability, title: 'Team Stability', subtitle: 'How stable are my teams?' },
-            { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
-            { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
-            { value: avgAgility, title: 'Overall Agility', subtitle: 'How agile are my teams?' },
+            { value: avgMaturity, title: 'Maturity', subtitle: 'How mature are my teams?' },
+            { value: avgPerformance, title: 'Performance', subtitle: 'How well are teams performing?' },
+            { value: avgAgility, title: 'Agility', subtitle: 'How agile are my teams?' },
           ].map((gauge, i) => (
             <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
               <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
@@ -113,9 +113,9 @@ const OverviewPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { value: avgStability, title: 'Team Stability', subtitle: `${selectedPlatform} stability` },
-              { value: avgMaturity, title: 'Overall Maturity', subtitle: `${selectedPlatform} maturity` },
-              { value: avgPerformance, title: 'Overall Performance', subtitle: `${selectedPlatform} performance` },
-              { value: avgAgility, title: 'Overall Agility', subtitle: `${selectedPlatform} agility` },
+              { value: avgMaturity, title: 'Maturity', subtitle: `${selectedPlatform} maturity` },
+              { value: avgPerformance, title: 'Performance', subtitle: `${selectedPlatform} performance` },
+              { value: avgAgility, title: 'Agility', subtitle: `${selectedPlatform} agility` },
             ].map((gauge, i) => (
               <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
                 <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
