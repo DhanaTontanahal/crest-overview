@@ -15,6 +15,7 @@ const METRIC_COLORS: Record<string, string> = {
   Stability: 'hsl(185, 70%, 50%)',
   Maturity: 'hsl(163, 100%, 21%)',
   Performance: 'hsl(155, 60%, 40%)',
+  Agility: 'hsl(45, 80%, 50%)',
 };
 
 const OverviewPage: React.FC = () => {
@@ -40,17 +41,20 @@ const OverviewPage: React.FC = () => {
     ? Math.round((filteredTeams.reduce((s, t) => s + t.maturity, 0) / filteredTeams.length) * 10) : 0;
   const avgPerformance = filteredTeams.length > 0
     ? Math.round((filteredTeams.reduce((s, t) => s + t.performance, 0) / filteredTeams.length) * 10) : 0;
+  const avgAgility = filteredTeams.length > 0
+    ? Math.round((filteredTeams.reduce((s, t) => s + t.agility, 0) / filteredTeams.length) * 10) : 0;
 
   const platformComparisonData = useMemo(() => {
     if (selectedPlatform === 'All') return null;
     const quarterTeams = teams.filter(t => t.quarter === selectedQuarter && (selectedPillar === 'All' || t.pillar === selectedPillar));
 
     const calcAvg = (pTeams: typeof quarterTeams) => {
-      if (pTeams.length === 0) return { stability: 0, maturity: 0, performance: 0 };
+      if (pTeams.length === 0) return { stability: 0, maturity: 0, performance: 0, agility: 0 };
       return {
         stability: Math.round(pTeams.reduce((s, t) => s + t.stability, 0) / pTeams.length),
         maturity: Math.round((pTeams.reduce((s, t) => s + t.maturity, 0) / pTeams.length) * 10),
         performance: Math.round((pTeams.reduce((s, t) => s + t.performance, 0) / pTeams.length) * 10),
+        agility: Math.round((pTeams.reduce((s, t) => s + t.agility, 0) / pTeams.length) * 10),
       };
     };
 
@@ -64,6 +68,7 @@ const OverviewPage: React.FC = () => {
         Stability: avg.stability,
         Maturity: avg.maturity,
         Performance: avg.performance,
+        Agility: avg.agility,
         isSelected: p === selectedPlatform,
       };
     }).concat([{
@@ -71,6 +76,7 @@ const OverviewPage: React.FC = () => {
       Stability: allAvg.stability,
       Maturity: allAvg.maturity,
       Performance: allAvg.performance,
+      Agility: allAvg.agility,
       isSelected: false,
     }]);
   }, [teams, platforms, selectedPlatform, selectedPillar, selectedQuarter]);
@@ -88,11 +94,12 @@ const OverviewPage: React.FC = () => {
     <>
       {/* Gauges */}
       {!isSpecificPlatform && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6" role="region" aria-label="Key metrics gauges">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
           {[
             { value: avgStability, title: 'Team Stability', subtitle: 'How stable are my teams?' },
             { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
             { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
+            { value: avgAgility, title: 'Overall Agility', subtitle: 'How agile are my teams?' },
           ].map((gauge, i) => (
             <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
               <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
@@ -103,19 +110,20 @@ const OverviewPage: React.FC = () => {
 
       {isSpecificPlatform && platformComparisonData && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { value: avgStability, title: 'Team Stability', subtitle: `${selectedPlatform} stability` },
               { value: avgMaturity, title: 'Overall Maturity', subtitle: `${selectedPlatform} maturity` },
               { value: avgPerformance, title: 'Overall Performance', subtitle: `${selectedPlatform} performance` },
+              { value: avgAgility, title: 'Overall Agility', subtitle: `${selectedPlatform} agility` },
             ].map((gauge, i) => (
               <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
                 <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {(['Stability', 'Maturity', 'Performance'] as const).map((metric, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(['Stability', 'Maturity', 'Performance', 'Agility'] as const).map((metric, i) => (
               <div key={metric} className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up" style={{ animationDelay: `${0.3 + i * 0.1}s`, animationFillMode: 'forwards' }}>
                 <h3 className="text-sm font-semibold text-card-foreground mb-1">{metric} Comparison</h3>
                 <p className="text-xs text-muted-foreground mb-4">{selectedPlatform} vs all platforms</p>
