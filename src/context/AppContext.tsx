@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { AppState, UserRole, UserProfile, TeamData, DimensionScore, TimeSeriesPoint } from '@/types/maturity';
-import { Assessment } from '@/data/assessmentQuestions';
+import { Assessment, AssessmentQuestion, assessmentQuestions as defaultQuestions } from '@/data/assessmentQuestions';
 import { sampleAssessments } from '@/data/assessmentQuestions';
 import {
   dummyTeams, dummyMaturityDimensions, dummyPerformanceMetrics,
@@ -10,6 +10,8 @@ import {
 interface ExtendedAppState extends AppState {
   assessments: Assessment[];
   setAssessments: React.Dispatch<React.SetStateAction<Assessment[]>>;
+  assessmentQuestions: AssessmentQuestion[];
+  setAssessmentQuestions: React.Dispatch<React.SetStateAction<AssessmentQuestion[]>>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
@@ -33,6 +35,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedPillar, setSelectedPillar] = useState<string>('All');
   const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuarter);
   const [assessments, setAssessments] = useState<Assessment[]>(sampleAssessments);
+  const [assessmentQuestionsState, setAssessmentQuestions] = useState<AssessmentQuestion[]>(defaultQuestions);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const filteredTeams = useMemo(() => {
@@ -79,6 +82,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     quarterlyTrends,
     availableQuarters,
     assessments, setAssessments,
+    assessmentQuestions: assessmentQuestionsState, setAssessmentQuestions,
     activeTab, setActiveTab,
   };
 
