@@ -3,9 +3,9 @@ import { Crown, Eye, Shield, User, FileSearch } from 'lucide-react';
 
 const personas = [
   { role: 'Super User', icon: Crown, color: 'from-accent to-accent/70' },
+  { role: 'Reviewer', icon: FileSearch, color: 'from-primary to-primary/70' },
   { role: 'Supervisor (CIO)', icon: Eye, color: 'from-chart-teal to-chart-cyan' },
   { role: 'Admin', icon: Shield, color: 'from-chart-gold to-chart-orange' },
-  { role: 'Reviewer', icon: FileSearch, color: 'from-primary to-primary/70' },
   { role: 'User (TPL)', icon: User, color: 'from-chart-green1 to-chart-green3' },
 ];
 
