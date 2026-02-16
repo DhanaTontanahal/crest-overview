@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Assessment, assessmentQuestions } from '@/data/assessmentQuestions';
+import { Assessment } from '@/data/assessmentQuestions';
 import { defaultPillars, defaultPlatforms } from '@/data/dummyData';
 import { useAppState } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ interface AssessmentViewProps {
 const AssessmentView: React.FC<AssessmentViewProps> = ({
   assessments, canDrillDown = false, platformFilter, onReview, reviewerPlatform,
 }) => {
-  const { selectedQuarter } = useAppState();
+  const { selectedQuarter, assessmentQuestions } = useAppState();
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [expandedPillar, setExpandedPillar] = useState<string | null>(null);
 

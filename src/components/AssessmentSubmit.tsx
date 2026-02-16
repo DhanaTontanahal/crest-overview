@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { assessmentQuestions, Assessment, AssessmentAnswer } from '@/data/assessmentQuestions';
+import { Assessment, AssessmentAnswer } from '@/data/assessmentQuestions';
 import { useAppState } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,7 +15,7 @@ interface AssessmentSubmitProps {
 }
 
 const AssessmentSubmit: React.FC<AssessmentSubmitProps> = ({ platform, onSubmit, existingAssessment }) => {
-  const { selectedQuarter } = useAppState();
+  const { selectedQuarter, assessmentQuestions } = useAppState();
   const { toast } = useToast();
   const [expandedPillar, setExpandedPillar] = useState<string | null>(defaultPillars[0]);
 
