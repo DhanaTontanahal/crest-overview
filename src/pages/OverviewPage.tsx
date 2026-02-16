@@ -103,10 +103,66 @@ const OverviewPage: React.FC = () => {
         </div>
       )}
 
-      {/* Super User gets consolidated CEO view + standard dashboard */}
+      {/* Super User gets consolidated CEO view + standard gauges/bar charts */}
       {isSuperUser && (
         <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
           <LTCCEOView />
+
+          {!isSpecificPlatform && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6" role="region" aria-label="Key metrics gauges">
+              {[
+                { value: avgStability, title: 'Team Stability', subtitle: 'How stable are my teams?' },
+                { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
+                { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
+              ].map((gauge, i) => (
+                <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+                  <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isSpecificPlatform && platformComparisonData && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {[
+                  { value: avgStability, title: 'Team Stability', subtitle: `${selectedPlatform} stability` },
+                  { value: avgMaturity, title: 'Overall Maturity', subtitle: `${selectedPlatform} maturity` },
+                  { value: avgPerformance, title: 'Overall Performance', subtitle: `${selectedPlatform} performance` },
+                ].map((gauge, i) => (
+                  <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+                    <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {(['Stability', 'Maturity', 'Performance'] as const).map((metric, i) => (
+                  <div key={metric} className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up" style={{ animationDelay: `${0.3 + i * 0.1}s`, animationFillMode: 'forwards' }}>
+                    <h3 className="text-sm font-semibold text-card-foreground mb-1">{metric} Comparison</h3>
+                    <p className="text-xs text-muted-foreground mb-4">{selectedPlatform} vs all platforms</p>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={platformComparisonData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="platform" fontSize={10} angle={-20} textAnchor="end" height={50} />
+                        <YAxis domain={[0, 100]} fontSize={10} />
+                        <Tooltip formatter={(value: number) => [`${value}%`, metric]} />
+                        <Bar dataKey={metric} radius={[4, 4, 0, 0]} barSize={28}>
+                          {platformComparisonData.map((entry, idx) => (
+                            <Cell
+                              key={idx}
+                              fill={entry.isSelected ? METRIC_COLORS[metric] : 'hsl(var(--muted-foreground) / 0.25)'}
+                              stroke={entry.isSelected ? METRIC_COLORS[metric] : 'transparent'}
+                              strokeWidth={entry.isSelected ? 2 : 0}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -137,7 +193,6 @@ const OverviewPage: React.FC = () => {
               </div>
             ))}
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {(['Stability', 'Maturity', 'Performance'] as const).map((metric, i) => (
               <div key={metric} className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up" style={{ animationDelay: `${0.3 + i * 0.1}s`, animationFillMode: 'forwards' }}>
