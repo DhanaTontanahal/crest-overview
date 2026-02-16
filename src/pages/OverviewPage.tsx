@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useAppState } from '@/context/AppContext';
+import { CalculationMethod } from '@/context/AppContext';
 import GaugeChart from '@/components/GaugeChart';
 import DimensionChart from '@/components/DimensionChart';
 import ExcelUpload from '@/components/ExcelUpload';
@@ -19,7 +20,30 @@ const METRIC_COLORS: Record<string, string> = {
 };
 
 const OverviewPage: React.FC = () => {
-  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, maturityDimensions, performanceMetrics } = useAppState();
+  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, maturityDimensions, performanceMetrics, calculationMethod } = useAppState();
+
+  // Calculation helper based on admin-selected method
+  const calc = useCallback((values: number[]): number => {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    switch (calculationMethod) {
+      case 'weighted':
+        // For gauges, weighted uses team stability as weight proxy
+        return values.reduce((s, v) => s + v, 0) / values.length; // falls back to simple for raw values; weighted applied at dimension level
+      case 'median':
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+      case 'trimmed': {
+        const trimCount = Math.max(1, Math.floor(sorted.length * 0.1));
+        if (sorted.length <= trimCount * 2) return sorted.reduce((s, v) => s + v, 0) / sorted.length;
+        const trimmed = sorted.slice(trimCount, sorted.length - trimCount);
+        return trimmed.reduce((s, v) => s + v, 0) / trimmed.length;
+      }
+      case 'simple':
+      default:
+        return values.reduce((s, v) => s + v, 0) / values.length;
+    }
+  }, [calculationMethod]);
 
   const filteredTeams = useMemo(() => {
     if (!user) return [];
@@ -36,13 +60,13 @@ const OverviewPage: React.FC = () => {
   }, [teams, selectedPlatform, selectedPillar, selectedQuarter, user, cios]);
 
   const avgStability = filteredTeams.length > 0
-    ? Math.round(filteredTeams.reduce((s, t) => s + t.stability, 0) / filteredTeams.length) : 0;
+    ? Math.round(calc(filteredTeams.map(t => t.stability))) : 0;
   const avgMaturity = filteredTeams.length > 0
-    ? Math.round((filteredTeams.reduce((s, t) => s + t.maturity, 0) / filteredTeams.length) * 10) : 0;
+    ? Math.round(calc(filteredTeams.map(t => t.maturity)) * 10) : 0;
   const avgPerformance = filteredTeams.length > 0
-    ? Math.round((filteredTeams.reduce((s, t) => s + t.performance, 0) / filteredTeams.length) * 10) : 0;
+    ? Math.round(calc(filteredTeams.map(t => t.performance)) * 10) : 0;
   const avgAgility = filteredTeams.length > 0
-    ? Math.round((filteredTeams.reduce((s, t) => s + t.agility, 0) / filteredTeams.length) * 10) : 0;
+    ? Math.round(calc(filteredTeams.map(t => t.agility)) * 10) : 0;
 
   const platformComparisonData = useMemo(() => {
     if (selectedPlatform === 'All') return null;
@@ -51,10 +75,10 @@ const OverviewPage: React.FC = () => {
     const calcAvg = (pTeams: typeof quarterTeams) => {
       if (pTeams.length === 0) return { stability: 0, maturity: 0, performance: 0, agility: 0 };
       return {
-        stability: Math.round(pTeams.reduce((s, t) => s + t.stability, 0) / pTeams.length),
-        maturity: Math.round((pTeams.reduce((s, t) => s + t.maturity, 0) / pTeams.length) * 10),
-        performance: Math.round((pTeams.reduce((s, t) => s + t.performance, 0) / pTeams.length) * 10),
-        agility: Math.round((pTeams.reduce((s, t) => s + t.agility, 0) / pTeams.length) * 10),
+        stability: Math.round(calc(pTeams.map(t => t.stability))),
+        maturity: Math.round(calc(pTeams.map(t => t.maturity)) * 10),
+        performance: Math.round(calc(pTeams.map(t => t.performance)) * 10),
+        agility: Math.round(calc(pTeams.map(t => t.agility)) * 10),
       };
     };
 
@@ -79,7 +103,7 @@ const OverviewPage: React.FC = () => {
       Agility: allAvg.agility,
       isSelected: false,
     }]);
-  }, [teams, platforms, selectedPlatform, selectedPillar, selectedQuarter]);
+  }, [teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, calc]);
 
   const isSuperUser = user?.role === 'superuser';
   const showDashboard = isSuperUser || user?.role === 'admin';

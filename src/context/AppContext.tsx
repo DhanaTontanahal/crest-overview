@@ -7,11 +7,15 @@ import {
   dummyTimeSeries, defaultPlatforms, defaultPillars, cios, quarterlyTrends, availableQuarters, currentQuarter,
 } from '@/data/dummyData';
 
+export type CalculationMethod = 'simple' | 'weighted' | 'median' | 'trimmed';
+
 interface ExtendedAppState extends AppState {
   assessments: Assessment[];
   setAssessments: React.Dispatch<React.SetStateAction<Assessment[]>>;
   assessmentQuestions: AssessmentQuestion[];
   setAssessmentQuestions: React.Dispatch<React.SetStateAction<AssessmentQuestion[]>>;
+  calculationMethod: CalculationMethod;
+  setCalculationMethod: (method: CalculationMethod) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
@@ -36,6 +40,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuarter);
   const [assessments, setAssessments] = useState<Assessment[]>(sampleAssessments);
   const [assessmentQuestionsState, setAssessmentQuestions] = useState<AssessmentQuestion[]>(defaultQuestions);
+  const [calculationMethod, setCalculationMethod] = useState<CalculationMethod>('simple');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const filteredTeams = useMemo(() => {
@@ -83,6 +88,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     availableQuarters,
     assessments, setAssessments,
     assessmentQuestions: assessmentQuestionsState, setAssessmentQuestions,
+    calculationMethod, setCalculationMethod,
     activeTab, setActiveTab,
   };
 
