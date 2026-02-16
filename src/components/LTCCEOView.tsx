@@ -137,8 +137,8 @@ const LTCCEOView: React.FC = () => {
       <div className="space-y-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-          <Button variant="ghost" size="sm" onClick={() => { setDrillPlatform(null); setDrillPillar(null); }} className="text-muted-foreground hover:text-foreground px-2">
-            <Building2 className="w-4 h-4 mr-1" /> LTC CEO
+           <Button variant="ghost" size="sm" onClick={() => { setDrillPlatform(null); setDrillPillar(null); }} className="text-muted-foreground hover:text-foreground px-2">
+            <Building2 className="w-4 h-4 mr-1" /> Overview
           </Button>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
           <Button variant="ghost" size="sm" onClick={() => setDrillPillar(null)} className="text-muted-foreground hover:text-foreground px-2">
@@ -244,7 +244,7 @@ const LTCCEOView: React.FC = () => {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm animate-fade-in" style={{ animationFillMode: 'forwards' }}>
           <Button variant="ghost" size="sm" onClick={() => { setDrillPlatform(null); setDrillPillar(null); }} className="text-muted-foreground hover:text-foreground px-2">
-            <Building2 className="w-4 h-4 mr-1" /> LTC CEO
+            <Building2 className="w-4 h-4 mr-1" /> Overview
           </Button>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
           <span className="font-semibold text-foreground">{drillPlatform}</span>
@@ -377,7 +377,7 @@ const LTCCEOView: React.FC = () => {
             <Building2 className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-foreground">LTC CEO Consolidated View</h2>
+            <h2 className="text-lg font-bold text-foreground">Consolidated Organisation View</h2>
             <p className="text-sm text-muted-foreground">Organisation-wide health across all platforms</p>
           </div>
         </div>

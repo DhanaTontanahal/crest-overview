@@ -2,14 +2,22 @@ import React from 'react';
 import { useAppState } from '@/context/AppContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { LogOut, Crown, Eye, Shield, User, Building2 } from 'lucide-react';
+import { LogOut, Crown, Eye, Shield, User, FileSearch } from 'lucide-react';
 
 const roleIcons: Record<string, React.ReactNode> = {
-  ltc_ceo: <Building2 className="w-4 h-4" />,
   superuser: <Crown className="w-4 h-4" />,
   supervisor: <Eye className="w-4 h-4" />,
   admin: <Shield className="w-4 h-4" />,
+  reviewer: <FileSearch className="w-4 h-4" />,
   user: <User className="w-4 h-4" />,
+};
+
+const roleLabels: Record<string, string> = {
+  superuser: 'Super User',
+  supervisor: 'Supervisor (CIO)',
+  admin: 'Admin',
+  reviewer: 'Reviewer',
+  user: 'Platform Lead',
 };
 
 const DashboardHeader: React.FC = () => {
@@ -24,7 +32,7 @@ const DashboardHeader: React.FC = () => {
   const isSuperUser = user?.role === 'superuser';
 
   return (
-    <header className="bg-primary text-primary-foreground">
+    <header className="bg-primary text-primary-foreground" role="banner" aria-label="Dashboard header">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
@@ -32,14 +40,14 @@ const DashboardHeader: React.FC = () => {
             <p className="text-sm opacity-80">
               {user ? (
                 <span className="flex items-center gap-1.5">
-                  {roleIcons[user.role]} {user.role === 'ltc_ceo' ? 'LTC CEO' : user.role === 'superuser' ? 'Super User' : user.role === 'supervisor' ? 'Supervisor (CIO)' : user.role === 'admin' ? 'Admin' : `Platform Lead${user.platformId ? ` — ${user.platformId}` : ''}`}
+                  {roleIcons[user.role]} {roleLabels[user.role] || user.role}{user.role === 'user' && user.platformId ? ` — ${user.platformId}` : ''}
                 </span>
               ) : 'Organisation Health & Performance Overview'}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <nav className="flex flex-wrap items-center gap-3" aria-label="Dashboard filters">
             <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-              <SelectTrigger className="w-[130px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+              <SelectTrigger className="w-[130px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground" aria-label="Select quarter">
                 <SelectValue placeholder="Quarter" />
               </SelectTrigger>
               <SelectContent>
@@ -49,7 +57,7 @@ const DashboardHeader: React.FC = () => {
 
             {(isSuperUser || user?.role === 'admin') && (
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-                <SelectTrigger className="w-[160px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+                <SelectTrigger className="w-[160px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground" aria-label="Select platform">
                   <SelectValue placeholder="Platform" />
                 </SelectTrigger>
                 <SelectContent>
@@ -60,7 +68,7 @@ const DashboardHeader: React.FC = () => {
             )}
 
             <Select value={selectedPillar} onValueChange={setSelectedPillar}>
-              <SelectTrigger className="w-[200px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+              <SelectTrigger className="w-[200px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground" aria-label="Select pillar">
                 <SelectValue placeholder="Pillar" />
               </SelectTrigger>
               <SelectContent>
@@ -74,10 +82,11 @@ const DashboardHeader: React.FC = () => {
               size="sm"
               onClick={() => setUser(null)}
               className="text-primary-foreground hover:bg-primary-foreground/10"
+              aria-label="Log out"
             >
               <LogOut className="w-4 h-4 mr-1" /> Logout
             </Button>
-          </div>
+          </nav>
         </div>
       </div>
     </header>

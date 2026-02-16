@@ -26,9 +26,9 @@ const AppSidebar: React.FC = () => {
 
   const isTPL = user?.role === 'user';
   const isAdmin = user?.role === 'admin';
+  const isReviewer = user?.role === 'reviewer';
   const showDashboard = user?.role === 'superuser' || isAdmin;
   const showSupervisor = user?.role === 'supervisor';
-  const showLTCCEO = user?.role === 'ltc_ceo';
 
   const dashboardItems = [
     { title: 'Overview', url: '/', icon: Gauge },
@@ -40,8 +40,8 @@ const AppSidebar: React.FC = () => {
 
   const assessmentItems = [
     ...(isTPL ? [{ title: 'Submit Assessment', url: '/assessments/submit', icon: ClipboardList }] : []),
-    { title: 'View Assessments', url: '/assessments/view', icon: FileSearch },
-    ...(isTPL ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
+    ...((isTPL || isReviewer) ? [{ title: 'View Assessments', url: '/assessments/view', icon: FileSearch }] : []),
+    ...((isTPL || isReviewer) ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
   ];
 
   const adminItems = isAdmin ? [
@@ -77,7 +77,7 @@ const AppSidebar: React.FC = () => {
           <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {(showDashboard || showSupervisor || showLTCCEO || isTPL) && renderItems(dashboardItems)}
+              {(showDashboard || showSupervisor || isTPL) && renderItems(dashboardItems)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

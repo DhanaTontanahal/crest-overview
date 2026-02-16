@@ -40,7 +40,6 @@ const OverviewPage: React.FC = () => {
   const avgPerformance = filteredTeams.length > 0
     ? Math.round((filteredTeams.reduce((s, t) => s + t.performance, 0) / filteredTeams.length) * 10) : 0;
 
-  // Platform comparison data for bar charts
   const platformComparisonData = useMemo(() => {
     if (selectedPlatform === 'All') return null;
     const quarterTeams = teams.filter(t => t.quarter === selectedQuarter && (selectedPillar === 'All' || t.pillar === selectedPillar));
@@ -75,16 +74,16 @@ const OverviewPage: React.FC = () => {
     }]);
   }, [teams, platforms, selectedPlatform, selectedPillar, selectedQuarter]);
 
-  const showDashboard = user?.role === 'superuser' || user?.role === 'admin';
+  const isSuperUser = user?.role === 'superuser';
+  const showDashboard = isSuperUser || user?.role === 'admin';
   const showSupervisor = user?.role === 'supervisor';
-  const showLTCCEO = user?.role === 'ltc_ceo';
   const isTPL = user?.role === 'user';
   const supervisorPlatform = user?.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
 
   const isSpecificPlatform = selectedPlatform !== 'All' && showDashboard;
 
   return (
-    <>
+    <section aria-label="Overview dashboard">
       {user?.role === 'admin' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
           <ExcelUpload />
@@ -98,20 +97,21 @@ const OverviewPage: React.FC = () => {
         </div>
       )}
 
-      {showLTCCEO && (
-        <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-          <LTCCEOView />
-        </div>
-      )}
-
       {showSupervisor && supervisorPlatform && (
         <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
           <SupervisorView platform={supervisorPlatform} />
         </div>
       )}
 
-      {showDashboard && !isSpecificPlatform && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {/* Super User gets consolidated CEO view + standard dashboard */}
+      {isSuperUser && (
+        <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+          <LTCCEOView />
+        </div>
+      )}
+
+      {showDashboard && !isSuperUser && !isSpecificPlatform && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6" role="region" aria-label="Key metrics gauges">
           {[
             { value: avgStability, title: 'Team Stability', subtitle: 'How stable are my teams?' },
             { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
@@ -124,9 +124,8 @@ const OverviewPage: React.FC = () => {
         </div>
       )}
 
-      {showDashboard && isSpecificPlatform && platformComparisonData && (
+      {showDashboard && !isSuperUser && isSpecificPlatform && platformComparisonData && (
         <div className="space-y-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-          {/* Selected platform gauges */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               { value: avgStability, title: 'Team Stability', subtitle: `${selectedPlatform} stability` },
@@ -139,7 +138,6 @@ const OverviewPage: React.FC = () => {
             ))}
           </div>
 
-          {/* Comparison Bar Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {(['Stability', 'Maturity', 'Performance'] as const).map((metric, i) => (
               <div key={metric} className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up" style={{ animationDelay: `${0.3 + i * 0.1}s`, animationFillMode: 'forwards' }}>
@@ -168,7 +166,7 @@ const OverviewPage: React.FC = () => {
           </div>
         </div>
       )}
-    </>
+    </section>
   );
 };
 

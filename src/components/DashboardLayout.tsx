@@ -11,9 +11,9 @@ const DashboardLayout: React.FC = () => {
       <SidebarProvider>
         <div className="flex min-h-[calc(100vh-4rem)] w-full">
           <AppSidebar />
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto" role="main" aria-label="Dashboard content">
             <div className="flex items-center border-b border-border px-4 h-10">
-              <SidebarTrigger />
+              <SidebarTrigger aria-label="Toggle sidebar navigation" />
             </div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
               <Outlet />

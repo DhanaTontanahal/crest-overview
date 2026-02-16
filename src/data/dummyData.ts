@@ -33,7 +33,7 @@ const getCurrentMonth = (): string => {
 export const currentQuarter = getCurrentQuarter();
 export const currentMonth = getCurrentMonth();
 
-export const availableQuarters = ['Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026'];
+export const availableQuarters = ['Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'];
 
 const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
   const teamNames = [
@@ -92,7 +92,7 @@ export const dummyTimeSeries: TimeSeriesPoint[] = [
   { period: 'Q2 2025', maturity: 5.5, performance: 5.7, agility: 5.2 },
   { period: 'Q3 2025', maturity: 6.1, performance: 6.3, agility: 5.8 },
   { period: 'Q4 2025', maturity: 6.8, performance: 6.9, agility: 6.4 },
-  { period: 'Q1 2026', maturity: 7.2, performance: 7.3, agility: 6.9 },
+  
 ];
 
 export const quarterlyTrends: QuarterlyTrend[] = availableQuarters.map((q, i) => ({
