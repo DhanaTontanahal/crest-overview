@@ -6,10 +6,10 @@ import AppSidebar from '@/components/AppSidebar';
 
 const DashboardLayout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader />
-      <SidebarProvider>
-        <div className="flex min-h-[calc(100vh-4rem)] w-full">
+    <SidebarProvider>
+      <div className="min-h-screen bg-background flex flex-col w-full">
+        <DashboardHeader />
+        <div className="flex flex-1 w-full">
           <AppSidebar />
           <main className="flex-1 overflow-auto" role="main" aria-label="Dashboard content">
             <div className="flex items-center border-b border-border px-4 h-10">
@@ -20,8 +20,8 @@ const DashboardLayout: React.FC = () => {
             </div>
           </main>
         </div>
-      </SidebarProvider>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
