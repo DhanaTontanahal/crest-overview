@@ -11,6 +11,14 @@ import SupervisorView from '@/components/SupervisorView';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ReferenceLine,
 } from 'recharts';
+import { Calculator } from 'lucide-react';
+
+const CALC_LABELS: Record<string, string> = {
+  simple: 'Simple Avg',
+  weighted: 'Weighted Avg',
+  median: 'Median',
+  trimmed: 'Trimmed Mean',
+};
 
 const METRIC_COLORS: Record<string, string> = {
   Stability: 'hsl(185, 70%, 50%)',
@@ -118,7 +126,11 @@ const OverviewPage: React.FC = () => {
     <>
       {/* Gauges */}
       {!isSpecificPlatform && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
+        <div className="relative">
+          <span className="absolute -top-1 right-0 inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full" aria-label={`Using ${CALC_LABELS[calculationMethod]} calculation`}>
+            <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
           {[
             { value: avgStability, title: 'Team Stability', subtitle: 'How stable are my teams?' },
             { value: avgMaturity, title: 'Maturity', subtitle: 'How mature are my teams?' },
@@ -129,12 +141,17 @@ const OverviewPage: React.FC = () => {
               <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
             </div>
           ))}
+          </div>
         </div>
       )}
 
       {isSpecificPlatform && platformComparisonData && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="relative">
+            <span className="absolute -top-1 right-0 inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full" aria-label={`Using ${CALC_LABELS[calculationMethod]} calculation`}>
+              <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { value: avgStability, title: 'Team Stability', subtitle: `${selectedPlatform} stability` },
               { value: avgMaturity, title: 'Maturity', subtitle: `${selectedPlatform} maturity` },
@@ -145,6 +162,7 @@ const OverviewPage: React.FC = () => {
                 <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
               </div>
             ))}
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(['Stability', 'Maturity', 'Performance', 'Agility'] as const).map((metric, i) => (
