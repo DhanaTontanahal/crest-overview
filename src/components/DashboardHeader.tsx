@@ -32,7 +32,7 @@ const DashboardHeader: React.FC = () => {
   const isSuperUser = user?.role === 'superuser';
 
   return (
-    <header className="bg-primary text-primary-foreground relative z-50" role="banner" aria-label="Dashboard header">
+    <header className="bg-primary text-primary-foreground sticky top-0 z-50" role="banner" aria-label="Dashboard header">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
