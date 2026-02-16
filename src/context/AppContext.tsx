@@ -40,7 +40,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuarter);
   const [assessments, setAssessments] = useState<Assessment[]>(sampleAssessments);
   const [assessmentQuestionsState, setAssessmentQuestions] = useState<AssessmentQuestion[]>(defaultQuestions);
-  const [calculationMethod, setCalculationMethod] = useState<CalculationMethod>('simple');
+  const [calculationMethod, setCalculationMethodState] = useState<CalculationMethod>(
+    () => (localStorage.getItem('calculationMethod') as CalculationMethod) || 'simple'
+  );
+  const setCalculationMethod = (method: CalculationMethod) => {
+    setCalculationMethodState(method);
+    localStorage.setItem('calculationMethod', method);
+  };
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const filteredTeams = useMemo(() => {
