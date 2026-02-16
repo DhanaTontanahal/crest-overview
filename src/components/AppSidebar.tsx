@@ -72,7 +72,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent className="pt-2">
+      <SidebarContent className="pt-12">
         <SidebarGroup>
           <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
