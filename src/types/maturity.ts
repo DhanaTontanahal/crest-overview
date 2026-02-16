@@ -1,4 +1,4 @@
-export type UserRole = 'superuser' | 'supervisor' | 'admin' | 'user' | 'ltc_ceo';
+export type UserRole = 'superuser' | 'supervisor' | 'admin' | 'user' | 'reviewer';
 
 export interface CIO {
   id: string;

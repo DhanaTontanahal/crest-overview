@@ -1,0 +1,411 @@
+{
+  "info": {
+    "name": "Platform Maturity Dashboard API",
+    "description": "API endpoint specifications for future backend integration of the Platform Maturity Dashboard",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIs...\",\n  \"user\": {\n    \"id\": \"uuid\",\n    \"name\": \"John Doe\",\n    \"email\": \"user@example.com\",\n    \"role\": \"superuser\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"Logged out successfully\" }" }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"id\": \"uuid\",\n  \"name\": \"John Doe\",\n  \"email\": \"user@example.com\",\n  \"role\": \"superuser\",\n  \"platformId\": null,\n  \"cioId\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "List Teams",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/teams?quarter=Q4 2025&platform=Consumer&pillar=All",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"data\": [\n    {\n      \"name\": \"Team Alpha\",\n      \"maturity\": 6.5,\n      \"performance\": 7.2,\n      \"agility\": 5.8,\n      \"stability\": 72,\n      \"platform\": \"Consumer\",\n      \"pillar\": \"Engineering Excellence\",\n      \"quarter\": \"Q4 2025\"\n    }\n  ],\n  \"total\": 24\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create/Update Team",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/teams",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Team Alpha\",\n  \"maturity\": 6.5,\n  \"performance\": 7.2,\n  \"agility\": 5.8,\n  \"stability\": 72,\n  \"platform\": \"Consumer\",\n  \"pillar\": \"Engineering Excellence\",\n  \"quarter\": \"Q4 2025\"\n}"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"Team updated\", \"id\": \"uuid\" }" }
+          ]
+        },
+        {
+          "name": "Bulk Upload Teams (Excel)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/teams/upload",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "teams.xlsx" }]
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"24 teams imported\", \"created\": 20, \"updated\": 4 }" }
+          ]
+        },
+        {
+          "name": "Export Teams (Excel)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/teams/export?quarter=Q4 2025",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "(Binary Excel file)", "header": [{ "key": "Content-Type", "value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }] }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Platforms",
+      "item": [
+        {
+          "name": "List Platforms",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/platforms",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"data\": [\"Consumer\", \"Commercial\", \"Wealth & Investment\", \"Insurance\"] }" }
+          ]
+        },
+        {
+          "name": "Update Platforms",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/platforms",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"platforms\": [\"Consumer\", \"Commercial\", \"Wealth & Investment\", \"Insurance\"] }"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"Platforms updated\" }" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pillars",
+      "item": [
+        {
+          "name": "List Pillars",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/pillars",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"data\": [\"Business and Technology\", \"Run and Change Together\", \"All in One Agile\", \"Project to Product\", \"Engineering Excellence\", \"Dynamic and Well Controlled\"] }" }
+          ]
+        },
+        {
+          "name": "Update Pillars",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/pillars",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"pillars\": [\"Business and Technology\", \"Run and Change Together\", \"All in One Agile\", \"Project to Product\", \"Engineering Excellence\", \"Dynamic and Well Controlled\"] }"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"Pillars updated\" }" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assessments",
+      "item": [
+        {
+          "name": "List Assessments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/assessments?quarter=Q4 2025&platform=Consumer",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"uuid\",\n      \"platform\": \"Consumer\",\n      \"quarter\": \"Q4 2025\",\n      \"submittedBy\": \"Platform Lead\",\n      \"submittedAt\": \"2025-10-15\",\n      \"status\": \"submitted\",\n      \"answers\": [\n        { \"questionId\": \"bt-1\", \"score\": 4, \"evidence\": \"Joint OKRs established...\" }\n      ],\n      \"reviewedBy\": null,\n      \"reviewedAt\": null\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit Assessment",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/assessments",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"platform\": \"Consumer\",\n  \"quarter\": \"Q4 2025\",\n  \"answers\": [\n    { \"questionId\": \"bt-1\", \"score\": 4, \"evidence\": \"Joint OKRs established across all product teams\" },\n    { \"questionId\": \"bt-2\", \"score\": 3, \"evidence\": \"NPS tracking in place, quarterly reviews\" }\n  ]\n}"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "201 Created", "body": "{ \"id\": \"uuid\", \"message\": \"Assessment submitted successfully\" }" }
+          ]
+        },
+        {
+          "name": "Review Assessment",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/assessments/:id/review",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewerPlatform\": \"Commercial\",\n  \"comments\": \"Good progress on maturity dimensions\"\n}"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"Assessment reviewed\", \"reviewedAt\": \"2025-10-20\" }" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Action Items",
+      "item": [
+        {
+          "name": "List Action Items",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/action-items?platform=Consumer&status=open",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"uuid\",\n      \"pillar\": \"Engineering Excellence\",\n      \"platform\": \"Consumer\",\n      \"description\": \"Improve test coverage to 80%\",\n      \"priority\": \"high\",\n      \"status\": \"open\",\n      \"createdBy\": \"System\",\n      \"isAutoGenerated\": true\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Action Item",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/action-items",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pillar\": \"Engineering Excellence\",\n  \"platform\": \"Consumer\",\n  \"description\": \"Implement CI/CD pipeline improvements\",\n  \"priority\": \"high\"\n}"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "201 Created", "body": "{ \"id\": \"uuid\", \"message\": \"Action item created\" }" }
+          ]
+        },
+        {
+          "name": "Update Action Item Status",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/action-items/:id",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"in_progress\" }"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"Action item updated\" }" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trends & Metrics",
+      "item": [
+        {
+          "name": "Get Quarterly Trends",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/trends/quarterly",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"data\": [\n    {\n      \"quarter\": \"Q4 2025\",\n      \"stability\": 73,\n      \"maturity\": 6.8,\n      \"performance\": 6.9,\n      \"agility\": 6.4,\n      \"weightedAverage\": 6.7\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Maturity Dimensions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/metrics/dimensions?quarter=Q4 2025&platform=All",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"maturity\": [\n    { \"name\": \"Clarity\", \"weight\": 25, \"average\": 6.5 },\n    { \"name\": \"Leadership\", \"weight\": 25, \"average\": 6.2 },\n    { \"name\": \"Culture\", \"weight\": 25, \"average\": 6.5 },\n    { \"name\": \"Foundation\", \"weight\": 25, \"average\": 6.4 }\n  ],\n  \"performance\": [\n    { \"name\": \"Throughput\", \"weight\": 16, \"average\": 6.4 },\n    { \"name\": \"Predictability\", \"weight\": 16, \"average\": 6.2 },\n    { \"name\": \"Change Fail Rate\", \"weight\": 16, \"average\": 5.7 },\n    { \"name\": \"Deployment Frequency\", \"weight\": 16, \"average\": 6.8 },\n    { \"name\": \"Mean Time to Deploy\", \"weight\": 16, \"average\": 6.1 },\n    { \"name\": \"Lead Time\", \"weight\": 20, \"average\": 6.1 }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Heatmap Data",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/metrics/heatmap?quarter=Q4 2025&metric=maturity",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"data\": [\n    {\n      \"platform\": \"Consumer\",\n      \"cells\": [\n        { \"pillar\": \"Engineering Excellence\", \"value\": 7.2, \"count\": 3 },\n        { \"pillar\": \"Business and Technology\", \"value\": 5.8, \"count\": 2 }\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin - Configuration",
+      "item": [
+        {
+          "name": "Get CIOs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/cios",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"data\": [\n    { \"id\": \"cio-consumer\", \"name\": \"CIO\", \"platform\": \"Consumer\" },\n    { \"id\": \"cio-commercial\", \"name\": \"CIO\", \"platform\": \"Commercial\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update CIOs",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/admin/cios",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cios\": [\n    { \"id\": \"cio-consumer\", \"name\": \"CIO\", \"platform\": \"Consumer\" },\n    { \"id\": \"cio-commercial\", \"name\": \"CIO\", \"platform\": \"Commercial\" }\n  ]\n}"
+            }
+          },
+          "response": [
+            { "name": "Success", "status": "200 OK", "body": "{ \"message\": \"CIOs updated\" }" }
+          ]
+        },
+        {
+          "name": "Get User Roles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/roles",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "200 OK",
+              "body": "{\n  \"roles\": [\n    { \"key\": \"superuser\", \"label\": \"Super User\", \"description\": \"Full org visibility with consolidated views\" },\n    { \"key\": \"supervisor\", \"label\": \"Supervisor (CIO)\", \"description\": \"Platform-level data\" },\n    { \"key\": \"admin\", \"label\": \"Admin\", \"description\": \"Data management\" },\n    { \"key\": \"reviewer\", \"label\": \"Reviewer\", \"description\": \"Assessment review and feedback\" },\n    { \"key\": \"user\", \"label\": \"User (TPL)\", \"description\": \"Platform lead\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" }
+  ]
+}

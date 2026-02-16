@@ -74,7 +74,7 @@ const Index: React.FC = () => {
 
   const showDashboard = user.role === 'superuser' || user.role === 'admin';
   const showSupervisor = user.role === 'supervisor';
-  const showLTCCEO = user.role === 'ltc_ceo';
+  const showLTCCEO = false; // Role removed, consolidated into superuser
   const isTPL = user.role === 'user';
   const supervisorPlatform = user.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
 
@@ -96,7 +96,7 @@ const Index: React.FC = () => {
       return (
         <AssessmentView
           assessments={assessments}
-          canDrillDown={user.role === 'superuser' || user.role === 'ltc_ceo' || user.role === 'supervisor'}
+          canDrillDown={user.role === 'superuser' || user.role === 'reviewer' || user.role === 'supervisor'}
           platformFilter={isTPL ? platformFilter : undefined}
           reviewerPlatform={isTPL ? user.platformId : undefined}
         />

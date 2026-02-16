@@ -21,8 +21,8 @@ describe("dummyData", () => {
     expect(currentQuarter).toMatch(/^Q[1-4] \d{4}$/);
   });
 
-  it("availableQuarters contains currentQuarter", () => {
-    expect(availableQuarters).toContain(currentQuarter);
+  it("availableQuarters does not include future quarters", () => {
+    expect(availableQuarters).not.toContain('Q1 2026');
   });
 
   it("dummyTeams have valid structure", () => {

@@ -43,7 +43,7 @@ export const ViewAssessmentsPage: React.FC = () => {
     <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
       <AssessmentView
         assessments={assessments}
-        canDrillDown={user?.role === 'superuser' || user?.role === 'ltc_ceo' || user?.role === 'supervisor'}
+        canDrillDown={user?.role === 'superuser' || user?.role === 'reviewer' || user?.role === 'supervisor'}
         platformFilter={isTPL ? platformFilter : undefined}
         reviewerPlatform={isTPL ? user?.platformId : undefined}
       />
