@@ -47,6 +47,16 @@ const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
   const platforms = defaultPlatforms;
   const pillars = defaultPillars;
 
+  // Quarter-specific adjustments to create realistic dips
+  // seed: 0=Q3'24, 1=Q4'24, 2=Q1'25, 3=Q2'25, 4=Q3'25, 5=Q4'25
+  const quarterDips: Record<number, { platforms?: string[]; pillars?: string[]; maturityAdj: number; performanceAdj: number; agilityAdj: number; stabilityAdj: number }> = {
+    2: { platforms: ['Commercial', 'Insurance'], maturityAdj: -0.6, performanceAdj: -0.4, agilityAdj: -0.3, stabilityAdj: -8 },
+    4: { pillars: ['Project to Product', 'Engineering Excellence'], maturityAdj: -0.5, performanceAdj: -0.7, agilityAdj: -0.4, stabilityAdj: -6 },
+    5: { platforms: ['Wealth & Investment'], pillars: ['All in One Agile', 'Dynamic and Well Controlled'], maturityAdj: -0.4, performanceAdj: -0.3, agilityAdj: -0.5, stabilityAdj: -5 },
+  };
+
+  const dip = quarterDips[seed];
+
   return teamNames.map((name, i) => {
     const platformIdx = i % platforms.length;
     const pillarIdx = i % pillars.length;
@@ -54,12 +64,24 @@ const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
     const base = 3.5 + (i % 7) * 0.8 + growth;
     const clamp = (v: number) => Math.min(10, Math.max(1, Math.round(v * 10) / 10));
 
+    let maturityAdj = 0, performanceAdj = 0, agilityAdj = 0, stabilityAdj = 0;
+    if (dip) {
+      const platformMatch = !dip.platforms || dip.platforms.includes(platforms[platformIdx]);
+      const pillarMatch = !dip.pillars || dip.pillars.includes(pillars[pillarIdx]);
+      if (platformMatch && pillarMatch) {
+        maturityAdj = dip.maturityAdj;
+        performanceAdj = dip.performanceAdj;
+        agilityAdj = dip.agilityAdj;
+        stabilityAdj = dip.stabilityAdj;
+      }
+    }
+
     return {
       name,
-      maturity: clamp(base + (i % 3) * 0.3),
-      performance: clamp(base - 0.2 + (i % 4) * 0.2),
-      agility: clamp(base - 0.4 + (i % 5) * 0.15),
-      stability: Math.min(100, Math.max(20, Math.round(base * 10 + (i % 6) * 3))),
+      maturity: clamp(base + (i % 3) * 0.3 + maturityAdj),
+      performance: clamp(base - 0.2 + (i % 4) * 0.2 + performanceAdj),
+      agility: clamp(base - 0.4 + (i % 5) * 0.15 + agilityAdj),
+      stability: Math.min(100, Math.max(20, Math.round(base * 10 + (i % 6) * 3 + stabilityAdj))),
       platform: platforms[platformIdx],
       pillar: pillars[pillarIdx],
       quarter,
