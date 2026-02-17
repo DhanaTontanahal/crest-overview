@@ -2,12 +2,13 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import ActionItems from "../ActionItems";
 
-// Mock AppContext
+// Mock AppContext with updated structure
 const mockAppState = {
   teams: [
-    { name: "T1", maturity: 3, performance: 4, agility: 3, stability: 40, platform: "Consumer", pillar: "Engineering Excellence", quarter: "Q1 2026" },
+    { name: "T1", maturity: 3, performance: 4, agility: 3, stability: 40, platform: "Consumer", pillar: "Engineering Excellence", quarter: "Q4 2025" },
+    { name: "T2", maturity: 7, performance: 8, agility: 7, stability: 85, platform: "Commercial", pillar: "Run and Change Together", quarter: "Q4 2025" },
   ],
-  selectedQuarter: "Q1 2026",
+  selectedQuarter: "Q4 2025",
   pillars: ["Engineering Excellence", "Run and Change Together"],
   platforms: ["Consumer", "Commercial"],
 };
@@ -28,7 +29,6 @@ describe("ActionItems", () => {
 
   it("shows auto-generated suggestions for low scores", () => {
     render(<ActionItems />);
-    // Low maturity (3) should generate a suggestion
     expect(screen.getByText(/Maturity score is low/)).toBeInTheDocument();
   });
 
@@ -45,7 +45,11 @@ describe("ActionItems", () => {
 
   it("filters by platformFilter prop", () => {
     render(<ActionItems platformFilter="Consumer" />);
-    // Should still render suggestions for Consumer only
     expect(screen.getByText(/Maturity score is low/)).toBeInTheDocument();
+  });
+
+  it("renders chart chat box", () => {
+    render(<ActionItems />);
+    expect(screen.getByTestId("chart-chat-box")).toBeInTheDocument();
   });
 });
