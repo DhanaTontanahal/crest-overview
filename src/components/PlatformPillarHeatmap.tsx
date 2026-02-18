@@ -21,6 +21,15 @@ const getHeatColor = (value: number, max: number): string => {
   return 'bg-red-500 text-white';
 };
 
+const getSubjectiveLabel = (value: number, max: number): string => {
+  const ratio = value / max;
+  if (ratio >= 0.8) return 'Excellent';
+  if (ratio >= 0.6) return 'Good';
+  if (ratio >= 0.4) return 'Fair';
+  if (ratio >= 0.2) return 'Needs Work';
+  return 'Critical';
+};
+
 interface PlatformPillarHeatmapProps {
   onDrill?: (platform: string, pillar: string) => void;
 }
@@ -97,7 +106,8 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
                           className={`w-full rounded-md py-2 px-1 font-semibold text-xs transition-all duration-200 hover:scale-105 hover:shadow-md ${getHeatColor(cell.value, metricConfig.max)} ${onDrill ? 'cursor-pointer' : 'cursor-default'}`}
                         >
                           {cell.value}{metric === 'stability' ? '%' : ''}
-                          <span className="block text-[9px] opacity-70 font-normal">{cell.count} team{cell.count !== 1 ? 's' : ''}</span>
+                          <span className="block text-[9px] opacity-80 font-medium">{getSubjectiveLabel(cell.value, metricConfig.max)}</span>
+                          <span className="block text-[9px] opacity-60 font-normal">{cell.count} team{cell.count !== 1 ? 's' : ''}</span>
                         </button>
                       ) : (
                         <span className="text-muted-foreground">—</span>
@@ -107,6 +117,7 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
                   <td className="py-1 px-2 text-center">
                     <span className={`inline-block rounded-md py-2 px-2 font-semibold text-xs ${getHeatColor(rowAvg, metricConfig.max)}`}>
                       {rowAvg}{metric === 'stability' ? '%' : ''}
+                      <span className="block text-[9px] opacity-80 font-medium">{getSubjectiveLabel(rowAvg, metricConfig.max)}</span>
                     </span>
                   </td>
                 </tr>

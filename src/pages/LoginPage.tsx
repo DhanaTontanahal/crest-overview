@@ -3,8 +3,7 @@ import { UserRole, UserProfile } from '@/types/maturity';
 import { cios, defaultPlatforms } from '@/data/dummyData';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, ChevronRight, Download, FileSearch } from 'lucide-react';
-import { downloadDummyDataExcel } from '@/utils/exportDummyData';
+import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, FileSearch } from 'lucide-react';
 
 interface LoginPageProps {
   onLogin: (profile: UserProfile) => void;
@@ -165,15 +164,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               aria-label="Sign in with selected role"
             >
               Sign In
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={downloadDummyDataExcel}
-              className="w-full"
-              aria-label="Download sample data as Excel file"
-            >
-              <Download className="w-4 h-4 mr-1" /> Download Sample Data
             </Button>
           </div>
         </div>
