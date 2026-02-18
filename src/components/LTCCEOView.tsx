@@ -465,85 +465,9 @@ const LTCCEOView: React.FC = () => {
         </div>
       </div>
 
-      {/* Trajectory */}
-      <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-all duration-300 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
-        <ChartChatBox chartTitle="Business Agility & Excellence Trajectory" />
-        <h3 className="text-base font-semibold text-card-foreground text-center">Business Agility & Excellence Trajectory</h3>
-        <p className="text-xs text-muted-foreground text-center mb-4">Quarter-over-quarter organisation-wide progression</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={quarterlyTrends} margin={{ left: 10, right: 20, top: 10, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="quarter" fontSize={11} />
-            <YAxis domain={[0, 10]} fontSize={11} />
-            <Tooltip />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-            <Area type="monotone" dataKey="weightedAverage" fill="hsl(163, 100%, 21%)" fillOpacity={0.1} stroke="none" name="Weighted Avg (area)" />
-            <Line type="monotone" dataKey="agility" stroke="hsl(185, 70%, 50%)" strokeWidth={3} dot={{ r: 5 }} name="Business Agility" animationDuration={1500} />
-            <Line type="monotone" dataKey="maturity" stroke="hsl(163, 100%, 21%)" strokeWidth={3} dot={{ r: 5 }} name="Excellence (Maturity)" animationDuration={1500} />
-            <Line type="monotone" dataKey="performance" stroke="hsl(155, 60%, 40%)" strokeWidth={2} dot={{ r: 4 }} name="Performance" strokeDasharray="5 5" animationDuration={1500} />
-            <Line type="monotone" dataKey={() => 7.5} stroke="hsl(0, 0%, 60%)" strokeWidth={1} strokeDasharray="8 4" dot={false} name="Target (7.5)" />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
-
       {/* Heatmap */}
       <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}>
         <PlatformPillarHeatmap onDrill={(platform, pillar) => { setDrillPlatform(platform); setDrillPillar(pillar); }} />
-      </div>
-
-      {/* Platform Summary Table - clickable rows */}
-      <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-all duration-300 opacity-0 animate-slide-up relative" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
-        <ChartChatBox chartTitle="Platform Summary" />
-        <h3 className="text-base font-semibold text-card-foreground mb-1">Platform Summary — {selectedQuarter}</h3>
-        <p className="text-xs text-muted-foreground mb-4">Click any platform to drill down into pillar details</p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-2 px-3 text-muted-foreground font-medium">Platform</th>
-                <th className="text-center py-2 px-3 text-muted-foreground font-medium">Teams</th>
-                <th className="text-center py-2 px-3 text-muted-foreground font-medium">Agility</th>
-                <th className="text-center py-2 px-3 text-muted-foreground font-medium">Maturity</th>
-                <th className="text-center py-2 px-3 text-muted-foreground font-medium">Performance</th>
-                <th className="text-center py-2 px-3 text-muted-foreground font-medium">Stability</th>
-                <th className="text-center py-2 px-3 text-muted-foreground font-medium"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {platformRadar.map((p, i) => {
-                const pStab = platformStability.find(ps => ps.platform === p.platform);
-                return (
-                  <tr
-                    key={p.platform}
-                    className="border-b border-border/50 hover:bg-muted/30 transition-colors cursor-pointer group"
-                    onClick={() => setDrillPlatform(p.platform)}
-                  >
-                    <td className="py-3 px-3 font-medium flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: PLATFORM_COLORS[i] }} />
-                      {p.platform}
-                    </td>
-                    <td className="text-center py-3 px-3">{pStab?.teamCount ?? 0}</td>
-                    <td className="text-center py-3 px-3">{p.agility}</td>
-                    <td className="text-center py-3 px-3">{p.maturity}</td>
-                    <td className="text-center py-3 px-3">{p.performance}</td>
-                    <td className="text-center py-3 px-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        (pStab?.stability ?? 0) >= 70 ? 'bg-green-100 text-green-800' :
-                        (pStab?.stability ?? 0) >= 50 ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {pStab?.stability ?? 0}%
-                      </span>
-                    </td>
-                    <td className="text-center py-3 px-3">
-                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors inline-block" />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
       </div>
 
       {/* Pillar Improvement */}
