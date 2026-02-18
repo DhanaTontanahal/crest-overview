@@ -36,19 +36,10 @@ export const currentMonth = getCurrentMonth();
 export const availableQuarters = ['Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'];
 
 const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
-  const teamNames = [
-    'Team Alpha', 'Team Beta', 'Team Gamma', 'Team Delta', 'Team Epsilon',
-    'Team Zeta', 'Team Eta', 'Team Theta', 'Team Iota', 'Team Kappa',
-    'Team Lambda', 'Team Mu', 'Team Nu', 'Team Xi', 'Team Omicron',
-    'Team Pi', 'Team Rho', 'Team Sigma', 'Team Tau', 'Team Upsilon',
-    'Team Phi', 'Team Chi', 'Team Psi', 'Team Omega',
-  ];
-
   const platforms = defaultPlatforms;
   const pillars = defaultPillars;
 
   // Quarter-specific adjustments to create realistic dips
-  // seed: 0=Q3'24, 1=Q4'24, 2=Q1'25, 3=Q2'25, 4=Q3'25, 5=Q4'25
   const quarterDips: Record<number, { platforms?: string[]; pillars?: string[]; maturityAdj: number; performanceAdj: number; agilityAdj: number; stabilityAdj: number }> = {
     2: { platforms: ['Commercial', 'Insurance'], maturityAdj: -0.6, performanceAdj: -0.4, agilityAdj: -0.3, stabilityAdj: -8 },
     4: { pillars: ['Project to Product', 'Engineering Excellence'], maturityAdj: -0.5, performanceAdj: -0.7, agilityAdj: -0.4, stabilityAdj: -6 },
@@ -56,37 +47,43 @@ const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
   };
 
   const dip = quarterDips[seed];
+  const teams: TeamData[] = [];
+  let teamIdx = 0;
 
-  return teamNames.map((name, i) => {
-    const platformIdx = i % platforms.length;
-    const pillarIdx = i % pillars.length;
-    const growth = seed * 0.15;
-    const base = 3.5 + (i % 7) * 0.8 + growth;
-    const clamp = (v: number) => Math.min(10, Math.max(1, Math.round(v * 10) / 10));
+  // Generate at least one team per platform-pillar combination to ensure full heatmap coverage
+  for (let pIdx = 0; pIdx < platforms.length; pIdx++) {
+    for (let plIdx = 0; plIdx < pillars.length; plIdx++) {
+      const growth = seed * 0.15;
+      const base = 3.5 + (teamIdx % 7) * 0.8 + growth;
+      const clamp = (v: number) => Math.min(10, Math.max(1, Math.round(v * 10) / 10));
 
-    let maturityAdj = 0, performanceAdj = 0, agilityAdj = 0, stabilityAdj = 0;
-    if (dip) {
-      const platformMatch = !dip.platforms || dip.platforms.includes(platforms[platformIdx]);
-      const pillarMatch = !dip.pillars || dip.pillars.includes(pillars[pillarIdx]);
-      if (platformMatch && pillarMatch) {
-        maturityAdj = dip.maturityAdj;
-        performanceAdj = dip.performanceAdj;
-        agilityAdj = dip.agilityAdj;
-        stabilityAdj = dip.stabilityAdj;
+      let maturityAdj = 0, performanceAdj = 0, agilityAdj = 0, stabilityAdj = 0;
+      if (dip) {
+        const platformMatch = !dip.platforms || dip.platforms.includes(platforms[pIdx]);
+        const pillarMatch = !dip.pillars || dip.pillars.includes(pillars[plIdx]);
+        if (platformMatch && pillarMatch) {
+          maturityAdj = dip.maturityAdj;
+          performanceAdj = dip.performanceAdj;
+          agilityAdj = dip.agilityAdj;
+          stabilityAdj = dip.stabilityAdj;
+        }
       }
-    }
 
-    return {
-      name,
-      maturity: clamp(base + (i % 3) * 0.3 + maturityAdj),
-      performance: clamp(base - 0.2 + (i % 4) * 0.2 + performanceAdj),
-      agility: clamp(base - 0.4 + (i % 5) * 0.15 + agilityAdj),
-      stability: Math.min(100, Math.max(20, Math.round(base * 10 + (i % 6) * 3 + stabilityAdj))),
-      platform: platforms[platformIdx],
-      pillar: pillars[pillarIdx],
-      quarter,
-    };
-  });
+      teams.push({
+        name: `Team ${platforms[pIdx].substring(0, 3).toUpperCase()}-${pillars[plIdx].substring(0, 3).toUpperCase()}-${teamIdx + 1}`,
+        maturity: clamp(base + (teamIdx % 3) * 0.3 + maturityAdj),
+        performance: clamp(base - 0.2 + (teamIdx % 4) * 0.2 + performanceAdj),
+        agility: clamp(base - 0.4 + (teamIdx % 5) * 0.15 + agilityAdj),
+        stability: Math.min(100, Math.max(20, Math.round(base * 10 + (teamIdx % 6) * 3 + stabilityAdj))),
+        platform: platforms[pIdx],
+        pillar: pillars[plIdx],
+        quarter,
+      });
+      teamIdx++;
+    }
+  }
+
+  return teams;
 };
 
 export const dummyTeams: TeamData[] = availableQuarters.flatMap((q, i) => generateTeamsForQuarter(q, i));

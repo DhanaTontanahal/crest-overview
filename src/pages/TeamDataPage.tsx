@@ -3,6 +3,7 @@ import { useAppState } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { downloadDummyDataExcel } from '@/utils/exportDummyData';
 
 const TeamDataPage: React.FC = () => {
   const { teams, selectedPlatform, selectedPillar, selectedQuarter, user, cios } = useAppState();
@@ -41,9 +42,14 @@ const TeamDataPage: React.FC = () => {
           <h2 className="text-lg font-semibold text-foreground">Team Data</h2>
           <p className="text-sm text-muted-foreground">{filtered.length} teams for {selectedQuarter}</p>
         </div>
-        <Button onClick={handleDownload} className="gap-2">
-          <Download className="w-4 h-4" /> Download Excel
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={downloadDummyDataExcel} className="gap-2">
+            <Download className="w-4 h-4" /> Full Sample Data
+          </Button>
+          <Button onClick={handleDownload} className="gap-2">
+            <Download className="w-4 h-4" /> Download Filtered
+          </Button>
+        </div>
       </div>
 
       <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
