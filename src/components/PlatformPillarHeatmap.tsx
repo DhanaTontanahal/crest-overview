@@ -62,7 +62,9 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
         </Select>
       </div>
       <p className="text-xs text-muted-foreground mb-4">
-        Color intensity shows {metricConfig.label.toLowerCase()} score{onDrill ? ' — click any cell to drill down' : ''}
+        Each cell shows the average <span className="font-medium">{metricConfig.label.toLowerCase()}</span> score of all teams in that platform–pillar intersection.
+        {' '}<span className="font-medium">Avg row/column</span> = mean across that platform or pillar.
+        {onDrill ? ' Click any cell to drill down into team-level details.' : ''}
       </p>
 
       <div className="overflow-x-auto">
@@ -75,7 +77,7 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
                   <span className="block leading-tight">{pillar}</span>
                 </th>
               ))}
-              <th className="text-center py-2 px-2 text-muted-foreground font-medium">Avg</th>
+              <th className="text-center py-2 px-2 text-muted-foreground font-medium" title="Average across all pillars for this platform">Avg</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +114,7 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
             })}
             {/* Column averages */}
             <tr className="border-t-2 border-border">
-              <td className="py-2 px-2 font-medium text-muted-foreground">Avg</td>
+              <td className="py-2 px-2 font-medium text-muted-foreground" title="Average across all platforms for each pillar">Avg</td>
               {pillars.map(pillar => {
                 const colValues = heatmapData.map(r => r.cells.find(c => c.pillar === pillar)?.value).filter((v): v is number => v !== null);
                 const colAvg = colValues.length > 0 ? +(colValues.reduce((s, v) => s + v, 0) / colValues.length).toFixed(1) : 0;

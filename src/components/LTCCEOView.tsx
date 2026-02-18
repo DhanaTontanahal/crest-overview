@@ -383,34 +383,6 @@ const LTCCEOView: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpiCards.map((kpi, i) => (
-          <div
-            key={kpi.label}
-            className="bg-card rounded-xl p-5 shadow-sm border border-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 opacity-0 animate-slide-up relative"
-            style={{ animationDelay: `${i * 0.1}s`, animationFillMode: 'forwards' }}
-          >
-            <ChartChatBox chartTitle={kpi.label} />
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${kpi.color}20` }}>
-                <kpi.icon className="w-5 h-5" style={{ color: kpi.color }} />
-              </div>
-              {kpi.change !== 0 && (
-                <div className="flex items-center gap-0.5 text-xs font-medium">
-                  <TrendArrow value={kpi.change} />
-                  <span className={kpi.change > 0 ? 'text-green-600' : kpi.change < 0 ? 'text-red-500' : 'text-muted-foreground'}>
-                    {kpi.change > 0 ? '+' : ''}{kpi.change}{kpi.suffix === '%' ? 'pp' : ''}
-                  </span>
-                </div>
-              )}
-            </div>
-            <p className="text-2xl font-bold text-foreground">{kpi.value}{kpi.suffix}</p>
-            <p className="text-xs text-muted-foreground mt-1">{kpi.label}</p>
-          </div>
-        ))}
-      </div>
-
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Platform Radar */}
