@@ -7,9 +7,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider, useAppState } from "@/context/AppContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import OverviewPage from "@/pages/OverviewPage";
+import OrgHealthPage from "@/pages/OrgHealthPage";
 import DimensionsPage from "@/pages/DimensionsPage";
 import TrendsPage from "@/pages/TrendsPage";
 import ImprovementsPage from "@/pages/ImprovementsPage";
+import HeatmapPage from "@/pages/HeatmapPage";
+import QuarterlyProgressPage from "@/pages/QuarterlyProgressPage";
+import ActionPlanPage from "@/pages/ActionPlanPage";
+import PlatformAssessmentsPage from "@/pages/PlatformAssessmentsPage";
 import TeamDataPage from "@/pages/TeamDataPage";
 import { SubmitAssessmentPage, ViewAssessmentsPage, ReviewAssessmentPage } from "@/pages/AssessmentPages";
 import { AdminUploadPage, AdminSettingsPage } from "@/pages/AdminPages";
@@ -30,9 +35,14 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<OverviewPage />} />
+        <Route path="/org-health" element={<OrgHealthPage />} />
         <Route path="/dimensions" element={<DimensionsPage />} />
         <Route path="/trends" element={<TrendsPage />} />
         <Route path="/improvements" element={<ImprovementsPage />} />
+        <Route path="/heatmap" element={<HeatmapPage />} />
+        <Route path="/quarterly-progress" element={<QuarterlyProgressPage />} />
+        <Route path="/action-plan" element={<ActionPlanPage />} />
+        <Route path="/platform-assessments" element={<PlatformAssessmentsPage />} />
         <Route path="/team-data" element={<TeamDataPage />} />
         <Route path="/assessments/submit" element={<SubmitAssessmentPage />} />
         <Route path="/assessments/view" element={<ViewAssessmentsPage />} />
