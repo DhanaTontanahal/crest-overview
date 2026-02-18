@@ -10,11 +10,11 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
   Gauge, BarChart3, TrendingUp, Target, ClipboardList, FileSearch, Eye, Download, Upload, Settings, Users,
+  Heart, Grid3X3, CalendarCheck, Lightbulb,
 } from 'lucide-react';
 
 const AppSidebar: React.FC = () => {
@@ -27,14 +27,18 @@ const AppSidebar: React.FC = () => {
   const isTPL = user?.role === 'user';
   const isAdmin = user?.role === 'admin';
   const isReviewer = user?.role === 'reviewer';
-  const showDashboard = user?.role === 'superuser' || isAdmin;
+  const isSuperUser = user?.role === 'superuser';
+  const showDashboard = isSuperUser || isAdmin;
   const showSupervisor = user?.role === 'supervisor';
 
   const dashboardItems = [
     { title: 'Overview', url: '/', icon: Gauge },
+    ...(showDashboard || showSupervisor ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
     { title: 'Dimensions', url: '/dimensions', icon: BarChart3 },
     { title: 'Trends', url: '/trends', icon: TrendingUp },
-    { title: 'Improvements', url: '/improvements', icon: Target },
+    ...(showDashboard || showSupervisor ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
+    ...(showDashboard || showSupervisor ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
+    ...(showDashboard || showSupervisor ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
     { title: 'Team Data', url: '/team-data', icon: Download },
   ];
 
@@ -42,6 +46,7 @@ const AppSidebar: React.FC = () => {
     ...(isTPL ? [{ title: 'Submit Assessment', url: '/assessments/submit', icon: ClipboardList }] : []),
     ...((isTPL || isReviewer) ? [{ title: 'View Assessments', url: '/assessments/view', icon: FileSearch }] : []),
     ...((isTPL || isReviewer) ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
+    ...((isSuperUser || showSupervisor) ? [{ title: 'Platform Assessments', url: '/platform-assessments', icon: ClipboardList }] : []),
   ];
 
   const adminItems = isAdmin ? [

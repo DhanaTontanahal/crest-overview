@@ -5,11 +5,10 @@ import GaugeChart from '@/components/GaugeChart';
 import DimensionChart from '@/components/DimensionChart';
 import ExcelUpload from '@/components/ExcelUpload';
 import AdminSettings from '@/components/AdminSettings';
-import LTCCEOView from '@/components/LTCCEOView';
 import UserTPLView from '@/components/UserTPLView';
 import SupervisorView from '@/components/SupervisorView';
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ReferenceLine,
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,
 } from 'recharts';
 import { Calculator } from 'lucide-react';
 
@@ -30,14 +29,12 @@ const METRIC_COLORS: Record<string, string> = {
 const OverviewPage: React.FC = () => {
   const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, maturityDimensions, performanceMetrics, calculationMethod } = useAppState();
 
-  // Calculation helper based on admin-selected method
   const calc = useCallback((values: number[]): number => {
     if (values.length === 0) return 0;
     const sorted = [...values].sort((a, b) => a - b);
     switch (calculationMethod) {
       case 'weighted':
-        // For gauges, weighted uses team stability as weight proxy
-        return values.reduce((s, v) => s + v, 0) / values.length; // falls back to simple for raw values; weighted applied at dimension level
+        return values.reduce((s, v) => s + v, 0) / values.length;
       case 'median':
         const mid = Math.floor(sorted.length / 2);
         return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
@@ -67,19 +64,14 @@ const OverviewPage: React.FC = () => {
     });
   }, [teams, selectedPlatform, selectedPillar, selectedQuarter, user, cios]);
 
-  const avgStability = filteredTeams.length > 0
-    ? Math.round(calc(filteredTeams.map(t => t.stability))) : 0;
-  const avgMaturity = filteredTeams.length > 0
-    ? Math.round(calc(filteredTeams.map(t => t.maturity)) * 10) : 0;
-  const avgPerformance = filteredTeams.length > 0
-    ? Math.round(calc(filteredTeams.map(t => t.performance)) * 10) : 0;
-  const avgAgility = filteredTeams.length > 0
-    ? Math.round(calc(filteredTeams.map(t => t.agility)) * 10) : 0;
+  const avgStability = filteredTeams.length > 0 ? Math.round(calc(filteredTeams.map(t => t.stability))) : 0;
+  const avgMaturity = filteredTeams.length > 0 ? Math.round(calc(filteredTeams.map(t => t.maturity)) * 10) : 0;
+  const avgPerformance = filteredTeams.length > 0 ? Math.round(calc(filteredTeams.map(t => t.performance)) * 10) : 0;
+  const avgAgility = filteredTeams.length > 0 ? Math.round(calc(filteredTeams.map(t => t.agility)) * 10) : 0;
 
   const platformComparisonData = useMemo(() => {
     if (selectedPlatform === 'All') return null;
     const quarterTeams = teams.filter(t => t.quarter === selectedQuarter && (selectedPillar === 'All' || t.pillar === selectedPillar));
-
     const calcAvg = (pTeams: typeof quarterTeams) => {
       if (pTeams.length === 0) return { stability: 0, maturity: 0, performance: 0, agility: 0 };
       return {
@@ -89,28 +81,12 @@ const OverviewPage: React.FC = () => {
         agility: Math.round(calc(pTeams.map(t => t.agility)) * 10),
       };
     };
-
     const allAvg = calcAvg(quarterTeams);
-
     return platforms.map(p => {
       const pTeams = quarterTeams.filter(t => t.platform === p);
       const avg = calcAvg(pTeams);
-      return {
-        platform: p,
-        Stability: avg.stability,
-        Maturity: avg.maturity,
-        Performance: avg.performance,
-        Agility: avg.agility,
-        isSelected: p === selectedPlatform,
-      };
-    }).concat([{
-      platform: 'All Platforms',
-      Stability: allAvg.stability,
-      Maturity: allAvg.maturity,
-      Performance: allAvg.performance,
-      Agility: allAvg.agility,
-      isSelected: false,
-    }]);
+      return { platform: p, Stability: avg.stability, Maturity: avg.maturity, Performance: avg.performance, Agility: avg.agility, isSelected: p === selectedPlatform };
+    }).concat([{ platform: 'All Platforms', Stability: allAvg.stability, Maturity: allAvg.maturity, Performance: allAvg.performance, Agility: allAvg.agility, isSelected: false }]);
   }, [teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, calc]);
 
   const isSuperUser = user?.role === 'superuser';
@@ -118,29 +94,26 @@ const OverviewPage: React.FC = () => {
   const showSupervisor = user?.role === 'supervisor';
   const isTPL = user?.role === 'user';
   const supervisorPlatform = user?.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
-
   const isSpecificPlatform = selectedPlatform !== 'All' && showDashboard;
 
-  // Shared gauge + dimension + bar chart rendering for Super User and Admin
   const renderGaugesAndDimensions = () => (
     <>
-      {/* Gauges */}
       {!isSpecificPlatform && (
         <div className="relative">
           <span className="absolute -top-1 right-0 inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full" aria-label={`Using ${CALC_LABELS[calculationMethod]} calculation`}>
             <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
-          {[
-            { value: avgStability, title: 'Overall Team Stability', subtitle: 'How stable are my teams?' },
-            { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
-            { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
-            { value: avgAgility, title: 'Overall Agility', subtitle: 'How agile are my teams?' },
-          ].map((gauge, i) => (
-            <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
-              <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
-            </div>
-          ))}
+            {[
+              { value: avgStability, title: 'Overall Team Stability', subtitle: 'How stable are my teams?' },
+              { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
+              { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
+              { value: avgAgility, title: 'Overall Agility', subtitle: 'How agile are my teams?' },
+            ].map((gauge, i) => (
+              <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+                <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -152,16 +125,16 @@ const OverviewPage: React.FC = () => {
               <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { value: avgStability, title: 'Overall Team Stability', subtitle: `${selectedPlatform} stability` },
-              { value: avgMaturity, title: 'Overall Maturity', subtitle: `${selectedPlatform} maturity` },
-              { value: avgPerformance, title: 'Overall Performance', subtitle: `${selectedPlatform} performance` },
-              { value: avgAgility, title: 'Overall Agility', subtitle: `${selectedPlatform} agility` },
-            ].map((gauge, i) => (
-              <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
-                <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
-              </div>
-            ))}
+              {[
+                { value: avgStability, title: 'Overall Team Stability', subtitle: `${selectedPlatform} stability` },
+                { value: avgMaturity, title: 'Overall Maturity', subtitle: `${selectedPlatform} maturity` },
+                { value: avgPerformance, title: 'Overall Performance', subtitle: `${selectedPlatform} performance` },
+                { value: avgAgility, title: 'Overall Agility', subtitle: `${selectedPlatform} agility` },
+              ].map((gauge, i) => (
+                <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+                  <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
+                </div>
+              ))}
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -177,12 +150,7 @@ const OverviewPage: React.FC = () => {
                     <Tooltip formatter={(value: number) => [`${value}%`, metric]} />
                     <Bar dataKey={metric} radius={[4, 4, 0, 0]} barSize={28}>
                       {platformComparisonData.map((entry, idx) => (
-                        <Cell
-                          key={idx}
-                          fill={entry.isSelected ? METRIC_COLORS[metric] : 'hsl(var(--muted-foreground) / 0.25)'}
-                          stroke={entry.isSelected ? METRIC_COLORS[metric] : 'transparent'}
-                          strokeWidth={entry.isSelected ? 2 : 0}
-                        />
+                        <Cell key={idx} fill={entry.isSelected ? METRIC_COLORS[metric] : 'hsl(var(--muted-foreground) / 0.25)'} stroke={entry.isSelected ? METRIC_COLORS[metric] : 'transparent'} strokeWidth={entry.isSelected ? 2 : 0} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -193,7 +161,6 @@ const OverviewPage: React.FC = () => {
         </>
       )}
 
-      {/* Dimension Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
           <DimensionChart title="Maturity Dimensions" subtitle="How dimensions contribute to maturity" dimensions={maturityDimensions} />
@@ -226,16 +193,7 @@ const OverviewPage: React.FC = () => {
         </div>
       )}
 
-      {/* Super User: gauges + dimensions FIRST, then consolidated CEO view */}
-      {isSuperUser && (
-        <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-          {renderGaugesAndDimensions()}
-          <LTCCEOView />
-        </div>
-      )}
-
-      {/* Admin (non-superuser): same gauges + dimensions */}
-      {showDashboard && !isSuperUser && (
+      {showDashboard && (
         <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
           {renderGaugesAndDimensions()}
         </div>
