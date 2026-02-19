@@ -3,6 +3,7 @@ import { useAppState } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import PageHeader from '@/components/PageHeader';
 import { downloadDummyDataExcel } from '@/utils/exportDummyData';
 
 const TeamDataPage: React.FC = () => {
@@ -38,10 +39,17 @@ const TeamDataPage: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      <PageHeader
+        title="Team Data"
+        subtitle={`${filtered.length} teams for ${selectedQuarter} — raw scores across all metrics.`}
+        infoContent={[
+          'This table shows every team\'s individual scores for the selected quarter, platform, and pillar filters.',
+          'Data originates from Excel uploads (Admin → Data Upload) or system defaults.',
+          'Download filtered results or the full sample dataset using the buttons above.',
+        ]}
+      />
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Team Data</h2>
-          <p className="text-sm text-muted-foreground">{filtered.length} teams for {selectedQuarter}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={downloadDummyDataExcel} className="gap-2">

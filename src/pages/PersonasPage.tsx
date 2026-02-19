@@ -1,5 +1,6 @@
 import React from 'react';
 import { Crown, Eye, Shield, User, FileSearch } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 const personas = [
   { role: 'Super User', icon: Crown, color: 'from-accent to-accent/70' },
@@ -12,7 +13,17 @@ const personas = [
 const PersonasPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-      <h2 className="text-2xl font-bold text-foreground" id="personas-heading">Personas</h2>
+      <PageHeader
+        title="Personas"
+        subtitle="Role-based access levels that control what each user sees across the dashboard."
+        infoContent={[
+          'Super User: Full organisational visibility including executive heatmaps and radar charts.',
+          'Supervisor (CIO): Restricted to their assigned platform with drill-down into sub-platforms.',
+          'Admin: Data and system management — uploads, settings, and assessment configuration.',
+          'User (TPL): Platform lead view with gauges and comparison against the organisation average.',
+          'Reviewer: Focused on assessment views and peer reviews.',
+        ]}
+      />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4" role="list" aria-labelledby="personas-heading">
         {personas.map((persona, idx) => (
