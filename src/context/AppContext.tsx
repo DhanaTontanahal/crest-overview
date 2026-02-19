@@ -65,10 +65,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Compute dimension scores from assessment answers
   const assessmentDerivedDimensions = useMemo(() => {
-    const quarterAssessments = assessments.filter(a => a.quarter === selectedQuarter && (a.status === 'submitted' || a.status === 'reviewed'));
+    let quarterAssessments = assessments.filter(a => a.quarter === selectedQuarter && (a.status === 'submitted' || a.status === 'reviewed'));
     if (quarterAssessments.length === 0) return null;
 
-    const questionMap = new Map(assessmentQuestionsState.map(q => [q.id, q]));
+    // Filter by selected platform if not 'All'
+    if (selectedPlatform !== 'All') {
+      quarterAssessments = quarterAssessments.filter(a => a.platform === selectedPlatform);
+      if (quarterAssessments.length === 0) return null;
+    }
 
     const buildScores = (metric: string, fallback: DimensionScore[]): DimensionScore[] => {
       const relevantQuestions = assessmentQuestionsState.filter(q => q.dimensionMetric === metric);
@@ -97,7 +101,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       stability: buildScores('Stability', dummyStabilityDimensions),
       agility: buildScores('Agility', dummyAgilityDimensions),
     };
-  }, [assessments, assessmentQuestionsState, selectedQuarter]);
+  }, [assessments, assessmentQuestionsState, selectedQuarter, selectedPlatform]);
 
   const maturityDimensions = useMemo<DimensionScore[]>(() => {
     if (assessmentDerivedDimensions?.maturity) return assessmentDerivedDimensions.maturity;
