@@ -63,41 +63,81 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, [teams, selectedPlatform, selectedPillar, selectedQuarter, user]);
 
+  // Compute dimension scores from assessment answers
+  const assessmentDerivedDimensions = useMemo(() => {
+    const quarterAssessments = assessments.filter(a => a.quarter === selectedQuarter && (a.status === 'submitted' || a.status === 'reviewed'));
+    if (quarterAssessments.length === 0) return null;
+
+    const questionMap = new Map(assessmentQuestionsState.map(q => [q.id, q]));
+
+    const buildScores = (metric: string, fallback: DimensionScore[]): DimensionScore[] => {
+      const relevantQuestions = assessmentQuestionsState.filter(q => q.dimensionMetric === metric);
+      const subMetrics = [...new Set(relevantQuestions.map(q => q.subMetric))];
+
+      if (subMetrics.length === 0) return fallback;
+
+      return subMetrics.map(sm => {
+        const qIds = relevantQuestions.filter(q => q.subMetric === sm).map(q => q.id);
+        const allScores: number[] = [];
+        quarterAssessments.forEach(a => {
+          qIds.forEach(qId => {
+            const ans = a.answers.find(an => an.questionId === qId);
+            if (ans && ans.score > 0) allScores.push(ans.score * 2); // scale 1-5 to 2-10
+          });
+        });
+        const avg = allScores.length > 0 ? allScores.reduce((s, v) => s + v, 0) / allScores.length : 0;
+        const weight = Math.round(100 / subMetrics.length);
+        return { name: sm, weight, scores: allScores.length > 0 ? allScores : [0], average: Math.round(avg * 10) / 10 };
+      });
+    };
+
+    return {
+      maturity: buildScores('Maturity', dummyMaturityDimensions),
+      performance: buildScores('Performance', dummyPerformanceMetrics),
+      stability: buildScores('Stability', dummyStabilityDimensions),
+      agility: buildScores('Agility', dummyAgilityDimensions),
+    };
+  }, [assessments, assessmentQuestionsState, selectedQuarter]);
+
   const maturityDimensions = useMemo<DimensionScore[]>(() => {
+    if (assessmentDerivedDimensions?.maturity) return assessmentDerivedDimensions.maturity;
     if (filteredTeams.length === 0) return dummyMaturityDimensions;
     return dummyMaturityDimensions.map(d => ({
       ...d,
       scores: filteredTeams.map((_, i) => d.scores[i % d.scores.length]),
       average: filteredTeams.reduce((sum, _, i) => sum + d.scores[i % d.scores.length], 0) / filteredTeams.length,
     }));
-  }, [filteredTeams]);
+  }, [filteredTeams, assessmentDerivedDimensions]);
 
   const performanceMetrics = useMemo<DimensionScore[]>(() => {
+    if (assessmentDerivedDimensions?.performance) return assessmentDerivedDimensions.performance;
     if (filteredTeams.length === 0) return dummyPerformanceMetrics;
     return dummyPerformanceMetrics.map(d => ({
       ...d,
       scores: filteredTeams.map((_, i) => d.scores[i % d.scores.length]),
       average: filteredTeams.reduce((sum, _, i) => sum + d.scores[i % d.scores.length], 0) / filteredTeams.length,
     }));
-  }, [filteredTeams]);
+  }, [filteredTeams, assessmentDerivedDimensions]);
 
   const stabilityDimensions = useMemo<DimensionScore[]>(() => {
+    if (assessmentDerivedDimensions?.stability) return assessmentDerivedDimensions.stability;
     if (filteredTeams.length === 0) return dummyStabilityDimensions;
     return dummyStabilityDimensions.map(d => ({
       ...d,
       scores: filteredTeams.map((_, i) => d.scores[i % d.scores.length]),
       average: filteredTeams.reduce((sum, _, i) => sum + d.scores[i % d.scores.length], 0) / filteredTeams.length,
     }));
-  }, [filteredTeams]);
+  }, [filteredTeams, assessmentDerivedDimensions]);
 
   const agilityDimensions = useMemo<DimensionScore[]>(() => {
+    if (assessmentDerivedDimensions?.agility) return assessmentDerivedDimensions.agility;
     if (filteredTeams.length === 0) return dummyAgilityDimensions;
     return dummyAgilityDimensions.map(d => ({
       ...d,
       scores: filteredTeams.map((_, i) => d.scores[i % d.scores.length]),
       average: filteredTeams.reduce((sum, _, i) => sum + d.scores[i % d.scores.length], 0) / filteredTeams.length,
     }));
-  }, [filteredTeams]);
+  }, [filteredTeams, assessmentDerivedDimensions]);
 
   const value: ExtendedAppState = {
     user, setUser,

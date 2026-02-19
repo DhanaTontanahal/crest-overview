@@ -138,11 +138,18 @@ const AssessmentSubmit: React.FC<AssessmentSubmitProps> = ({ platform, onSubmit,
               <div className="px-5 pb-5 space-y-5 border-t border-border pt-4">
                 {questions.map((q, qi) => (
                   <div key={q.id} className="space-y-3 p-4 bg-muted/20 rounded-lg border border-border/50">
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
-                        {qi + 1}
-                      </span>
-                      <p className="text-sm font-medium text-card-foreground">{q.question}</p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
+                          {qi + 1}
+                        </span>
+                        <p className="text-sm font-medium text-card-foreground">{q.question}</p>
+                      </div>
+                      {q.dimensionMetric && q.subMetric && (
+                        <span className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-semibold whitespace-nowrap">
+                          {q.dimensionMetric} → {q.subMetric}
+                        </span>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
