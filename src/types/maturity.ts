@@ -73,6 +73,8 @@ export interface AppState {
   cios: CIO[];
   maturityDimensions: DimensionScore[];
   performanceMetrics: DimensionScore[];
+  stabilityDimensions: DimensionScore[];
+  agilityDimensions: DimensionScore[];
   timeSeries: TimeSeriesPoint[];
   setTimeSeries: (ts: TimeSeriesPoint[]) => void;
   selectedPlatform: string;

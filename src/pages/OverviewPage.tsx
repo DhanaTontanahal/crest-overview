@@ -8,7 +8,7 @@ import AdminSettings from '@/components/AdminSettings';
 import UserTPLView from '@/components/UserTPLView';
 import SupervisorView from '@/components/SupervisorView';
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
 } from 'recharts';
 import { Calculator } from 'lucide-react';
 
@@ -27,7 +27,7 @@ const METRIC_COLORS: Record<string, string> = {
 };
 
 const OverviewPage: React.FC = () => {
-  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, maturityDimensions, performanceMetrics, calculationMethod } = useAppState();
+  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions, calculationMethod } = useAppState();
 
   const calc = useCallback((values: number[]): number => {
     if (values.length === 0) return 0;
@@ -137,36 +137,21 @@ const OverviewPage: React.FC = () => {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {(['Stability', 'Maturity', 'Performance', 'Agility'] as const).map((metric, i) => (
-              <div key={metric} className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up" style={{ animationDelay: `${0.3 + i * 0.1}s`, animationFillMode: 'forwards' }}>
-                <h3 className="text-sm font-semibold text-card-foreground mb-1">{metric} Comparison</h3>
-                <p className="text-xs text-muted-foreground mb-4">{selectedPlatform} vs all platforms</p>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={platformComparisonData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="platform" fontSize={10} angle={-20} textAnchor="end" height={50} />
-                    <YAxis domain={[0, 100]} fontSize={10} />
-                    <Tooltip formatter={(value: number) => [`${value}%`, metric]} />
-                    <Bar dataKey={metric} radius={[4, 4, 0, 0]} barSize={28}>
-                      {platformComparisonData.map((entry, idx) => (
-                        <Cell key={idx} fill={entry.isSelected ? METRIC_COLORS[metric] : 'hsl(var(--muted-foreground) / 0.25)'} stroke={entry.isSelected ? METRIC_COLORS[metric] : 'transparent'} strokeWidth={entry.isSelected ? 2 : 0} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            ))}
-          </div>
         </>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
-          <DimensionChart title="Maturity Dimensions" subtitle="How dimensions contribute to maturity" dimensions={maturityDimensions} />
+          <DimensionChart title="Stability Dimensions" subtitle="How dimensions contribute to stability" dimensions={stabilityDimensions} />
         </div>
         <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+          <DimensionChart title="Maturity Dimensions" subtitle="How dimensions contribute to maturity" dimensions={maturityDimensions} />
+        </div>
+        <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
           <DimensionChart title="Performance Metrics" subtitle="How metrics contribute to performance" dimensions={performanceMetrics} />
+        </div>
+        <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
+          <DimensionChart title="Agility Dimensions" subtitle="How dimensions contribute to agility" dimensions={agilityDimensions} />
         </div>
       </div>
     </>

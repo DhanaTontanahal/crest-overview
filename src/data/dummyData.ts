@@ -115,6 +115,21 @@ export const dummyPerformanceMetrics: DimensionScore[] = [
   { name: 'Lead Time', weight: 20, scores: [7, 5, 8, 4, 6, 4, 8, 6, 7, 6], average: 6.1 },
 ];
 
+export const dummyStabilityDimensions: DimensionScore[] = [
+  { name: 'Attrition Rate', weight: 25, scores: [8, 6, 7, 5, 7, 6, 8, 7, 6, 7], average: 6.7 },
+  { name: 'Tenure', weight: 25, scores: [7, 5, 8, 6, 6, 5, 7, 6, 7, 6], average: 6.3 },
+  { name: 'Role Clarity', weight: 25, scores: [8, 6, 9, 5, 7, 5, 8, 7, 7, 6], average: 6.8 },
+  { name: 'Succession Plan', weight: 25, scores: [6, 4, 7, 5, 6, 4, 7, 5, 6, 5], average: 5.5 },
+];
+
+export const dummyAgilityDimensions: DimensionScore[] = [
+  { name: 'Adaptability', weight: 20, scores: [7, 5, 8, 5, 7, 5, 8, 6, 7, 6], average: 6.4 },
+  { name: 'Innovation', weight: 20, scores: [6, 5, 7, 4, 6, 4, 8, 5, 6, 5], average: 5.6 },
+  { name: 'Time to Market', weight: 20, scores: [8, 6, 9, 5, 7, 5, 9, 7, 8, 6], average: 7.0 },
+  { name: 'Responsiveness', weight: 20, scores: [7, 5, 8, 4, 6, 5, 8, 6, 7, 5], average: 6.1 },
+  { name: 'Continuous Improvement', weight: 20, scores: [7, 6, 8, 5, 7, 5, 8, 6, 7, 6], average: 6.5 },
+];
+
 export const dummyTimeSeries: TimeSeriesPoint[] = [
   { period: 'Q3 2024', maturity: 3.2, performance: 3.5, agility: 3.0 },
   { period: 'Q4 2024', maturity: 4.1, performance: 4.3, agility: 3.8 },
