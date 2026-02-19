@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useAppState } from '@/context/AppContext';
 import { CalculationMethod } from '@/context/AppContext';
 import GaugeChart from '@/components/GaugeChart';
@@ -10,7 +10,7 @@ import SupervisorView from '@/components/SupervisorView';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
 } from 'recharts';
-import { Calculator } from 'lucide-react';
+import { Calculator, TrendingUp, TrendingDown, Minus, Target, Shield, Zap, BarChart3, ArrowRight, X } from 'lucide-react';
 
 const CALC_LABELS: Record<string, string> = {
   simple: 'Simple Avg',
@@ -26,8 +26,21 @@ const METRIC_COLORS: Record<string, string> = {
   Agility: 'hsl(45, 80%, 50%)',
 };
 
+interface MetricInsight {
+  key: string;
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+  dimensions: { name: string; score: number; trend: 'up' | 'down' | 'stable'; insight: string }[];
+  summary: string;
+  improvements: string[];
+}
+
 const OverviewPage: React.FC = () => {
-  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, calculationMethod } = useAppState();
+  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, calculationMethod,
+    maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions, quarterlyTrends } = useAppState();
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
   const calc = useCallback((values: number[]): number => {
     if (values.length === 0) return 0;
@@ -69,25 +82,114 @@ const OverviewPage: React.FC = () => {
   const avgPerformance = filteredTeams.length > 0 ? Math.round(calc(filteredTeams.map(t => t.performance)) * 10) : 0;
   const avgAgility = filteredTeams.length > 0 ? Math.round(calc(filteredTeams.map(t => t.agility)) * 10) : 0;
 
-  const platformComparisonData = useMemo(() => {
-    if (selectedPlatform === 'All') return null;
-    const quarterTeams = teams.filter(t => t.quarter === selectedQuarter && (selectedPillar === 'All' || t.pillar === selectedPillar));
-    const calcAvg = (pTeams: typeof quarterTeams) => {
-      if (pTeams.length === 0) return { stability: 0, maturity: 0, performance: 0, agility: 0 };
-      return {
-        stability: Math.round(calc(pTeams.map(t => t.stability))),
-        maturity: Math.round(calc(pTeams.map(t => t.maturity)) * 10),
-        performance: Math.round(calc(pTeams.map(t => t.performance)) * 10),
-        agility: Math.round(calc(pTeams.map(t => t.agility)) * 10),
-      };
+  // Build metric insights from dimension data
+  const metricInsights = useMemo((): MetricInsight[] => {
+    const getTrend = (name: string, dims: typeof maturityDimensions): 'up' | 'down' | 'stable' => {
+      const d = dims.find(d => d.name === name);
+      if (!d) return 'stable';
+      return d.average >= 7 ? 'up' : d.average < 5 ? 'down' : 'stable';
     };
-    const allAvg = calcAvg(quarterTeams);
-    return platforms.map(p => {
-      const pTeams = quarterTeams.filter(t => t.platform === p);
-      const avg = calcAvg(pTeams);
-      return { platform: p, Stability: avg.stability, Maturity: avg.maturity, Performance: avg.performance, Agility: avg.agility, isSelected: p === selectedPlatform };
-    }).concat([{ platform: 'All Platforms', Stability: allAvg.stability, Maturity: allAvg.maturity, Performance: allAvg.performance, Agility: allAvg.agility, isSelected: false }]);
-  }, [teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, calc]);
+
+    const currentTrend = quarterlyTrends.find(t => t.quarter === selectedQuarter);
+    const prevIdx = quarterlyTrends.findIndex(t => t.quarter === selectedQuarter) - 1;
+    const prevTrend = prevIdx >= 0 ? quarterlyTrends[prevIdx] : null;
+
+    const stabilityDelta = currentTrend && prevTrend ? currentTrend.stability - prevTrend.stability : 0;
+    const maturityDelta = currentTrend && prevTrend ? currentTrend.maturity - prevTrend.maturity : 0;
+    const performanceDelta = currentTrend && prevTrend ? currentTrend.performance - prevTrend.performance : 0;
+    const agilityDelta = currentTrend && prevTrend ? currentTrend.agility - prevTrend.agility : 0;
+
+    return [
+      {
+        key: 'stability',
+        title: 'Overall Team Stability',
+        icon: <Shield className="w-5 h-5" />,
+        color: 'text-cyan-600',
+        bgColor: 'bg-cyan-50 border-cyan-200',
+        dimensions: stabilityDimensions.map(d => ({
+          name: d.name,
+          score: d.average,
+          trend: d.average >= 7 ? 'up' as const : d.average < 5 ? 'down' as const : 'stable' as const,
+          insight: d.average >= 7 ? 'Strong performance — maintain current practices' : d.average < 5 ? 'Needs immediate attention and improvement plan' : 'On track — continue monitoring progress',
+        })),
+        summary: stabilityDelta >= 0
+          ? `Stability improved by ${Math.abs(stabilityDelta).toFixed(0)}% QoQ, driven by workforce retention and role clarity initiatives.`
+          : `Stability declined by ${Math.abs(stabilityDelta).toFixed(0)}% QoQ — review team composition and succession planning.`,
+        improvements: [
+          'Strengthen succession planning across all platforms',
+          'Reduce contractor dependency through targeted hiring',
+          'Implement structured onboarding for improved tenure',
+          'Establish clear role definitions and career pathways',
+        ],
+      },
+      {
+        key: 'maturity',
+        title: 'Overall Maturity',
+        icon: <Target className="w-5 h-5" />,
+        color: 'text-emerald-700',
+        bgColor: 'bg-emerald-50 border-emerald-200',
+        dimensions: maturityDimensions.map(d => ({
+          name: d.name,
+          score: d.average,
+          trend: d.average >= 7 ? 'up' as const : d.average < 5 ? 'down' as const : 'stable' as const,
+          insight: d.average >= 7 ? 'Mature capability — focus on sustaining excellence' : d.average < 5 ? 'Foundational gaps require strategic investment' : 'Building momentum — accelerate adoption',
+        })),
+        summary: maturityDelta >= 0
+          ? `Maturity grew ${maturityDelta.toFixed(1)} points QoQ through improved leadership alignment and cultural embedding.`
+          : `Maturity regressed ${Math.abs(maturityDelta).toFixed(1)} points — revisit transformation roadmap priorities.`,
+        improvements: [
+          'Deepen product-centric operating model adoption',
+          'Embed continuous feedback culture across pillars',
+          'Align joint BPL/TPL OKRs to value outcomes',
+          'Invest in foundational capability building',
+        ],
+      },
+      {
+        key: 'performance',
+        title: 'Overall Performance',
+        icon: <BarChart3 className="w-5 h-5" />,
+        color: 'text-green-600',
+        bgColor: 'bg-green-50 border-green-200',
+        dimensions: performanceMetrics.map(d => ({
+          name: d.name,
+          score: d.average,
+          trend: d.average >= 7 ? 'up' as const : d.average < 5 ? 'down' as const : 'stable' as const,
+          insight: d.average >= 7 ? 'High-performing — benchmark and share practices' : d.average < 5 ? 'Critical bottleneck requiring process redesign' : 'Progressing — identify and remove remaining blockers',
+        })),
+        summary: performanceDelta >= 0
+          ? `Performance increased ${performanceDelta.toFixed(1)} points QoQ, with deployment frequency and predictability leading gains.`
+          : `Performance dipped ${Math.abs(performanceDelta).toFixed(1)} points — focus on DORA metrics improvement.`,
+        improvements: [
+          'Accelerate CI/CD pipeline adoption across teams',
+          'Reduce change fail rate through automated testing',
+          'Improve deployment frequency to weekly or better',
+          'Shorten lead time through value stream mapping',
+        ],
+      },
+      {
+        key: 'agility',
+        title: 'Overall Agility',
+        icon: <Zap className="w-5 h-5" />,
+        color: 'text-amber-600',
+        bgColor: 'bg-amber-50 border-amber-200',
+        dimensions: agilityDimensions.map(d => ({
+          name: d.name,
+          score: d.average,
+          trend: d.average >= 7 ? 'up' as const : d.average < 5 ? 'down' as const : 'stable' as const,
+          insight: d.average >= 7 ? 'Highly agile — foster innovation experiments' : d.average < 5 ? 'Rigid processes limiting responsiveness' : 'Evolving — embed agile practices deeper',
+        })),
+        summary: agilityDelta >= 0
+          ? `Agility improved ${agilityDelta.toFixed(1)} points QoQ through better adaptive planning and ceremony effectiveness.`
+          : `Agility declined ${Math.abs(agilityDelta).toFixed(1)} points — review agile ceremony effectiveness and tooling adoption.`,
+        improvements: [
+          'Embed flow-based planning (Kanban) across teams',
+          'Drive Horizon 2/3 experimentation and innovation',
+          'Improve retrospective action tracking and outcomes',
+          'Accelerate time-to-market through governance automation',
+        ],
+      },
+    ];
+  }, [maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions, quarterlyTrends, selectedQuarter]);
 
   const isSuperUser = user?.role === 'superuser';
   const showDashboard = isSuperUser || user?.role === 'admin';
@@ -96,6 +198,25 @@ const OverviewPage: React.FC = () => {
   const supervisorPlatform = user?.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
   const isSpecificPlatform = selectedPlatform !== 'All' && showDashboard;
 
+  const handleGaugeClick = (metricKey: string) => {
+    setSelectedMetric(prev => prev === metricKey ? null : metricKey);
+  };
+
+  const selectedInsight = metricInsights.find(m => m.key === selectedMetric);
+
+  const TrendIcon: React.FC<{ trend: 'up' | 'down' | 'stable' }> = ({ trend }) => {
+    if (trend === 'up') return <TrendingUp className="w-4 h-4 text-green-500" />;
+    if (trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500" />;
+    return <Minus className="w-4 h-4 text-amber-500" />;
+  };
+
+  const gaugeConfigs = [
+    { value: avgStability, key: 'stability', title: 'Overall Team Stability', subtitle: isSpecificPlatform ? `${selectedPlatform} stability` : 'How stable are my teams?' },
+    { value: avgMaturity, key: 'maturity', title: 'Overall Maturity', subtitle: isSpecificPlatform ? `${selectedPlatform} maturity` : 'How mature are my teams?' },
+    { value: avgPerformance, key: 'performance', title: 'Overall Performance', subtitle: isSpecificPlatform ? `${selectedPlatform} performance` : 'How well are teams performing?' },
+    { value: avgAgility, key: 'agility', title: 'Overall Agility', subtitle: isSpecificPlatform ? `${selectedPlatform} agility` : 'How agile are my teams?' },
+  ];
+
   const renderGauges = () => (
     <>
       <div className="relative">
@@ -103,18 +224,114 @@ const OverviewPage: React.FC = () => {
           <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
-          {[
-            { value: avgStability, title: 'Overall Team Stability', subtitle: isSpecificPlatform ? `${selectedPlatform} stability` : 'How stable are my teams?' },
-            { value: avgMaturity, title: 'Overall Maturity', subtitle: isSpecificPlatform ? `${selectedPlatform} maturity` : 'How mature are my teams?' },
-            { value: avgPerformance, title: 'Overall Performance', subtitle: isSpecificPlatform ? `${selectedPlatform} performance` : 'How well are teams performing?' },
-            { value: avgAgility, title: 'Overall Agility', subtitle: isSpecificPlatform ? `${selectedPlatform} agility` : 'How agile are my teams?' },
-          ].map((gauge, i) => (
-            <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+          {gaugeConfigs.map((gauge, i) => (
+            <div
+              key={i}
+              className={`opacity-0 animate-slide-up cursor-pointer transition-all duration-300 rounded-xl ${
+                selectedMetric === gauge.key ? 'ring-2 ring-primary ring-offset-2 scale-[1.02]' : 'hover:scale-[1.01]'
+              }`}
+              style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}
+              onClick={() => handleGaugeClick(gauge.key)}
+            >
               <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
             </div>
           ))}
         </div>
       </div>
+
+      {/* Expandable Metric Detail Panel */}
+      {selectedInsight && (
+        <div className={`mt-6 rounded-xl border-2 ${selectedInsight.bgColor} overflow-hidden animate-scale-in`} style={{ animationFillMode: 'forwards' }}>
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border/30">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-lg bg-card flex items-center justify-center ${selectedInsight.color}`}>
+                {selectedInsight.icon}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">{selectedInsight.title}</h3>
+                <p className="text-sm text-muted-foreground">{selectedQuarter} • Dimension Breakdown & Insights</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedMetric(null)}
+              className="w-8 h-8 rounded-full bg-card/80 hover:bg-card flex items-center justify-center transition-colors"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+
+          <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Dimension Mind Map */}
+            <div className="lg:col-span-2 space-y-3">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" /> Dimension Scores
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {selectedInsight.dimensions.map((dim, idx) => (
+                  <div
+                    key={dim.name}
+                    className="bg-card rounded-lg p-4 border border-border/50 shadow-sm opacity-0 animate-fade-in hover:shadow-md transition-shadow"
+                    style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'forwards' }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-card-foreground">{dim.name}</span>
+                      <div className="flex items-center gap-1.5">
+                        <TrendIcon trend={dim.trend} />
+                        <span className={`text-lg font-bold ${
+                          dim.score >= 7 ? 'text-green-600' : dim.score >= 5 ? 'text-amber-600' : 'text-red-600'
+                        }`}>
+                          {dim.score.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Score bar */}
+                    <div className="w-full h-2 bg-muted rounded-full mb-2 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${
+                          dim.score >= 7 ? 'bg-green-500' : dim.score >= 5 ? 'bg-amber-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${(dim.score / 10) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{dim.insight}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary & Improvements */}
+            <div className="space-y-4">
+              {/* Summary */}
+              <div className="bg-card rounded-lg p-4 border border-border/50 shadow-sm opacity-0 animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+                <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" /> Quarter Summary
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">{selectedInsight.summary}</p>
+              </div>
+
+              {/* Improvement Areas */}
+              <div className="bg-card rounded-lg p-4 border border-border/50 shadow-sm opacity-0 animate-fade-in" style={{ animationDelay: '350ms', animationFillMode: 'forwards' }}>
+                <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4" /> Key Improvements
+                </h4>
+                <ul className="space-y-2.5">
+                  {selectedInsight.improvements.map((item, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-start gap-2 text-sm text-muted-foreground opacity-0 animate-fade-in"
+                      style={{ animationDelay: `${400 + idx * 80}ms`, animationFillMode: 'forwards' }}
+                    >
+                      <ArrowRight className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 
