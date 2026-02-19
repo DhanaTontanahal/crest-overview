@@ -174,87 +174,112 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       <div className="w-full max-w-5xl animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           {/* Left: Compact Framework Circle */}
-          <div className="relative" style={{ minHeight: 380 }} aria-label="Maturity Framework visualization" role="img">
+          <div className="relative" style={{ minHeight: 420 }} aria-label="Maturity Framework visualization" role="img">
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none z-0"
-              viewBox="0 0 400 380"
+              viewBox="0 0 400 420"
               preserveAspectRatio="xMidYMid meet"
               aria-hidden="true"
             >
-              <circle cx="200" cy="180" r="120" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.25" />
-              <circle cx="200" cy="180" r="120" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.6" strokeDasharray="754" strokeDashoffset="754" style={{ animation: 'draw-circle 2s ease-out 0.5s forwards' }} />
+              {/* Outer glow ring */}
+              <circle cx="200" cy="210" r="130" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.1" />
+              {/* Main circle */}
+              <circle cx="200" cy="210" r="110" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.2" />
+              <circle cx="200" cy="210" r="110" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.7" strokeDasharray="691" strokeDashoffset="691" style={{ animation: 'draw-circle 2s ease-out 0.5s forwards' }} />
+              {/* Orbiting dots */}
               {[0, 1, 2].map((i) => (
-                <circle key={i} r="4" fill="hsl(var(--primary))" opacity="0.5">
+                <circle key={i} r="4" fill="hsl(var(--primary))" opacity="0.6">
                   <animateMotion dur={`${5 + i * 2}s`} repeatCount="indefinite" begin={`${i * 1.2}s`}>
                     <mpath xlinkHref="#circPath2" />
                   </animateMotion>
                 </circle>
               ))}
-              <circle id="circPath2" cx="200" cy="180" r="120" fill="none" stroke="none" />
-              {/* Connector lines to corners */}
-              <line x1="115" y1="100" x2="30" y2="30" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
-              <line x1="285" y1="100" x2="370" y2="30" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
-              <line x1="285" y1="260" x2="370" y2="340" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
-              <line x1="115" y1="260" x2="30" y2="340" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
-              {[{ cx: 115, cy: 100 }, { cx: 285, cy: 100 }, { cx: 285, cy: 260 }, { cx: 115, cy: 260 }].map((p, i) => (
-                <circle key={i} cx={p.cx} cy={p.cy} r="14" fill="hsl(var(--primary))" opacity="0.12" />
+              <circle id="circPath2" cx="200" cy="210" r="110" fill="none" stroke="none" />
+              {/* Animated connector lines */}
+              {[
+                { x1: 120, y1: 130, x2: 30, y2: 50 },
+                { x1: 280, y1: 130, x2: 370, y2: 50 },
+                { x1: 280, y1: 290, x2: 370, y2: 370 },
+                { x1: 120, y1: 290, x2: 30, y2: 370 },
+              ].map((l, i) => (
+                <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0" strokeDasharray="4 4" style={{ animation: `fade-line 0.6s ease-out ${0.4 + i * 0.2}s forwards` }} />
+              ))}
+              {/* Glowing endpoint dots */}
+              {[{ cx: 120, cy: 130 }, { cx: 280, cy: 130 }, { cx: 280, cy: 290 }, { cx: 120, cy: 290 }].map((p, i) => (
+                <React.Fragment key={i}>
+                  <circle cx={p.cx} cy={p.cy} r="18" fill="hsl(var(--primary))" opacity="0">
+                    <animate attributeName="opacity" from="0" to="0.1" dur="0.5s" begin={`${0.4 + i * 0.2}s`} fill="freeze" />
+                  </circle>
+                  <circle cx={p.cx} cy={p.cy} r="6" fill="hsl(var(--primary))" opacity="0">
+                    <animate attributeName="opacity" from="0" to="0.4" dur="0.5s" begin={`${0.4 + i * 0.2}s`} fill="freeze" />
+                    <animate attributeName="r" values="4;7;4" dur="3s" begin={`${1 + i * 0.5}s`} repeatCount="indefinite" />
+                  </circle>
+                </React.Fragment>
               ))}
             </svg>
 
-            {/* Center label */}
-            <div className="absolute z-10 animate-scale-in" style={{ left: '50%', top: '44%', transform: 'translate(-50%, -50%)', animationDelay: '0.6s', animationFillMode: 'both' }}>
+            {/* Center label — exactly centered */}
+            <div className="absolute z-10 animate-scale-in" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', animationDelay: '0.6s', animationFillMode: 'both' }}>
               <p className="text-lg font-bold text-foreground text-center leading-tight">Maturity</p>
               <p className="text-lg font-bold text-foreground text-center leading-tight">Framework</p>
             </div>
 
             {/* Who — top-left */}
-            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ left: 0, top: 0, animationDelay: '0.4s', animationFillMode: 'both' }}>
-              <div className="flex items-start gap-1.5">
-                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                  <Users className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-foreground">Who</span>
-                  <p className="text-[10px] text-muted-foreground leading-snug">Product / Platform leadership, Voice of Engineer & Customers</p>
+            <div className="absolute z-10 w-[42%] opacity-0" style={{ left: 0, top: 0, animation: 'slide-in-left 0.6s ease-out 0.4s forwards' }}>
+              <div className="bg-card/80 backdrop-blur-sm rounded-lg p-2 border border-border/50 shadow-sm hover:-translate-y-0.5 transition-transform duration-200">
+                <div className="flex items-start gap-1.5">
+                  <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <Users className="w-3.5 h-3.5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-foreground">Who</span>
+                    <p className="text-[10px] text-muted-foreground leading-snug">Product / Platform leadership, Voice of Engineer & Customers</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Why — top-right */}
-            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ right: 0, top: 0, animationDelay: '0.6s', animationFillMode: 'both' }}>
-              <div className="flex items-start gap-1.5">
-                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                  <TrendingUp className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-foreground">Why</span>
-                  <p className="text-[10px] text-muted-foreground leading-snug">Baseline maturity and identify areas of opportunity</p>
+            <div className="absolute z-10 w-[42%] opacity-0" style={{ right: 0, top: 0, animation: 'slide-in-right-custom 0.6s ease-out 0.6s forwards' }}>
+              <div className="bg-card/80 backdrop-blur-sm rounded-lg p-2 border border-border/50 shadow-sm hover:-translate-y-0.5 transition-transform duration-200">
+                <div className="flex items-start gap-1.5">
+                  <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-foreground">Why</span>
+                    <p className="text-[10px] text-muted-foreground leading-snug">Baseline maturity and identify areas of opportunity</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* What — bottom-right */}
-            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ right: 0, bottom: '5%', animationDelay: '0.8s', animationFillMode: 'both' }}>
-              <div className="flex items-start gap-1.5">
-                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-foreground">What</span>
-                  <p className="text-[10px] text-muted-foreground leading-snug">Common language for capability, gaps and progress</p>
+            <div className="absolute z-10 w-[42%] opacity-0" style={{ right: 0, bottom: '3%', animation: 'slide-in-right-custom 0.6s ease-out 0.8s forwards' }}>
+              <div className="bg-card/80 backdrop-blur-sm rounded-lg p-2 border border-border/50 shadow-sm hover:-translate-y-0.5 transition-transform duration-200">
+                <div className="flex items-start gap-1.5">
+                  <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <MessageSquare className="w-3.5 h-3.5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-foreground">What</span>
+                    <p className="text-[10px] text-muted-foreground leading-snug">Common language for capability, gaps and progress</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* When — bottom-left */}
-            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ left: 0, bottom: '5%', animationDelay: '1.0s', animationFillMode: 'both' }}>
-              <div className="flex items-start gap-1.5">
-                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                  <Clock className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-foreground">When</span>
-                  <p className="text-[10px] text-muted-foreground leading-snug">Reviewed every six months — a marathon, not a sprint</p>
+            <div className="absolute z-10 w-[42%] opacity-0" style={{ left: 0, bottom: '3%', animation: 'slide-in-left 0.6s ease-out 1.0s forwards' }}>
+              <div className="bg-card/80 backdrop-blur-sm rounded-lg p-2 border border-border/50 shadow-sm hover:-translate-y-0.5 transition-transform duration-200">
+                <div className="flex items-start gap-1.5">
+                  <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <Clock className="w-3.5 h-3.5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-foreground">When</span>
+                    <p className="text-[10px] text-muted-foreground leading-snug">Reviewed every six months — a marathon, not a sprint</p>
+                  </div>
                 </div>
               </div>
             </div>
