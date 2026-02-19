@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import {
   dummyTeams, dummyMaturityDimensions, dummyPerformanceMetrics,
   dummyTimeSeries, quarterlyTrends, cios, defaultPlatforms, defaultPillars, availableQuarters,
-  currentQuarter, currentMonth,
+  currentQuarter, currentMonth, subPlatformMap,
 } from '@/data/dummyData';
 import { assessmentQuestions, sampleAssessments } from '@/data/assessmentQuestions';
 
@@ -17,6 +17,7 @@ export function downloadDummyDataExcel() {
     Agility: t.agility,
     'Stability (%)': t.stability,
     Platform: t.platform,
+    'Sub Platform': t.subPlatform,
     Pillar: t.pillar,
     Quarter: t.quarter,
   }));
@@ -130,7 +131,17 @@ export function downloadDummyDataExcel() {
   });
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pillarSummary), 'Pillar Scores');
 
-  // Sheet 10: Reference (CIOs, Platforms, Pillars, Quarters)
+  // Sheet 10: Sub-Platform Reference
+  const subPlatformRows: Record<string, unknown>[] = [];
+  defaultPlatforms.forEach(platform => {
+    const subs = subPlatformMap[platform] || [];
+    subs.forEach(sub => {
+      subPlatformRows.push({ Platform: platform, 'Sub Platform': sub });
+    });
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(subPlatformRows), 'Sub-Platforms');
+
+  // Sheet 11: Reference (CIOs, Platforms, Pillars, Quarters)
   const maxLen = Math.max(cios.length, defaultPlatforms.length, defaultPillars.length, availableQuarters.length);
   const refData = Array.from({ length: maxLen }, (_, i) => ({
     'CIO ID': cios[i]?.id ?? '',

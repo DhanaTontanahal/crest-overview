@@ -56,9 +56,9 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
 
   return (
     <div className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-all duration-300 relative">
-      <ChartChatBox chartTitle="Platform × Pillar Heatmap" />
+      <ChartChatBox chartTitle="Cross-Platform Maturity Scorecard" />
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-semibold text-card-foreground">Platform × Pillar Heatmap</h3>
+        <h3 className="text-base font-semibold text-card-foreground">Cross-Platform Maturity Scorecard</h3>
         <Select value={metric} onValueChange={(v) => setMetric(v as MetricKey)}>
           <SelectTrigger className="w-[140px] h-8 text-xs">
             <SelectValue />
@@ -71,8 +71,7 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
         </Select>
       </div>
       <p className="text-xs text-muted-foreground mb-4">
-        Each cell shows the average <span className="font-medium">{metricConfig.label.toLowerCase()}</span> score of all teams in that platform–pillar intersection.
-        {' '}<span className="font-medium">Avg row/column</span> = mean across that platform or pillar.
+        Each cell shows the average <span className="font-medium">{metricConfig.label.toLowerCase()}</span> score of all teams in that platform–pillar intersection, with a qualitative rating.
         {onDrill ? ' Click any cell to drill down into team-level details.' : ''}
       </p>
 
@@ -86,15 +85,11 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
                   <span className="block leading-tight">{pillar}</span>
                 </th>
               ))}
-              <th className="text-center py-2 px-2 text-muted-foreground font-medium" title="Average across all pillars for this platform">Avg</th>
+              <th className="text-center py-2 px-2 text-muted-foreground font-medium" title="Average across all pillars for this platform"></th>
             </tr>
           </thead>
           <tbody>
             {heatmapData.map(row => {
-              const validCells = row.cells.filter(c => c.value !== null);
-              const rowAvg = validCells.length > 0
-                ? +(validCells.reduce((s, c) => s + (c.value ?? 0), 0) / validCells.length).toFixed(1)
-                : 0;
               return (
                 <tr key={row.platform} className="border-t border-border/30">
                   <td className="py-2 px-2 font-medium text-foreground">{row.platform}</td>
@@ -114,31 +109,10 @@ const PlatformPillarHeatmap: React.FC<PlatformPillarHeatmapProps> = ({ onDrill }
                       )}
                     </td>
                   ))}
-                  <td className="py-1 px-2 text-center">
-                    <span className={`inline-block rounded-md py-2 px-2 font-semibold text-xs ${getHeatColor(rowAvg, metricConfig.max)}`}>
-                      {rowAvg}{metric === 'stability' ? '%' : ''}
-                      <span className="block text-[9px] opacity-80 font-medium">{getSubjectiveLabel(rowAvg, metricConfig.max)}</span>
-                    </span>
-                  </td>
+                  <td />
                 </tr>
               );
             })}
-            {/* Column averages */}
-            <tr className="border-t-2 border-border">
-              <td className="py-2 px-2 font-medium text-muted-foreground" title="Average across all platforms for each pillar">Avg</td>
-              {pillars.map(pillar => {
-                const colValues = heatmapData.map(r => r.cells.find(c => c.pillar === pillar)?.value).filter((v): v is number => v !== null);
-                const colAvg = colValues.length > 0 ? +(colValues.reduce((s, v) => s + v, 0) / colValues.length).toFixed(1) : 0;
-                return (
-                  <td key={pillar} className="py-1 px-1 text-center">
-                    <span className={`inline-block rounded-md py-2 px-2 font-semibold text-xs ${getHeatColor(colAvg, metricConfig.max)}`}>
-                      {colAvg}{metric === 'stability' ? '%' : ''}
-                    </span>
-                  </td>
-                );
-              })}
-              <td />
-            </tr>
           </tbody>
         </table>
       </div>

@@ -9,6 +9,13 @@ export const cios: CIO[] = [
 
 export const defaultPlatforms = ['Consumer', 'Commercial', 'Wealth & Investment', 'Insurance'];
 
+export const subPlatformMap: Record<string, string[]> = {
+  'Consumer': ['Cards', 'Loans', 'Transport'],
+  'Commercial': ['Trade Finance', 'Cash Management', 'Lending'],
+  'Wealth & Investment': ['Advisory', 'Trading', 'Custody'],
+  'Insurance': ['Life', 'General', 'Reinsurance'],
+};
+
 export const defaultPillars = [
   'Business and Technology',
   'Run and Change Together',
@@ -50,36 +57,40 @@ const generateTeamsForQuarter = (quarter: string, seed: number): TeamData[] => {
   const teams: TeamData[] = [];
   let teamIdx = 0;
 
-  // Generate at least one team per platform-pillar combination to ensure full heatmap coverage
+  // Generate teams per platform → sub-platform → pillar
   for (let pIdx = 0; pIdx < platforms.length; pIdx++) {
-    for (let plIdx = 0; plIdx < pillars.length; plIdx++) {
-      const growth = seed * 0.15;
-      const base = 3.5 + (teamIdx % 7) * 0.8 + growth;
-      const clamp = (v: number) => Math.min(10, Math.max(1, Math.round(v * 10) / 10));
+    const subs = subPlatformMap[platforms[pIdx]] || [platforms[pIdx]];
+    for (let sIdx = 0; sIdx < subs.length; sIdx++) {
+      for (let plIdx = 0; plIdx < pillars.length; plIdx++) {
+        const growth = seed * 0.15;
+        const base = 3.5 + (teamIdx % 7) * 0.8 + growth;
+        const clamp = (v: number) => Math.min(10, Math.max(1, Math.round(v * 10) / 10));
 
-      let maturityAdj = 0, performanceAdj = 0, agilityAdj = 0, stabilityAdj = 0;
-      if (dip) {
-        const platformMatch = !dip.platforms || dip.platforms.includes(platforms[pIdx]);
-        const pillarMatch = !dip.pillars || dip.pillars.includes(pillars[plIdx]);
-        if (platformMatch && pillarMatch) {
-          maturityAdj = dip.maturityAdj;
-          performanceAdj = dip.performanceAdj;
-          agilityAdj = dip.agilityAdj;
-          stabilityAdj = dip.stabilityAdj;
+        let maturityAdj = 0, performanceAdj = 0, agilityAdj = 0, stabilityAdj = 0;
+        if (dip) {
+          const platformMatch = !dip.platforms || dip.platforms.includes(platforms[pIdx]);
+          const pillarMatch = !dip.pillars || dip.pillars.includes(pillars[plIdx]);
+          if (platformMatch && pillarMatch) {
+            maturityAdj = dip.maturityAdj;
+            performanceAdj = dip.performanceAdj;
+            agilityAdj = dip.agilityAdj;
+            stabilityAdj = dip.stabilityAdj;
+          }
         }
-      }
 
-      teams.push({
-        name: `Team ${platforms[pIdx].substring(0, 3).toUpperCase()}-${pillars[plIdx].substring(0, 3).toUpperCase()}-${teamIdx + 1}`,
-        maturity: clamp(base + (teamIdx % 3) * 0.3 + maturityAdj),
-        performance: clamp(base - 0.2 + (teamIdx % 4) * 0.2 + performanceAdj),
-        agility: clamp(base - 0.4 + (teamIdx % 5) * 0.15 + agilityAdj),
-        stability: Math.min(100, Math.max(20, Math.round(base * 10 + (teamIdx % 6) * 3 + stabilityAdj))),
-        platform: platforms[pIdx],
-        pillar: pillars[plIdx],
-        quarter,
-      });
-      teamIdx++;
+        teams.push({
+          name: `Team ${subs[sIdx].substring(0, 3).toUpperCase()}-${pillars[plIdx].substring(0, 3).toUpperCase()}-${teamIdx + 1}`,
+          maturity: clamp(base + (teamIdx % 3) * 0.3 + maturityAdj),
+          performance: clamp(base - 0.2 + (teamIdx % 4) * 0.2 + performanceAdj),
+          agility: clamp(base - 0.4 + (teamIdx % 5) * 0.15 + agilityAdj),
+          stability: Math.min(100, Math.max(20, Math.round(base * 10 + (teamIdx % 6) * 3 + stabilityAdj))),
+          platform: platforms[pIdx],
+          subPlatform: subs[sIdx],
+          pillar: pillars[plIdx],
+          quarter,
+        });
+        teamIdx++;
+      }
     }
   }
 
@@ -111,7 +122,6 @@ export const dummyTimeSeries: TimeSeriesPoint[] = [
   { period: 'Q2 2025', maturity: 5.5, performance: 5.7, agility: 5.2 },
   { period: 'Q3 2025', maturity: 6.1, performance: 6.3, agility: 5.8 },
   { period: 'Q4 2025', maturity: 6.8, performance: 6.9, agility: 6.4 },
-  
 ];
 
 export const quarterlyTrends: QuarterlyTrend[] = availableQuarters.map((q, i) => ({

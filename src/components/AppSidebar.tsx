@@ -33,12 +33,12 @@ const AppSidebar: React.FC = () => {
 
   const dashboardItems = [
     { title: 'Overview', url: '/', icon: Gauge },
-    ...(showDashboard || showSupervisor ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
-    { title: 'Dimensions', url: '/dimensions', icon: BarChart3 },
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
+    { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
     { title: 'Trends', url: '/trends', icon: TrendingUp },
-    ...(showDashboard || showSupervisor ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
-    ...(showDashboard || showSupervisor ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
-    ...(showDashboard || showSupervisor ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
     { title: 'Team Data', url: '/team-data', icon: Download },
   ];
 
