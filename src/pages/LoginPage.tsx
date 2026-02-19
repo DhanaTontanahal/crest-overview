@@ -19,7 +19,7 @@ const roleConfig: { value: UserRole; label: string; icon: React.ReactNode; descr
 ];
 
 /* ── Carousel ── */
-const SLIDE_TITLES = ['Maturity Framework', 'Assessment to Metrics', 'Framework at a Glance'];
+const SLIDE_TITLES = ['Framework at a Glance', 'Maturity Framework', 'Assessment to Metrics'];
 
 const LandingCarousel: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -57,13 +57,18 @@ const LandingCarousel: React.FC = () => {
       </div>
 
       <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-sm" style={{ minHeight: 500 }}>
-        {/* Slide 0 — Framework Circle */}
-        <div className="absolute inset-0 p-6 transition-all duration-700 ease-in-out" style={slideStyle(0)}>
+        {/* Slide 0 — Mind Map */}
+        <div className="absolute inset-0 p-6 transition-all duration-700 ease-in-out overflow-y-auto" style={slideStyle(0)}>
+          <MindMap />
+        </div>
+
+        {/* Slide 1 — Framework Circle */}
+        <div className="absolute inset-0 p-6 transition-all duration-700 ease-in-out" style={slideStyle(1)}>
           <div className="relative w-full h-full" style={{ minHeight: 460 }}>
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 600 460" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
               <circle cx="300" cy="230" r="130" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.1" />
               <circle cx="300" cy="230" r="110" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.2" />
-              <circle cx="300" cy="230" r="110" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.7" strokeDasharray="691" strokeDashoffset="691" style={{ animation: current === 0 ? 'draw-circle 2s ease-out 0.2s forwards' : 'none' }} />
+              <circle cx="300" cy="230" r="110" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.7" strokeDasharray="691" strokeDashoffset="691" style={{ animation: current === 1 ? 'draw-circle 2s ease-out 0.2s forwards' : 'none' }} />
               {[0, 1, 2].map(i => (
                 <circle key={i} r="4" fill="hsl(var(--primary))" opacity="0.6">
                   <animateMotion dur={`${5 + i * 2}s`} repeatCount="indefinite" begin={`${i * 1.2}s`}><mpath xlinkHref="#cPath" /></animateMotion>
@@ -71,7 +76,7 @@ const LandingCarousel: React.FC = () => {
               ))}
               <circle id="cPath" cx="300" cy="230" r="110" fill="none" stroke="none" />
               {[{ x1: 220, y1: 150, x2: 60, y2: 40 }, { x1: 380, y1: 150, x2: 540, y2: 40 }, { x1: 380, y1: 310, x2: 540, y2: 420 }, { x1: 220, y1: 310, x2: 60, y2: 420 }].map((l, i) => (
-                <line key={i} {...l} stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0" strokeDasharray="4 4" style={{ animation: current === 0 ? `fade-line 0.6s ease-out ${0.2 + i * 0.15}s forwards` : 'none' }} />
+                <line key={i} {...l} stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0" strokeDasharray="4 4" style={{ animation: current === 1 ? `fade-line 0.6s ease-out ${0.2 + i * 0.15}s forwards` : 'none' }} />
               ))}
               {[{ cx: 220, cy: 150 }, { cx: 380, cy: 150 }, { cx: 380, cy: 310 }, { cx: 220, cy: 310 }].map((p, i) => (
                 <React.Fragment key={i}>
@@ -95,7 +100,7 @@ const LandingCarousel: React.FC = () => {
               { pos: { right: '2%', bottom: '2%' } as React.CSSProperties, icon: MessageSquare, label: 'What', text: 'Common language for capability, gaps and progress', anim: 'slide-in-right-custom', delay: '0.6s' },
               { pos: { left: '2%', bottom: '2%' } as React.CSSProperties, icon: Clock, label: 'When', text: 'Reviewed every six months — a marathon, not a sprint', anim: 'slide-in-left', delay: '0.8s' },
             ].map((item, i) => (
-              <div key={i} className="absolute z-10 w-[34%] opacity-0" style={{ ...item.pos, animation: current === 0 ? `${item.anim} 0.6s ease-out ${item.delay} forwards` : 'none' }}>
+              <div key={i} className="absolute z-10 w-[34%] opacity-0" style={{ ...item.pos, animation: current === 1 ? `${item.anim} 0.6s ease-out ${item.delay} forwards` : 'none' }}>
                 <div className="bg-card/90 backdrop-blur-sm rounded-lg p-2.5 border border-border/50 shadow-sm hover:-translate-y-0.5 transition-transform duration-200">
                   <div className="flex items-start gap-2">
                     <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shrink-0"><item.icon className="w-4 h-4 text-primary-foreground" /></div>
@@ -110,12 +115,12 @@ const LandingCarousel: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide 1 — Assessment Flow */}
-        <div className="absolute inset-0 p-6 transition-all duration-700 ease-in-out" style={slideStyle(1)}>
+        {/* Slide 2 — Assessment Flow */}
+        <div className="absolute inset-0 p-6 transition-all duration-700 ease-in-out" style={slideStyle(2)}>
           <div className="flex flex-col items-center gap-0 max-w-lg mx-auto">
             <h3 className="text-base font-bold text-card-foreground mb-4 text-center">How Assessments Drive Metrics</h3>
 
-            <div className="w-full bg-background border border-border rounded-xl p-4 shadow-sm opacity-0" style={{ animation: current === 1 ? 'scale-in 0.4s ease-out 0.1s forwards' : 'none' }}>
+            <div className="w-full bg-background border border-border rounded-xl p-4 shadow-sm opacity-0" style={{ animation: current === 2 ? 'scale-in 0.4s ease-out 0.1s forwards' : 'none' }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shrink-0"><ClipboardList className="w-5 h-5 text-primary-foreground" /></div>
                 <div>
@@ -127,10 +132,10 @@ const LandingCarousel: React.FC = () => {
 
             <div className="relative h-10 w-px">
               <div className="absolute inset-0 bg-primary/20" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary opacity-0" style={{ animation: current === 1 ? 'flow-dot 2s ease-in-out 0.5s infinite' : 'none' }} />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary opacity-0" style={{ animation: current === 2 ? 'flow-dot 2s ease-in-out 0.5s infinite' : 'none' }} />
             </div>
 
-            <div className="w-full bg-background border border-border rounded-xl p-4 shadow-sm opacity-0" style={{ animation: current === 1 ? 'scale-in 0.4s ease-out 0.3s forwards' : 'none' }}>
+            <div className="w-full bg-background border border-border rounded-xl p-4 shadow-sm opacity-0" style={{ animation: current === 2 ? 'scale-in 0.4s ease-out 0.3s forwards' : 'none' }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 border-2 border-primary rounded-lg flex items-center justify-center shrink-0"><UserCheck className="w-5 h-5 text-primary" /></div>
                 <div>
@@ -142,10 +147,10 @@ const LandingCarousel: React.FC = () => {
 
             <div className="relative h-10 w-px">
               <div className="absolute inset-0 bg-primary/20" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary opacity-0" style={{ animation: current === 1 ? 'flow-dot 2s ease-in-out 0.9s infinite' : 'none' }} />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary opacity-0" style={{ animation: current === 2 ? 'flow-dot 2s ease-in-out 0.9s infinite' : 'none' }} />
             </div>
 
-            <div className="w-full bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 shadow-sm opacity-0" style={{ animation: current === 1 ? 'scale-in 0.4s ease-out 0.5s forwards' : 'none' }}>
+            <div className="w-full bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 shadow-sm opacity-0" style={{ animation: current === 2 ? 'scale-in 0.4s ease-out 0.5s forwards' : 'none' }}>
               <p className="text-sm font-bold text-card-foreground mb-3 flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Metric Outputs</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
@@ -154,7 +159,7 @@ const LandingCarousel: React.FC = () => {
                   { name: 'Performance', color: 'hsl(155, 60%, 40%)', dims: 'Throughput · Predictability · Deploy Freq. · Lead Time' },
                   { name: 'Agility', color: 'hsl(45, 80%, 50%)', dims: 'Adaptability · Innovation · Time to Market · Responsiveness' },
                 ].map((m, i) => (
-                  <div key={m.name} className="bg-card/80 rounded-lg p-2.5 border border-border opacity-0 hover:-translate-y-0.5 transition-transform duration-200" style={{ animation: current === 1 ? `slide-up 0.4s ease-out ${0.7 + i * 0.1}s forwards` : 'none', borderLeftWidth: 3, borderLeftColor: m.color }}>
+                  <div key={m.name} className="bg-card/80 rounded-lg p-2.5 border border-border opacity-0 hover:-translate-y-0.5 transition-transform duration-200" style={{ animation: current === 2 ? `slide-up 0.4s ease-out ${0.7 + i * 0.1}s forwards` : 'none', borderLeftWidth: 3, borderLeftColor: m.color }}>
                     <p className="text-xs font-bold text-card-foreground">{m.name}</p>
                     <p className="text-[9px] text-muted-foreground leading-snug mt-0.5">{m.dims}</p>
                   </div>
@@ -162,11 +167,6 @@ const LandingCarousel: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Slide 2 — Mind Map */}
-        <div className="absolute inset-0 p-6 transition-all duration-700 ease-in-out overflow-y-auto" style={slideStyle(2)}>
-          <MindMap />
         </div>
       </div>
 
