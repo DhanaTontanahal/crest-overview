@@ -6,7 +6,6 @@ import GaugeChart from '@/components/GaugeChart';
 import ExcelUpload from '@/components/ExcelUpload';
 import AdminSettings from '@/components/AdminSettings';
 import UserTPLView from '@/components/UserTPLView';
-import SupervisorView from '@/components/SupervisorView';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
 } from 'recharts';
@@ -38,9 +37,17 @@ interface MetricInsight {
 }
 
 const OverviewPage: React.FC = () => {
-  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, calculationMethod,
+  const { user, teams, platforms, selectedPlatform, setSelectedPlatform, selectedPillar, selectedQuarter, cios, calculationMethod,
     maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions, quarterlyTrends } = useAppState();
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+
+  // Auto-set platform for supervisors
+  const supervisorPlatform = user?.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
+  React.useEffect(() => {
+    if (supervisorPlatform && selectedPlatform !== supervisorPlatform) {
+      setSelectedPlatform(supervisorPlatform);
+    }
+  }, [supervisorPlatform]);
 
   const calc = useCallback((values: number[]): number => {
     if (values.length === 0) return 0;
@@ -192,11 +199,9 @@ const OverviewPage: React.FC = () => {
   }, [maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions, quarterlyTrends, selectedQuarter]);
 
   const isSuperUser = user?.role === 'superuser';
-  const showDashboard = isSuperUser || user?.role === 'admin';
-  const showSupervisor = user?.role === 'supervisor';
+  const showDashboard = isSuperUser || user?.role === 'admin' || user?.role === 'supervisor';
   const isTPL = user?.role === 'user';
-  const supervisorPlatform = user?.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
-  const isSpecificPlatform = selectedPlatform !== 'All' && showDashboard;
+  const isSpecificPlatform = selectedPlatform !== 'All';
 
   const handleGaugeClick = (metricKey: string) => {
     setSelectedMetric(prev => prev === metricKey ? null : metricKey);
@@ -350,11 +355,6 @@ const OverviewPage: React.FC = () => {
         </div>
       )}
 
-      {showSupervisor && supervisorPlatform && (
-        <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-          <SupervisorView platform={supervisorPlatform} />
-        </div>
-      )}
 
       {showDashboard && (
         <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
