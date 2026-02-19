@@ -4,6 +4,7 @@ import { cios, defaultPlatforms } from '@/data/dummyData';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shield, Eye, User, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, ArrowRight, FileSearch } from 'lucide-react';
+import MindMap from '@/components/MindMap';
 
 interface LoginPageProps {
   onLogin: (profile: UserProfile) => void;
@@ -283,6 +284,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </React.Fragment>
         ))}
       </div>
+      {/* Mind Map */}
+      <MindMap />
     </div>
   );
 };
