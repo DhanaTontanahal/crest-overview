@@ -23,6 +23,7 @@ const TeamDataPage: React.FC = () => {
     const data = filtered.map(t => ({
       Team: t.name,
       Platform: t.platform,
+      'Sub Platform': t.subPlatform,
       Pillar: t.pillar,
       Quarter: t.quarter,
       Maturity: t.maturity.toFixed(1),
@@ -59,6 +60,7 @@ const TeamDataPage: React.FC = () => {
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Team</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Platform</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Sub Platform</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Pillar</th>
                 <th className="text-right py-3 px-4 text-muted-foreground font-medium">Maturity</th>
                 <th className="text-right py-3 px-4 text-muted-foreground font-medium">Performance</th>
@@ -71,6 +73,7 @@ const TeamDataPage: React.FC = () => {
                 <tr key={i} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                   <td className="py-3 px-4 font-medium">{team.name}</td>
                   <td className="py-3 px-4">{team.platform}</td>
+                  <td className="py-3 px-4">{team.subPlatform}</td>
                   <td className="py-3 px-4">{team.pillar}</td>
                   <td className="text-right py-3 px-4">{team.maturity.toFixed(1)}</td>
                   <td className="text-right py-3 px-4">{team.performance.toFixed(1)}</td>

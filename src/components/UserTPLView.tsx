@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAppState } from '@/context/AppContext';
-import { Building2, Activity, Award, Users, TrendingUp, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { Users } from 'lucide-react';
 import ChartChatBox from '@/components/ChartChatBox';
 import GaugeChart from '@/components/GaugeChart';
 import DimensionChart from '@/components/DimensionChart';
@@ -19,12 +19,6 @@ const PILLAR_COLORS = [
   'hsl(140, 45%, 70%)',
 ];
 
-const TrendArrow: React.FC<{ value: number }> = ({ value }) => {
-  if (value > 0) return <ArrowUpRight className="w-4 h-4 text-green-500" />;
-  if (value < 0) return <ArrowDownRight className="w-4 h-4 text-red-500" />;
-  return <Minus className="w-4 h-4 text-muted-foreground" />;
-};
-
 const UserTPLView: React.FC = () => {
   const { user, teams, selectedQuarter, pillars, maturityDimensions, performanceMetrics } = useAppState();
 
@@ -33,6 +27,12 @@ const UserTPLView: React.FC = () => {
   const platformTeams = useMemo(() =>
     teams.filter(t => t.quarter === selectedQuarter && t.platform === userPlatform),
     [teams, selectedQuarter, userPlatform]
+  );
+
+  // All teams in the quarter for overall comparison
+  const allQuarterTeams = useMemo(() =>
+    teams.filter(t => t.quarter === selectedQuarter),
+    [teams, selectedQuarter]
   );
 
   const pillarData = useMemo(() => {
@@ -51,6 +51,21 @@ const UserTPLView: React.FC = () => {
     ? Math.round((platformTeams.reduce((s, t) => s + t.maturity, 0) / platformTeams.length) * 10) : 0;
   const avgPerformance = platformTeams.length > 0
     ? Math.round((platformTeams.reduce((s, t) => s + t.performance, 0) / platformTeams.length) * 10) : 0;
+
+  // Current platform vs Overall comparison data
+  const comparisonData = useMemo(() => {
+    const overallAvg = (key: 'agility' | 'maturity' | 'performance' | 'stability') =>
+      allQuarterTeams.length > 0 ? +(allQuarterTeams.reduce((s, t) => s + t[key], 0) / allQuarterTeams.length).toFixed(1) : 0;
+    const platformAvg = (key: 'agility' | 'maturity' | 'performance' | 'stability') =>
+      platformTeams.length > 0 ? +(platformTeams.reduce((s, t) => s + t[key], 0) / platformTeams.length).toFixed(1) : 0;
+
+    return [
+      { metric: 'Maturity', [userPlatform]: platformAvg('maturity'), Overall: overallAvg('maturity') },
+      { metric: 'Performance', [userPlatform]: platformAvg('performance'), Overall: overallAvg('performance') },
+      { metric: 'Agility', [userPlatform]: platformAvg('agility'), Overall: overallAvg('agility') },
+      { metric: 'Stability', [userPlatform]: +(platformAvg('stability') / 10).toFixed(1), Overall: +(overallAvg('stability') / 10).toFixed(1) },
+    ];
+  }, [platformTeams, allQuarterTeams, userPlatform]);
 
   return (
     <div className="space-y-6">
@@ -78,6 +93,24 @@ const UserTPLView: React.FC = () => {
             <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={platformTeams.length} />
           </div>
         ))}
+      </div>
+
+      {/* Current Platform vs Overall Comparison */}
+      <div className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up relative" style={{ animationDelay: '0.25s', animationFillMode: 'forwards' }}>
+        <ChartChatBox chartTitle={`${userPlatform} vs Organisation Overall`} />
+        <h3 className="text-base font-semibold text-card-foreground text-center">{userPlatform} vs Organisation Overall</h3>
+        <p className="text-xs text-muted-foreground text-center mb-4">How your platform compares against the organisation-wide average across key metrics</p>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={comparisonData} layout="vertical" margin={{ left: 20, right: 20, top: 5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+            <XAxis type="number" domain={[0, 10]} fontSize={11} />
+            <YAxis dataKey="metric" type="category" width={100} fontSize={11} />
+            <Tooltip />
+            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Bar dataKey={userPlatform} fill="hsl(163, 100%, 21%)" barSize={12} radius={[0, 4, 4, 0]} />
+            <Bar dataKey="Overall" fill="hsl(var(--muted-foreground) / 0.3)" barSize={12} radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Dimension Charts */}

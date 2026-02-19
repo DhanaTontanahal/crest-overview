@@ -31,6 +31,7 @@ export interface TeamData {
   agility: number;
   stability: number;
   platform: string;
+  subPlatform: string;
   pillar: string;
   quarter: string;
 }

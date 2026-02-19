@@ -1,15 +1,15 @@
-Team,Maturity,Performance,Agility,Stability,Platform,Pillar
-Team Alpha,7.8,7.2,7.5,82,Consumer,Business and Technology
-Team Beta,5.1,5.6,4.9,58,Commercial,Run and Change Together
-Team Gamma,8.5,8.1,8.3,91,Wealth & Investment,All in One Agile
-Team Delta,3.9,4.2,3.7,45,Insurance,Project to Product
-Team Epsilon,6.4,6.9,6.2,73,Consumer,Engineering Excellence
-Team Zeta,4.6,3.8,4.1,52,Commercial,Dynamic and Well Controlled
-Team Eta,8.9,8.7,8.5,94,Wealth & Investment,Business and Technology
-Team Theta,6.3,5.5,6.8,68,Insurance,Run and Change Together
-Team Iota,7.1,7.4,6.6,76,Consumer,All in One Agile
-Team Kappa,5.7,6.1,5.3,61,Commercial,Project to Product
-Team Lambda,3.2,3.5,2.9,38,Insurance,Engineering Excellence
-Team Mu,4.1,3.6,3.4,42,Commercial,Dynamic and Well Controlled
-Team Nu,6.8,7.0,6.5,74,Wealth & Investment,Business and Technology
-Team Xi,2.8,3.1,2.5,32,Insurance,All in One Agile
+Team,Maturity,Performance,Agility,Stability,Platform,Sub Platform,Pillar
+Team Alpha,7.8,7.2,7.5,82,Consumer,Cards,Business and Technology
+Team Beta,5.1,5.6,4.9,58,Commercial,Trade Finance,Run and Change Together
+Team Gamma,8.5,8.1,8.3,91,Wealth & Investment,Advisory,All in One Agile
+Team Delta,3.9,4.2,3.7,45,Insurance,Life,Project to Product
+Team Epsilon,6.4,6.9,6.2,73,Consumer,Loans,Engineering Excellence
+Team Zeta,4.6,3.8,4.1,52,Commercial,Cash Management,Dynamic and Well Controlled
+Team Eta,8.9,8.7,8.5,94,Wealth & Investment,Trading,Business and Technology
+Team Theta,6.3,5.5,6.8,68,Insurance,General,Run and Change Together
+Team Iota,7.1,7.4,6.6,76,Consumer,Transport,All in One Agile
+Team Kappa,5.7,6.1,5.3,61,Commercial,Lending,Project to Product
+Team Lambda,3.2,3.5,2.9,38,Insurance,Reinsurance,Engineering Excellence
+Team Mu,4.1,3.6,3.4,42,Commercial,Trade Finance,Dynamic and Well Controlled
+Team Nu,6.8,7.0,6.5,74,Wealth & Investment,Custody,Business and Technology
+Team Xi,2.8,3.1,2.5,32,Insurance,Life,All in One Agile
