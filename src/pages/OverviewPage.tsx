@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import { useAppState } from '@/context/AppContext';
 import { CalculationMethod } from '@/context/AppContext';
 import GaugeChart from '@/components/GaugeChart';
-import DimensionChart from '@/components/DimensionChart';
+
 import ExcelUpload from '@/components/ExcelUpload';
 import AdminSettings from '@/components/AdminSettings';
 import UserTPLView from '@/components/UserTPLView';
@@ -27,7 +27,7 @@ const METRIC_COLORS: Record<string, string> = {
 };
 
 const OverviewPage: React.FC = () => {
-  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions, calculationMethod } = useAppState();
+  const { user, teams, platforms, selectedPlatform, selectedPillar, selectedQuarter, cios, calculationMethod } = useAppState();
 
   const calc = useCallback((values: number[]): number => {
     if (values.length === 0) return 0;
@@ -96,62 +96,23 @@ const OverviewPage: React.FC = () => {
   const supervisorPlatform = user?.role === 'supervisor' && user.cioId ? cios.find(c => c.id === user.cioId)?.platform : undefined;
   const isSpecificPlatform = selectedPlatform !== 'All' && showDashboard;
 
-  const renderGaugesAndDimensions = () => (
+  const renderGauges = () => (
     <>
-      {!isSpecificPlatform && (
-        <div className="relative">
-          <span className="absolute -top-1 right-0 inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full" aria-label={`Using ${CALC_LABELS[calculationMethod]} calculation`}>
-            <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
-            {[
-              { value: avgStability, title: 'Overall Team Stability', subtitle: 'How stable are my teams?' },
-              { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are my teams?' },
-              { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
-              { value: avgAgility, title: 'Overall Agility', subtitle: 'How agile are my teams?' },
-            ].map((gauge, i) => (
-              <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
-                <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {isSpecificPlatform && platformComparisonData && (
-        <>
-          <div className="relative">
-            <span className="absolute -top-1 right-0 inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full" aria-label={`Using ${CALC_LABELS[calculationMethod]} calculation`}>
-              <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { value: avgStability, title: 'Overall Team Stability', subtitle: `${selectedPlatform} stability` },
-                { value: avgMaturity, title: 'Overall Maturity', subtitle: `${selectedPlatform} maturity` },
-                { value: avgPerformance, title: 'Overall Performance', subtitle: `${selectedPlatform} performance` },
-                { value: avgAgility, title: 'Overall Agility', subtitle: `${selectedPlatform} agility` },
-              ].map((gauge, i) => (
-                <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
-                  <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
-                </div>
-              ))}
+      <div className="relative">
+        <span className="absolute -top-1 right-0 inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full" aria-label={`Using ${CALC_LABELS[calculationMethod]} calculation`}>
+          <Calculator className="w-3 h-3" /> {CALC_LABELS[calculationMethod]}
+        </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Key metrics gauges">
+          {[
+            { value: avgStability, title: 'Overall Team Stability', subtitle: isSpecificPlatform ? `${selectedPlatform} stability` : 'How stable are my teams?' },
+            { value: avgMaturity, title: 'Overall Maturity', subtitle: isSpecificPlatform ? `${selectedPlatform} maturity` : 'How mature are my teams?' },
+            { value: avgPerformance, title: 'Overall Performance', subtitle: isSpecificPlatform ? `${selectedPlatform} performance` : 'How well are teams performing?' },
+            { value: avgAgility, title: 'Overall Agility', subtitle: isSpecificPlatform ? `${selectedPlatform} agility` : 'How agile are my teams?' },
+          ].map((gauge, i) => (
+            <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
+              <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={filteredTeams.length} />
             </div>
-          </div>
-        </>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
-          <DimensionChart title="Stability Dimensions" subtitle="How dimensions contribute to stability" dimensions={stabilityDimensions} />
-        </div>
-        <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
-          <DimensionChart title="Maturity Dimensions" subtitle="How dimensions contribute to maturity" dimensions={maturityDimensions} />
-        </div>
-        <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
-          <DimensionChart title="Performance Metrics" subtitle="How metrics contribute to performance" dimensions={performanceMetrics} />
-        </div>
-        <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
-          <DimensionChart title="Agility Dimensions" subtitle="How dimensions contribute to agility" dimensions={agilityDimensions} />
+          ))}
         </div>
       </div>
     </>
@@ -180,7 +141,7 @@ const OverviewPage: React.FC = () => {
 
       {showDashboard && (
         <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-          {renderGaugesAndDimensions()}
+          {renderGauges()}
         </div>
       )}
     </section>
