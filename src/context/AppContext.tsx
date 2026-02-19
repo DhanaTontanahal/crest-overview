@@ -4,6 +4,7 @@ import { Assessment, AssessmentQuestion, assessmentQuestions as defaultQuestions
 import { sampleAssessments } from '@/data/assessmentQuestions';
 import {
   dummyTeams, dummyMaturityDimensions, dummyPerformanceMetrics,
+  dummyStabilityDimensions, dummyAgilityDimensions,
   dummyTimeSeries, defaultPlatforms, defaultPillars, cios, quarterlyTrends, availableQuarters, currentQuarter,
 } from '@/data/dummyData';
 
@@ -80,12 +81,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, [filteredTeams]);
 
+  const stabilityDimensions = useMemo<DimensionScore[]>(() => {
+    if (filteredTeams.length === 0) return dummyStabilityDimensions;
+    return dummyStabilityDimensions.map(d => ({
+      ...d,
+      scores: filteredTeams.map((_, i) => d.scores[i % d.scores.length]),
+      average: filteredTeams.reduce((sum, _, i) => sum + d.scores[i % d.scores.length], 0) / filteredTeams.length,
+    }));
+  }, [filteredTeams]);
+
+  const agilityDimensions = useMemo<DimensionScore[]>(() => {
+    if (filteredTeams.length === 0) return dummyAgilityDimensions;
+    return dummyAgilityDimensions.map(d => ({
+      ...d,
+      scores: filteredTeams.map((_, i) => d.scores[i % d.scores.length]),
+      average: filteredTeams.reduce((sum, _, i) => sum + d.scores[i % d.scores.length], 0) / filteredTeams.length,
+    }));
+  }, [filteredTeams]);
+
   const value: ExtendedAppState = {
     user, setUser,
     role, setRole, teams, setTeams,
     platforms, setPlatforms, pillars, setPillars,
     cios,
     maturityDimensions, performanceMetrics,
+    stabilityDimensions, agilityDimensions,
     timeSeries, setTimeSeries,
     selectedPlatform, setSelectedPlatform,
     selectedPillar, setSelectedPillar,
