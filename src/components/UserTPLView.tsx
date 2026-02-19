@@ -6,7 +6,6 @@ import GaugeChart from '@/components/GaugeChart';
 import DimensionChart from '@/components/DimensionChart';
 import PillarImprovement from '@/components/PillarImprovement';
 import ActionItems from '@/components/ActionItems';
-import SubPlatformHeatmap from '@/components/SubPlatformHeatmap';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, Legend,
 } from 'recharts';
@@ -96,10 +95,6 @@ const UserTPLView: React.FC = () => {
         ))}
       </div>
 
-      {/* Sub-Platform Heatmap */}
-      <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-        <SubPlatformHeatmap platform={userPlatform} />
-      </div>
 
       {/* Current Platform vs Overall Comparison */}
       <div className="bg-card rounded-xl p-6 shadow-sm border border-border opacity-0 animate-slide-up relative" style={{ animationDelay: '0.25s', animationFillMode: 'forwards' }}>
