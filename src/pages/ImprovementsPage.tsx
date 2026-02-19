@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppState } from '@/context/AppContext';
 import PillarImprovement from '@/components/PillarImprovement';
 import ActionItems from '@/components/ActionItems';
+import PageHeader from '@/components/PageHeader';
 
 const ImprovementsPage: React.FC = () => {
   const { user, cios } = useAppState();
@@ -10,6 +11,15 @@ const ImprovementsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        title="Improvements & Action Plan"
+        subtitle="Pillar-level improvement opportunities and prioritised action items for the current quarter."
+        infoContent={[
+          'Pillar improvements highlight areas where teams score below target thresholds.',
+          'Action items are auto-generated based on the lowest-scoring pillars and platforms.',
+          'Supervisors see only their assigned platform; Super Users see the full organisation.',
+        ]}
+      />
       <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}>
         <PillarImprovement platformFilter={supervisorPlatform} />
       </div>

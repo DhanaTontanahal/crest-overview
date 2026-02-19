@@ -6,6 +6,7 @@ import GaugeChart from '@/components/GaugeChart';
 import ExcelUpload from '@/components/ExcelUpload';
 import AdminSettings from '@/components/AdminSettings';
 import UserTPLView from '@/components/UserTPLView';
+import PageHeader from '@/components/PageHeader';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
 } from 'recharts';
@@ -358,6 +359,16 @@ const OverviewPage: React.FC = () => {
 
       {showDashboard && (
         <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+          <PageHeader
+            title="Overview"
+            subtitle="High-level health gauges across all four key metrics — click any gauge to expand dimension insights."
+            infoContent={[
+              'Gauges show aggregated team scores for the selected quarter, platform, and pillar filters.',
+              'Click a gauge to expand a detailed breakdown of its contributing dimensions.',
+              'The calculation method (simple avg, weighted, median, trimmed) can be changed in Admin Settings.',
+              'Supervisors see only their assigned platform; Super Users see the full organisation.',
+            ]}
+          />
           {renderGauges()}
         </div>
       )}

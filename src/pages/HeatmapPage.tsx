@@ -6,6 +6,7 @@ import { Building2, ChevronRight, ArrowLeft, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ChartChatBox from '@/components/ChartChatBox';
+import PageHeader from '@/components/PageHeader';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
@@ -127,25 +128,18 @@ const HeatmapPage: React.FC = () => {
   // Main heatmap view for other roles
   return (
     <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+      <PageHeader
+        title="Cross-Platform Maturity Scorecard"
+        subtitle="Heatmap showing average metric scores at every platform–pillar intersection."
+        infoContent={[
+          'Each cell displays the average score across all teams in that platform–pillar intersection.',
+          'Values come from team-level data (uploaded via Admin → Data Upload or system defaults).',
+          'Assessment responses feed the Dimension & Metric charts separately (scaled 1–5 → 2–10).',
+          'Click any cell to drill into team-level KPIs for that intersection.',
+          'Use the metric dropdown to switch between Maturity, Performance, Agility, and Stability.',
+        ]}
+      />
       <PlatformPillarHeatmap onDrill={(platform, pillar) => { setDrillPlatform(platform); setDrillPillar(pillar); }} />
-
-      {/* Data source info card */}
-      <Card className="border-border/60">
-        <CardContent className="p-5">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-            <div className="space-y-2 text-sm">
-              <h4 className="font-semibold text-card-foreground">Where do these values come from?</h4>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li><span className="font-medium text-foreground">Team Data (Excel Upload):</span> Each cell shows the average metric score across all teams in that platform–pillar intersection, sourced from uploaded team data or system defaults.</li>
-                <li><span className="font-medium text-foreground">Assessment Responses:</span> When platform leads submit self-assessments (1–5 scale), those scores are scaled (×2) and aggregated to drive the <span className="italic">Dimension &amp; Metric charts</span> (Maturity, Performance, Stability, Agility breakdowns).</li>
-                <li><span className="font-medium text-foreground">Quarterly Filtering:</span> All values are scoped to the currently selected quarter.</li>
-              </ul>
-              <p className="text-xs text-muted-foreground/80 pt-1">To update heatmap scores, upload new team data via Admin → Data Upload. To influence dimension metrics, submit or update platform assessments.</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
