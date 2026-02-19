@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import {
   Gauge, BarChart3, TrendingUp, Target, ClipboardList, FileSearch, Eye, Download, Upload, Settings, Users,
-  Heart, Grid3X3, CalendarCheck, Lightbulb,
+  Heart, Grid3X3, CalendarCheck, Lightbulb, GitCompare,
 } from 'lucide-react';
 
 const AppSidebar: React.FC = () => {
@@ -35,6 +35,7 @@ const AppSidebar: React.FC = () => {
     { title: 'Overview', url: '/', icon: Gauge },
     { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
     ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
+    ...(isTPL ? [{ title: 'Platform vs Organisation', url: '/platform-comparison', icon: GitCompare }] : []),
     { title: 'Trends', url: '/trends', icon: TrendingUp },
     ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
     ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),

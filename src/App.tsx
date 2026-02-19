@@ -19,6 +19,7 @@ import TeamDataPage from "@/pages/TeamDataPage";
 import { SubmitAssessmentPage, ViewAssessmentsPage, ReviewAssessmentPage } from "@/pages/AssessmentPages";
 import { AdminUploadPage, AdminSettingsPage } from "@/pages/AdminPages";
 import PersonasPage from "@/pages/PersonasPage";
+import PlatformComparisonPage from "@/pages/PlatformComparisonPage";
 import NotFound from "./pages/NotFound";
 import LoginPage from "@/pages/LoginPage";
 
@@ -37,6 +38,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<OverviewPage />} />
         <Route path="/org-health" element={<OrgHealthPage />} />
         <Route path="/dimensions" element={<DimensionsPage />} />
+        <Route path="/platform-comparison" element={<PlatformComparisonPage />} />
         <Route path="/trends" element={<TrendsPage />} />
         <Route path="/improvements" element={<ImprovementsPage />} />
         <Route path="/heatmap" element={<HeatmapPage />} />
