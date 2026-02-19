@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppState } from '@/context/AppContext';
 import PlatformPillarHeatmap from '@/components/PlatformPillarHeatmap';
+import SubPlatformHeatmap from '@/components/SubPlatformHeatmap';
 import { Building2, ChevronRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ChartChatBox from '@/components/ChartChatBox';
@@ -9,7 +10,7 @@ import {
 } from 'recharts';
 
 const HeatmapPage: React.FC = () => {
-  const { teams, selectedQuarter, pillars } = useAppState();
+  const { user, teams, selectedQuarter, pillars } = useAppState();
   const [drillPlatform, setDrillPlatform] = useState<string | null>(null);
   const [drillPillar, setDrillPillar] = useState<string | null>(null);
 
@@ -110,7 +111,19 @@ const HeatmapPage: React.FC = () => {
     );
   }
 
-  // Main heatmap view
+  const isTPL = user?.role === 'user';
+  const userPlatform = user?.platformId ?? '';
+
+  // TPL users see sub-platform heatmap for their platform
+  if (isTPL && userPlatform) {
+    return (
+      <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+        <SubPlatformHeatmap platform={userPlatform} />
+      </div>
+    );
+  }
+
+  // Main heatmap view for other roles
   return (
     <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
       <PlatformPillarHeatmap onDrill={(platform, pillar) => { setDrillPlatform(platform); setDrillPillar(pillar); }} />
