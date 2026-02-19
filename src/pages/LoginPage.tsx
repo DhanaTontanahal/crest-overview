@@ -170,86 +170,158 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         </div>
       </div>
 
-      {/* Circular Framework Visual */}
-      <div className="w-full max-w-5xl relative animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }} aria-label="Maturity Framework visualization" role="img">
-        <div className="relative mx-auto" style={{ maxWidth: 720, aspectRatio: '720/520' }}>
-          {/* SVG circle with animated dots */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none z-0"
-            viewBox="0 0 720 520"
-            preserveAspectRatio="xMidYMid meet"
-            aria-hidden="true"
-          >
-            <circle cx="280" cy="240" r="180" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.3" />
-            <circle cx="280" cy="240" r="180" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.6" strokeDasharray="1131" strokeDashoffset="1131" style={{ animation: 'draw-circle 2s ease-out 0.5s forwards' }} />
-            {[0, 1, 2].map((i) => (
-              <circle key={i} r="5" fill="hsl(var(--primary))" opacity="0.5">
-                <animateMotion dur={`${6 + i * 2}s`} repeatCount="indefinite" begin={`${i * 1.5}s`}>
-                  <mpath xlinkHref="#circPath" />
-                </animateMotion>
-              </circle>
-            ))}
-            <circle id="circPath" cx="280" cy="240" r="180" fill="none" stroke="none" />
-            <line x1="140" y1="130" x2="40" y2="40" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.2" strokeDasharray="4 4" />
-            <line x1="460" y1="160" x2="520" y2="80" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.2" strokeDasharray="4 4" />
-            <line x1="460" y1="280" x2="520" y2="300" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.2" strokeDasharray="4 4" />
-            <line x1="140" y1="370" x2="40" y2="430" stroke="hsl(var(--primary))" strokeWidth="1.5" opacity="0.2" strokeDasharray="4 4" />
-            {[
-              { cx: 140, cy: 130 }, { cx: 440, cy: 140 }, { cx: 440, cy: 340 }, { cx: 140, cy: 370 },
-            ].map((pos, i) => (
-              <circle key={i} cx={pos.cx} cy={pos.cy} r="20" fill="hsl(var(--primary))" opacity="0.15" />
-            ))}
-          </svg>
+      {/* Framework + Assessment Flow — Two Column */}
+      <div className="w-full max-w-5xl animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          {/* Left: Compact Framework Circle */}
+          <div className="relative" style={{ minHeight: 380 }} aria-label="Maturity Framework visualization" role="img">
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none z-0"
+              viewBox="0 0 400 380"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+            >
+              <circle cx="200" cy="180" r="120" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.25" />
+              <circle cx="200" cy="180" r="120" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" opacity="0.6" strokeDasharray="754" strokeDashoffset="754" style={{ animation: 'draw-circle 2s ease-out 0.5s forwards' }} />
+              {[0, 1, 2].map((i) => (
+                <circle key={i} r="4" fill="hsl(var(--primary))" opacity="0.5">
+                  <animateMotion dur={`${5 + i * 2}s`} repeatCount="indefinite" begin={`${i * 1.2}s`}>
+                    <mpath xlinkHref="#circPath2" />
+                  </animateMotion>
+                </circle>
+              ))}
+              <circle id="circPath2" cx="200" cy="180" r="120" fill="none" stroke="none" />
+              {/* Connector lines to corners */}
+              <line x1="115" y1="100" x2="30" y2="30" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
+              <line x1="285" y1="100" x2="370" y2="30" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
+              <line x1="285" y1="260" x2="370" y2="340" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
+              <line x1="115" y1="260" x2="30" y2="340" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.15" strokeDasharray="4 4" />
+              {[{ cx: 115, cy: 100 }, { cx: 285, cy: 100 }, { cx: 285, cy: 260 }, { cx: 115, cy: 260 }].map((p, i) => (
+                <circle key={i} cx={p.cx} cy={p.cy} r="14" fill="hsl(var(--primary))" opacity="0.12" />
+              ))}
+            </svg>
 
-          <div className="absolute z-10 animate-scale-in" style={{ left: '28%', top: '38%', transform: 'translate(-50%, -50%)', animationDelay: '0.6s', animationFillMode: 'both' }}>
-            <p className="text-xl md:text-2xl font-bold text-foreground text-center leading-tight">Maturity</p>
-            <p className="text-xl md:text-2xl font-bold text-foreground text-center leading-tight">Framework</p>
-          </div>
+            {/* Center label */}
+            <div className="absolute z-10 animate-scale-in" style={{ left: '50%', top: '44%', transform: 'translate(-50%, -50%)', animationDelay: '0.6s', animationFillMode: 'both' }}>
+              <p className="text-lg font-bold text-foreground text-center leading-tight">Maturity</p>
+              <p className="text-lg font-bold text-foreground text-center leading-tight">Framework</p>
+            </div>
 
-          <div className="absolute z-10 w-[40%] md:w-[200px] animate-fade-in" style={{ left: 0, top: 0, animationDelay: '0.4s', animationFillMode: 'both' }}>
-            <div className="flex items-start gap-2">
-              <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
-                <Users className="w-4 h-4 text-primary-foreground" />
+            {/* Who — top-left */}
+            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ left: 0, top: 0, animationDelay: '0.4s', animationFillMode: 'both' }}>
+              <div className="flex items-start gap-1.5">
+                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <Users className="w-3.5 h-3.5 text-primary-foreground" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-foreground">Who</span>
+                  <p className="text-[10px] text-muted-foreground leading-snug">Product / Platform leadership, Voice of Engineer & Customers</p>
+                </div>
               </div>
-              <div>
-                <span className="text-xs font-bold text-foreground">Who:</span>
-                <p className="text-[11px] text-muted-foreground leading-snug">Completed by Product / Platform leadership, Voice of Engineer, Voice of Customers</p>
+            </div>
+
+            {/* Why — top-right */}
+            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ right: 0, top: 0, animationDelay: '0.6s', animationFillMode: 'both' }}>
+              <div className="flex items-start gap-1.5">
+                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-primary-foreground" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-foreground">Why</span>
+                  <p className="text-[10px] text-muted-foreground leading-snug">Baseline maturity and identify areas of opportunity</p>
+                </div>
+              </div>
+            </div>
+
+            {/* What — bottom-right */}
+            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ right: 0, bottom: '5%', animationDelay: '0.8s', animationFillMode: 'both' }}>
+              <div className="flex items-start gap-1.5">
+                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-primary-foreground" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-foreground">What</span>
+                  <p className="text-[10px] text-muted-foreground leading-snug">Common language for capability, gaps and progress</p>
+                </div>
+              </div>
+            </div>
+
+            {/* When — bottom-left */}
+            <div className="absolute z-10 w-[42%] animate-fade-in" style={{ left: 0, bottom: '5%', animationDelay: '1.0s', animationFillMode: 'both' }}>
+              <div className="flex items-start gap-1.5">
+                <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-primary-foreground" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-foreground">When</span>
+                  <p className="text-[10px] text-muted-foreground leading-snug">Reviewed every six months — a marathon, not a sprint</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="absolute z-10 w-[40%] md:w-[220px] animate-fade-in" style={{ right: 0, top: '10%', animationDelay: '0.6s', animationFillMode: 'both' }}>
-            <div className="flex items-start gap-2">
-              <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
-                <TrendingUp className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-foreground">Why:</span>
-                <p className="text-[11px] text-muted-foreground leading-snug">Standardise how Platform leadership baseline their current maturity and understand areas of opportunity</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute z-10 w-[40%] md:w-[240px] animate-fade-in" style={{ right: 0, top: '48%', animationDelay: '0.8s', animationFillMode: 'both' }}>
-            <div className="flex items-start gap-2">
-              <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
-                <MessageSquare className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-foreground">What:</span>
-                <p className="text-[11px] text-muted-foreground leading-snug">Establish a common language for maturity, helping leaders talk consistently about capability, gaps and progress</p>
+          {/* Right: Assessment → Metrics Flow */}
+          <div className="flex flex-col items-center gap-0 opacity-0 animate-fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}>
+            {/* Step 1: Self Assessment */}
+            <div className="w-full bg-card border border-border rounded-xl p-4 shadow-sm opacity-0 animate-scale-in" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shrink-0">
+                  <ClipboardList className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-card-foreground">Self-Assessment Questionnaires</p>
+                  <p className="text-[11px] text-muted-foreground">Platform leaders answer structured questions across all pillars — honest conversations, not tick boxes</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="absolute z-10 w-[40%] md:w-[200px] animate-fade-in" style={{ left: 0, bottom: '5%', animationDelay: '1.0s', animationFillMode: 'both' }}>
-            <div className="flex items-start gap-2">
-              <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
-                <Clock className="w-4 h-4 text-primary-foreground" />
+            {/* Animated connector */}
+            <div className="relative h-10 w-px">
+              <div className="absolute inset-0 bg-primary/20" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary opacity-0" style={{ animation: 'flow-dot 2s ease-in-out 1s infinite' }} />
+            </div>
+
+            {/* Step 2: Scoring */}
+            <div className="w-full bg-card border border-border rounded-xl p-4 shadow-sm opacity-0 animate-scale-in" style={{ animationDelay: '0.9s', animationFillMode: 'forwards' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 border-2 border-primary rounded-lg flex items-center justify-center shrink-0">
+                  <UserCheck className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-card-foreground">Peer Review & Calibration</p>
+                  <p className="text-[11px] text-muted-foreground">Responses reviewed with SME leaders and BUMD for consistency and honest reflection</p>
+                </div>
               </div>
-              <div>
-                <span className="text-xs font-bold text-foreground">When:</span>
-                <p className="text-[11px] text-muted-foreground leading-snug">Maturity is a marathon not a sprint — reviewed every six months</p>
+            </div>
+
+            {/* Animated connector */}
+            <div className="relative h-10 w-px">
+              <div className="absolute inset-0 bg-primary/20" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary opacity-0" style={{ animation: 'flow-dot 2s ease-in-out 1.5s infinite' }} />
+            </div>
+
+            {/* Step 3: Metric Outputs */}
+            <div className="w-full bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 shadow-sm opacity-0 animate-scale-in" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>
+              <p className="text-sm font-bold text-card-foreground mb-3 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                Metric Outputs
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { name: 'Stability', color: 'hsl(185, 70%, 50%)', dims: 'Attrition · Tenure · Role Clarity · Succession' },
+                  { name: 'Maturity', color: 'hsl(163, 100%, 21%)', dims: 'Clarity · Leadership · Culture · Foundation' },
+                  { name: 'Performance', color: 'hsl(155, 60%, 40%)', dims: 'Throughput · Predictability · Deploy Freq. · Lead Time' },
+                  { name: 'Agility', color: 'hsl(45, 80%, 50%)', dims: 'Adaptability · Innovation · Time to Market · Responsiveness' },
+                ].map((m, i) => (
+                  <div
+                    key={m.name}
+                    className="bg-card/80 rounded-lg p-2.5 border border-border opacity-0 animate-slide-up hover:-translate-y-0.5 transition-transform duration-200"
+                    style={{ animationDelay: `${1.4 + i * 0.12}s`, animationFillMode: 'forwards', borderLeftWidth: 3, borderLeftColor: m.color }}
+                  >
+                    <p className="text-xs font-bold text-card-foreground">{m.name}</p>
+                    <p className="text-[9px] text-muted-foreground leading-snug mt-0.5">{m.dims}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
