@@ -6,6 +6,7 @@ import GaugeChart from '@/components/GaugeChart';
 import DimensionChart from '@/components/DimensionChart';
 import PillarImprovement from '@/components/PillarImprovement';
 import ActionItems from '@/components/ActionItems';
+import SubPlatformHeatmap from '@/components/SubPlatformHeatmap';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, Legend,
 } from 'recharts';
@@ -93,6 +94,11 @@ const UserTPLView: React.FC = () => {
             <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={platformTeams.length} />
           </div>
         ))}
+      </div>
+
+      {/* Sub-Platform Heatmap */}
+      <div className="opacity-0 animate-slide-up" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+        <SubPlatformHeatmap platform={userPlatform} />
       </div>
 
       {/* Current Platform vs Overall Comparison */}
