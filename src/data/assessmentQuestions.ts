@@ -1,3 +1,5 @@
+export type DimensionMetric = 'Maturity' | 'Performance' | 'Stability' | 'Agility';
+
 export interface AssessmentQuestion {
   id: string;
   pillar: string;
@@ -5,6 +7,8 @@ export interface AssessmentQuestion {
   lowMaturity: string;
   highMaturity: string;
   observableMetrics: string;
+  dimensionMetric: DimensionMetric;
+  subMetric: string;
 }
 
 export const assessmentQuestions: AssessmentQuestion[] = [
@@ -16,6 +20,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Business and technology operate in silos; minimal collaboration; success measured by delivery of scope and timelines; no shared accountability for outcomes.',
     highMaturity: 'Fully integrated product-centric operating model; business and technology co-own outcomes, measured by customer value and business impact; joint OKRs tied to product and service outcomes; continuous transformation mindset.',
     observableMetrics: 'There is a roadmap which is published, provides and provide a transparent, rolling view covering 15 to 18 months. It must be a joint roadmap, inclusive of both business and technology commitments. The roadmap should be 360-degree, incorporating service-sustaining work, mandatory legal requirements, and product feature builds.',
+    dimensionMetric: 'Maturity',
+    subMetric: 'Leadership',
   },
   {
     id: 'bt-2',
@@ -24,6 +30,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Reactive approach to incidents and changes; limited visibility into product performance; feedback loops are rare or ad hoc.',
     highMaturity: 'Continuous improvement culture; feedback loops from customers and operations drive decisions; data-driven, real-time product performance and customer insights.',
     observableMetrics: 'NPS, reduction in customer impacting incidents (example High: 10% reduction per quarter, Medium: 5% & Low: 0%). BPL TPL Shred Objectives. Incident management control review.',
+    dimensionMetric: 'Maturity',
+    subMetric: 'Culture',
   },
   // 2. Run and Change Together
   {
@@ -33,6 +41,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Technology and business are separate; operations handled by centralized teams; change handled by project teams; reactive incident management; minimal automation.',
     highMaturity: 'Autonomous product feature teams own strategy, build, run, and evolution; agentic operations; high automation; proactive incident prevention; continuous improvement culture. Tech Debt for service improvement have same priority as new features.',
     observableMetrics: 'Tech debt: High: 5% of backlog, Medium: 5-15%, Low: >15%. % Engineers ITIL trained. High-risk vulnerabilities not remediated within 90 days. Vulnerability Backlog.',
+    dimensionMetric: 'Stability',
+    subMetric: 'Role Clarity',
   },
   {
     id: 'rc-2',
@@ -41,6 +51,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Success measured by activity completion, not product outcomes; manual handoffs between run and change functions; KPIs mostly technical.',
     highMaturity: 'Stability and innovation go hand-in-hand; operational health and change initiatives harmonized; reliability and resilience embedded in delivery; shared success metrics.',
     observableMetrics: 'Service availability. Change fail rate. Dependencies volumes.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Change Fail Rate',
   },
   // 3. Project to Product
   {
@@ -50,6 +62,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Funding is project-based; teams organized around projects; minimal product ownership.',
     highMaturity: 'Enduring funding for product teams; portfolio organized around products; autonomous, empowered product teams.',
     observableMetrics: 'Enduring vs one-off funding (should be available in finance data).',
+    dimensionMetric: 'Maturity',
+    subMetric: 'Foundation',
   },
   {
     id: 'pp-2',
@@ -58,6 +72,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Teams are organized around projects; product ownership is unclear or minimal.',
     highMaturity: 'Teams are organized around products; clear accountability and funding models; value stream management.',
     observableMetrics: 'Published Product Roadmaps. Alignment to OD Guardrails (no non-strategic roles).',
+    dimensionMetric: 'Maturity',
+    subMetric: 'Clarity',
   },
   {
     id: 'pp-3',
@@ -66,6 +82,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Product metrics are basic or absent; value streams not defined or managed.',
     highMaturity: 'Product metrics and value streams are managed and tracked; continuous improvement culture; decisions based on outcomes.',
     observableMetrics: 'Customer Journey Maps and Blueprints are complete and maintained.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Throughput',
   },
   {
     id: 'pp-4',
@@ -74,6 +92,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Decisions are based on outputs (e.g., delivery of scope, timelines); outcome-based thinking is rare.',
     highMaturity: 'Decisions are based on business and customer outcomes; OKRs and KPIs are outcome-focused; persistent funding supports value delivery.',
     observableMetrics: 'Pulse survey response (understand why decisions are being made). 18 months rolling roadmap with OKRs specific to address customer problems.',
+    dimensionMetric: 'Maturity',
+    subMetric: 'Culture',
   },
   {
     id: 'pp-5',
@@ -82,6 +102,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Backlog management is ad hoc; value release is infrequent and not iterative.',
     highMaturity: 'Backlog management is continuous and collaborative; iterative value release is standard; technical debt is managed strategically.',
     observableMetrics: 'Predictability, Deployment frequency & Mean Time to Recover.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Predictability',
   },
   {
     id: 'pp-6',
@@ -90,6 +112,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Experimentation is rare or ad hoc; feature toggles not used.',
     highMaturity: 'Continuous experimentation and innovation looking at Horizon 3.',
     observableMetrics: 'Do Tech and Product roadmaps extend to Horizon 3.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Innovation',
   },
   // 4. All in on Agile
   {
@@ -99,6 +123,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Agile ceremonies minimally practiced or ad hoc; status meetings replace agile ceremonies; inconsistent use of agile tools.',
     highMaturity: 'Agile is cultural; ceremonies are embedded and habitual; continuous planning and real-time reviews; improvement is habitual and part of daily work.',
     observableMetrics: 'For discussion: evidence to include calendar of agile ceremonies and sprint cycles. Sprint retro: Evidence for effectiveness of ceremonies.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Responsiveness',
   },
   {
     id: 'ag-2',
@@ -107,6 +133,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Agile tooling used minimally or inconsistently; teams revert to traditional project management.',
     highMaturity: 'Agile tools and practices are part of how we work; adaptive, flow-based planning; automation coverage > 90%; continuous feedback and improvement.',
     observableMetrics: 'Flow metrics: Cycle Time & Throughput. Quarter on quarter velocity improvement for the feature teams.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Adaptability',
   },
   {
     id: 'ag-3',
@@ -115,6 +143,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Delivery predictability <50%; lead time >90 days; sporadic, big-bang releases; high change failure rate.',
     highMaturity: 'Time <14 days (often hours); continuous deployment; change failure rate low.',
     observableMetrics: 'Cycle time, feature predictability, feature throughput.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Predictability',
   },
   {
     id: 'ag-4',
@@ -123,6 +153,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Deployment frequency is low (monthly or less); releases are large and infrequent.',
     highMaturity: 'Deployment frequency is high (daily or on-demand); continuous deployment; success rate; experimentation throughput is high.',
     observableMetrics: 'Deployment Frequency. Highest maturity: Deployment on demand.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Deployment Frequency',
   },
   {
     id: 'ag-5',
@@ -131,6 +163,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Retrospectives are occasional or not systematic; feedback is not regularly acted upon.',
     highMaturity: 'Retrospectives are embedded in daily work and actioned; continuous stakeholder engagement; improvement is habitual and data-driven.',
     observableMetrics: 'Observational (how often are they held, who participates). Retrospective notes documented & shared with team for each sprint. Retro notes showing improvements over period of time for the issues/feedback. Stakeholders/Customer feedback loop established.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Continuous Improvement',
   },
   {
     id: 'ag-6',
@@ -139,6 +173,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Planning is rigid, timeboxed poorly, or not responsive to change; backlog refinement is rare.',
     highMaturity: 'Product Owners are enabled to prioritise autonomously; adaptive, flow-based approaches (Kanban, Lean Portfolio); real-time reviews and prioritization.',
     observableMetrics: 'Predictability. Churn.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Adaptability',
   },
   // 5. Engineering Excellence
   {
@@ -148,6 +184,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Over-reliance on seniors or contractors; thin mid-level layer; inconsistent early-career pipeline; firefighting rather than capability planning.',
     highMaturity: 'Clear skill pyramid; strong senior core; healthy mid-level depth; structured early-career pathways; intentional workforce planning.',
     observableMetrics: 'Diamond structure based on skill assessment at the lab level.',
+    dimensionMetric: 'Stability',
+    subMetric: 'Attrition Rate',
   },
   {
     id: 'ee-2',
@@ -156,6 +194,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Manual or ad hoc build and deploy processes; limited test automation; long release cycles.',
     highMaturity: 'Fully automated CI/CD pipelines; continuous integration, testing, and deployment; fast, reliable release cycles.',
     observableMetrics: 'Pipeline coverage, build success rate, deployment frequency, test automation coverage.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Mean Time to Deploy',
   },
   {
     id: 'ee-3',
@@ -164,6 +204,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'No AI tooling adoption; manual code reviews; reactive defect management.',
     highMaturity: 'AI copilots for code generation and review; predictive analytics for defect and incident prevention; automated quality gates.',
     observableMetrics: 'AI tooling adoption rate, AI-assisted code coverage, predictive incident reduction.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Innovation',
   },
   {
     id: 'ee-4',
@@ -172,6 +214,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Technical debt is not tracked or managed; accumulates over time; impacts delivery speed.',
     highMaturity: 'Technical debt is continuously tracked, prioritized, and reduced; part of regular backlog management.',
     observableMetrics: 'Tech debt backlog size, remediation rate, impact on velocity.',
+    dimensionMetric: 'Performance',
+    subMetric: 'Lead Time',
   },
   // 6. Dynamic and Well Controlled
   {
@@ -181,6 +225,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Controls are manual; risk management is reactive; compliance is checkbox-based.',
     highMaturity: 'Automated controls and policy-as-code; proactive risk management; continuous compliance monitoring.',
     observableMetrics: 'Automation coverage for controls, audit findings, compliance score.',
+    dimensionMetric: 'Stability',
+    subMetric: 'Succession Plan',
   },
   {
     id: 'dw-2',
@@ -189,6 +235,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Governance is separate from delivery; compliance treated as a gate; slows delivery.',
     highMaturity: 'Governance is embedded in workflows; compliance is continuous and automated; enables rather than blocks delivery.',
     observableMetrics: 'Time to compliance, governance automation rate, delivery impact score.',
+    dimensionMetric: 'Agility',
+    subMetric: 'Time to Market',
   },
   {
     id: 'dw-3',
@@ -197,6 +245,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     lowMaturity: 'Teams are siloed by function; handoffs between disciplines; limited cross-functional ownership.',
     highMaturity: 'Fully cross-functional teams with shared ownership; product, engineering, design, data and risk work as one.',
     observableMetrics: 'Team composition audits, cross-functional initiative success rate.',
+    dimensionMetric: 'Stability',
+    subMetric: 'Tenure',
   },
 ];
 

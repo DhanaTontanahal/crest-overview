@@ -18,6 +18,8 @@ const AdminAssessmentQuestions: React.FC = () => {
     lowMaturity: '',
     highMaturity: '',
     observableMetrics: '',
+    dimensionMetric: undefined,
+    subMetric: '',
   });
 
   const questionsByPillar = pillars.map(pillar => ({
@@ -26,7 +28,7 @@ const AdminAssessmentQuestions: React.FC = () => {
   }));
 
   const resetForm = () => {
-    setFormData({ pillar: '', question: '', lowMaturity: '', highMaturity: '', observableMetrics: '' });
+    setFormData({ pillar: '', question: '', lowMaturity: '', highMaturity: '', observableMetrics: '', dimensionMetric: undefined, subMetric: '' });
     setShowAddForm(false);
     setEditingId(null);
   };
@@ -38,7 +40,7 @@ const AdminAssessmentQuestions: React.FC = () => {
   };
 
   const handleAdd = () => {
-    if (!formData.pillar || !formData.question) return;
+    if (!formData.pillar || !formData.question || !formData.dimensionMetric || !formData.subMetric) return;
     const newQuestion: AssessmentQuestion = {
       id: generateId(formData.pillar),
       pillar: formData.pillar,
@@ -46,6 +48,8 @@ const AdminAssessmentQuestions: React.FC = () => {
       lowMaturity: formData.lowMaturity || '',
       highMaturity: formData.highMaturity || '',
       observableMetrics: formData.observableMetrics || '',
+      dimensionMetric: formData.dimensionMetric,
+      subMetric: formData.subMetric,
     };
     setAssessmentQuestions(prev => [...prev, newQuestion]);
     resetForm();
@@ -69,6 +73,15 @@ const AdminAssessmentQuestions: React.FC = () => {
     setAssessmentQuestions(prev => prev.filter(q => q.id !== id));
   };
 
+  const dimensionMetrics = ['Maturity', 'Performance', 'Stability', 'Agility'] as const;
+
+  const subMetricOptions: Record<string, string[]> = {
+    'Maturity': ['Clarity', 'Leadership', 'Culture', 'Foundation'],
+    'Performance': ['Throughput', 'Predictability', 'Change Fail Rate', 'Deployment Frequency', 'Mean Time to Deploy', 'Lead Time'],
+    'Stability': ['Attrition Rate', 'Tenure', 'Role Clarity', 'Succession Plan'],
+    'Agility': ['Adaptability', 'Innovation', 'Time to Market', 'Responsiveness', 'Continuous Improvement'],
+  };
+
   const renderForm = (onSave: () => void, saveLabel: string) => (
     <div className="space-y-3 p-4 bg-muted/30 rounded-lg border border-border" role="form" aria-label={saveLabel === 'Add Question' ? 'Add new question form' : 'Edit question form'}>
       <Select value={formData.pillar} onValueChange={v => setFormData(f => ({ ...f, pillar: v }))}>
@@ -79,6 +92,24 @@ const AdminAssessmentQuestions: React.FC = () => {
           {pillars.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
         </SelectContent>
       </Select>
+      <div className="grid grid-cols-2 gap-3">
+        <Select value={formData.dimensionMetric || ''} onValueChange={v => setFormData(f => ({ ...f, dimensionMetric: v as any, subMetric: '' }))}>
+          <SelectTrigger aria-label="Select dimension metric">
+            <SelectValue placeholder="Dimension Metric" />
+          </SelectTrigger>
+          <SelectContent>
+            {dimensionMetrics.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={formData.subMetric || ''} onValueChange={v => setFormData(f => ({ ...f, subMetric: v }))} disabled={!formData.dimensionMetric}>
+          <SelectTrigger aria-label="Select sub-metric">
+            <SelectValue placeholder="Sub-Metric" />
+          </SelectTrigger>
+          <SelectContent>
+            {(subMetricOptions[formData.dimensionMetric || ''] || []).map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
       <Textarea
         placeholder="Question *"
         value={formData.question || ''}
@@ -108,7 +139,7 @@ const AdminAssessmentQuestions: React.FC = () => {
         aria-label="Observable metrics"
       />
       <div className="flex gap-2">
-        <Button size="sm" onClick={onSave} disabled={!formData.pillar || !formData.question}>
+        <Button size="sm" onClick={onSave} disabled={!formData.pillar || !formData.question || !formData.dimensionMetric || !formData.subMetric}>
           <Save className="w-4 h-4 mr-1" /> {saveLabel}
         </Button>
         <Button size="sm" variant="outline" onClick={resetForm}>
@@ -163,6 +194,9 @@ const AdminAssessmentQuestions: React.FC = () => {
                           </p>
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                             <span className="font-medium">Metrics:</span> {q.observableMetrics}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-semibold">{q.dimensionMetric} → {q.subMetric}</span>
                           </p>
                         </div>
                         <div className="flex gap-1 shrink-0">

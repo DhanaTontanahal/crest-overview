@@ -33,8 +33,8 @@ const AppSidebar: React.FC = () => {
 
   const dashboardItems = [
     { title: 'Overview', url: '/', icon: Gauge },
-    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
     { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
     { title: 'Trends', url: '/trends', icon: TrendingUp },
     ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
     ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
