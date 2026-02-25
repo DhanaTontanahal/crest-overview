@@ -22,6 +22,10 @@ import PersonasPage from "@/pages/PersonasPage";
 import PlatformComparisonPage from "@/pages/PlatformComparisonPage";
 import NotFound from "./pages/NotFound";
 import LoginPage from "@/pages/LoginPage";
+// v0 imports
+import V0LoginPage from "@/pages/v0/V0LoginPage";
+import V0DashboardLayout from "@/components/v0/V0DashboardLayout";
+import { V0CreateAssessmentPage, V0SelfAssessmentPage, V0PeerReviewPage, V0ViewAssessmentsPage } from "@/pages/v0/V0AssessmentPages";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +38,7 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
+      {/* v1 routes (existing 5-role) */}
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<OverviewPage />} />
         <Route path="/org-health" element={<OrgHealthPage />} />
@@ -58,6 +63,36 @@ const AppRoutes: React.FC = () => {
   );
 };
 
+/* v0 routes component */
+const V0Routes: React.FC = () => {
+  const { user, setUser } = useAppState();
+
+  if (!user) {
+    return <V0LoginPage onLogin={setUser} />;
+  }
+
+  return (
+    <Routes>
+      <Route element={<V0DashboardLayout />}>
+        <Route path="/" element={<OverviewPage />} />
+        <Route path="/dimensions" element={<DimensionsPage />} />
+        <Route path="/trends" element={<TrendsPage />} />
+        <Route path="/heatmap" element={<HeatmapPage />} />
+        <Route path="/quarterly-progress" element={<QuarterlyProgressPage />} />
+        <Route path="/action-plan" element={<ActionPlanPage />} />
+        <Route path="/team-data" element={<TeamDataPage />} />
+        <Route path="/assessments/create" element={<V0CreateAssessmentPage />} />
+        <Route path="/assessments/submit" element={<V0SelfAssessmentPage />} />
+        <Route path="/assessments/view" element={<V0ViewAssessmentsPage />} />
+        <Route path="/assessments/review" element={<V0PeerReviewPage />} />
+        <Route path="/admin/personas" element={<PersonasPage />} />
+        <Route path="/admin/upload" element={<AdminUploadPage />} />
+        <Route path="/admin/settings" element={<AdminSettingsPage />} />
+      </Route>
+    </Routes>
+  );
+};
+
 const App: React.FC = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -65,7 +100,10 @@ const App: React.FC = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppRoutes />
+          <Routes>
+            <Route path="/v0/*" element={<V0Routes />} />
+            <Route path="/*" element={<AppRoutes />} />
+          </Routes>
         </BrowserRouter>
       </AppProvider>
     </TooltipProvider>
