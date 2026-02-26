@@ -26,6 +26,7 @@ import LoginPage from "@/pages/LoginPage";
 import V0LoginPage from "@/pages/v0/V0LoginPage";
 import V0DashboardLayout from "@/components/v0/V0DashboardLayout";
 import { V0CreateAssessmentPage, V0SelfAssessmentPage, V0PeerReviewPage, V0ViewAssessmentsPage } from "@/pages/v0/V0AssessmentPages";
+import V0PersonasPage from "@/pages/v0/V0PersonasPage";
 
 const queryClient = new QueryClient();
 
@@ -85,7 +86,7 @@ const V0Routes: React.FC = () => {
         <Route path="/assessments/submit" element={<V0SelfAssessmentPage />} />
         <Route path="/assessments/view" element={<V0ViewAssessmentsPage />} />
         <Route path="/assessments/review" element={<V0PeerReviewPage />} />
-        <Route path="/admin/personas" element={<PersonasPage />} />
+        <Route path="/admin/personas" element={<V0PersonasPage />} />
         <Route path="/admin/upload" element={<AdminUploadPage />} />
         <Route path="/admin/settings" element={<AdminSettingsPage />} />
       </Route>
