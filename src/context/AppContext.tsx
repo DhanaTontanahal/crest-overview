@@ -15,6 +15,9 @@ interface ExtendedAppState extends AppState {
   setAssessments: React.Dispatch<React.SetStateAction<Assessment[]>>;
   assessmentQuestions: AssessmentQuestion[];
   setAssessmentQuestions: React.Dispatch<React.SetStateAction<AssessmentQuestion[]>>;
+  publishedQuestions: AssessmentQuestion[];
+  publishQuestions: () => void;
+  isQuestionsPublished: boolean;
   calculationMethod: CalculationMethod;
   setCalculationMethod: (method: CalculationMethod) => void;
   activeTab: string;
@@ -40,7 +43,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedPillar, setSelectedPillar] = useState<string>('All');
   const [selectedQuarter, setSelectedQuarter] = useState<string>('Q4 2025');
   const [assessments, setAssessments] = useState<Assessment[]>(sampleAssessments);
-  const [assessmentQuestionsState, setAssessmentQuestions] = useState<AssessmentQuestion[]>(defaultQuestions);
+  const [assessmentQuestionsState, setAssessmentQuestionsRaw] = useState<AssessmentQuestion[]>(defaultQuestions);
+  const [publishedQuestions, setPublishedQuestions] = useState<AssessmentQuestion[]>(defaultQuestions);
+  const [isQuestionsPublished, setIsQuestionsPublished] = useState(true);
+
+  const publishQuestions = () => {
+    setPublishedQuestions([...assessmentQuestionsState]);
+    setIsQuestionsPublished(true);
+  };
+
+  const setAssessmentQuestions: React.Dispatch<React.SetStateAction<AssessmentQuestion[]>> = (action) => {
+    setAssessmentQuestionsRaw(action);
+    setIsQuestionsPublished(false);
+  };
   const [calculationMethod, setCalculationMethodState] = useState<CalculationMethod>(
     () => (localStorage.getItem('calculationMethod') as CalculationMethod) || 'simple'
   );
@@ -158,6 +173,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     availableQuarters,
     assessments, setAssessments,
     assessmentQuestions: assessmentQuestionsState, setAssessmentQuestions,
+    publishedQuestions, publishQuestions, isQuestionsPublished,
     calculationMethod, setCalculationMethod,
     activeTab, setActiveTab,
   };

@@ -21,7 +21,9 @@ interface AssessmentFormProps {
 const DIMENSION_METRICS: DimensionMetric[] = ['Maturity', 'Performance', 'Stability', 'Agility'];
 
 const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, existingAssessment, onSubmit, mode }) => {
-  const { assessmentQuestions, selectedQuarter, pillars } = useAppState();
+  const { assessmentQuestions: allQuestions, publishedQuestions, selectedQuarter, pillars } = useAppState();
+  // Admin sees all draft questions; users see only published
+  const assessmentQuestions = mode === 'create' ? allQuestions : publishedQuestions;
   const { toast } = useToast();
   const [tabView, setTabView] = useState<'pillar' | 'dimension'>('pillar');
 
@@ -244,7 +246,10 @@ export const V0CreateAssessmentPage: React.FC = () => {
 /* ─── User: Self Assessment ─── */
 
 export const V0SelfAssessmentPage: React.FC = () => {
-  const { user, assessments, setAssessments, selectedQuarter } = useAppState();
+  const { user, assessments, setAssessments, selectedQuarter, publishedQuestions } = useAppState();
+
+  if (user?.role !== 'user' || !user.platformId) return <p className="text-muted-foreground">Only Users can self-assess.</p>;
+  if (publishedQuestions.length === 0) return <p className="text-muted-foreground">No questionnaire has been published yet. Please wait for the Admin to publish.</p>;
 
   if (user?.role !== 'user' || !user.platformId) return <p className="text-muted-foreground">Only Users can self-assess.</p>;
 
@@ -268,7 +273,7 @@ export const V0SelfAssessmentPage: React.FC = () => {
 /* ─── Peer Review ─── */
 
 export const V0PeerReviewPage: React.FC = () => {
-  const { user, assessments, setAssessments, assessmentQuestions, selectedQuarter } = useAppState();
+  const { user, assessments, setAssessments, publishedQuestions: assessmentQuestions, selectedQuarter } = useAppState();
 
   if (user?.role !== 'reviewer') return <p className="text-muted-foreground">Peer Reviewers only.</p>;
 
@@ -339,7 +344,7 @@ export const V0PeerReviewPage: React.FC = () => {
 /* ─── View All Assessments ─── */
 
 export const V0ViewAssessmentsPage: React.FC = () => {
-  const { assessments, selectedQuarter, assessmentQuestions } = useAppState();
+  const { assessments, selectedQuarter, publishedQuestions: assessmentQuestions } = useAppState();
   const filtered = assessments.filter(a => a.quarter === selectedQuarter);
 
   if (filtered.length === 0) return <p className="text-muted-foreground text-sm">No assessments for {selectedQuarter}.</p>;
