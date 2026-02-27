@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Clock, FileSearch } from 'lucide-react';
+import { CheckCircle2, Clock, FileSearch, Settings2 } from 'lucide-react';
+import AdminAssessmentQuestions from '@/components/AdminAssessmentQuestions';
 
 /* ─── Tab-wise Assessment Form (shared by Create + Self-Assess) ─── */
 
@@ -214,11 +215,24 @@ export const V0CreateAssessmentPage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-      {!selectedPlatform ? (
+      {selectedPlatform === '__manage__' ? (
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back to platforms</Button>
+          <AdminAssessmentQuestions />
+        </div>
+      ) : !selectedPlatform ? (
         <div className="space-y-4">
           <h3 className="text-lg font-bold text-foreground">Create Assessment</h3>
           <p className="text-sm text-muted-foreground">Select a platform to create or edit its assessment for {selectedQuarter}.</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Common for All Platforms */}
+            <button onClick={() => setSelectedPlatform('__manage__')}
+              className="p-4 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 hover:border-primary hover:bg-primary/10 transition-all text-left col-span-2 md:col-span-4">
+              <p className="font-semibold text-sm text-foreground flex items-center gap-2">
+                <Settings2 className="w-4 h-4 text-primary" /> Common for All Platforms
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1">Manage questionnaire — add, edit, delete, upload &amp; publish questions</p>
+            </button>
             {platforms.map(p => {
               const exists = assessments.some(a => a.platform === p && a.quarter === selectedQuarter);
               return (
