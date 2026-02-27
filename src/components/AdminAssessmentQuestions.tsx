@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAppState } from '@/context/AppContext';
-import { AssessmentQuestion } from '@/data/assessmentQuestions';
+import { AssessmentQuestion, DimensionMetric } from '@/data/assessmentQuestions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Save, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Pencil, Trash2, ChevronDown, ChevronRight, Save, X, Upload, Send } from 'lucide-react';
+import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 
 const AdminAssessmentQuestions: React.FC = () => {
-  const { assessmentQuestions, setAssessmentQuestions, pillars } = useAppState();
+  const { assessmentQuestions, setAssessmentQuestions, pillars, publishQuestions, isQuestionsPublished } = useAppState();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [expandedPillar, setExpandedPillar] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -74,12 +78,63 @@ const AdminAssessmentQuestions: React.FC = () => {
   };
 
   const dimensionMetrics = ['Maturity', 'Performance', 'Stability', 'Agility'] as const;
+  const validDimensionMetrics: string[] = [...dimensionMetrics];
 
   const subMetricOptions: Record<string, string[]> = {
     'Maturity': ['Clarity', 'Leadership', 'Culture', 'Foundation'],
     'Performance': ['Throughput', 'Predictability', 'Change Fail Rate', 'Deployment Frequency', 'Mean Time to Deploy', 'Lead Time'],
     'Stability': ['Attrition Rate', 'Tenure', 'Role Clarity', 'Succession Plan'],
     'Agility': ['Adaptability', 'Innovation', 'Time to Market', 'Responsiveness', 'Continuous Improvement'],
+  };
+
+  const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const wb = XLSX.read(evt.target?.result, { type: 'binary' });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
+        const newQuestions: AssessmentQuestion[] = [];
+        let skipped = 0;
+        rows.forEach((row, i) => {
+          const pillar = (row['Pillar'] || '').trim();
+          const question = (row['Question'] || '').trim();
+          const dim = (row['Dimension Metric'] || '').trim();
+          const sub = (row['Sub-Metric'] || row['Sub Metric'] || '').trim();
+          if (!pillar || !question || !dim || !sub) { skipped++; return; }
+          if (!validDimensionMetrics.includes(dim)) { skipped++; return; }
+          const prefix = pillar.slice(0, 2).toLowerCase();
+          const id = `${prefix}-upload-${Date.now()}-${i}`;
+          newQuestions.push({
+            id,
+            pillar,
+            question,
+            lowMaturity: (row['Low Maturity'] || '').trim(),
+            highMaturity: (row['High Maturity'] || '').trim(),
+            observableMetrics: (row['Observable Metrics'] || '').trim(),
+            dimensionMetric: dim as DimensionMetric,
+            subMetric: sub,
+          });
+        });
+        if (newQuestions.length > 0) {
+          setAssessmentQuestions(prev => [...prev, ...newQuestions]);
+          toast.success(`Added ${newQuestions.length} questions${skipped > 0 ? ` (${skipped} skipped)` : ''}`);
+        } else {
+          toast.error('No valid questions found. Required columns: Pillar, Question, Dimension Metric, Sub-Metric');
+        }
+      } catch {
+        toast.error('Failed to parse Excel file');
+      }
+      e.target.value = '';
+    };
+    reader.readAsBinaryString(file);
+  };
+
+  const handlePublish = () => {
+    publishQuestions();
+    toast.success(`Published ${assessmentQuestions.length} questions. Users can now self-assess.`);
   };
 
   const renderForm = (onSave: () => void, saveLabel: string) => (
@@ -151,14 +206,30 @@ const AdminAssessmentQuestions: React.FC = () => {
 
   return (
     <div className="bg-card rounded-lg p-6 shadow-sm border border-border space-y-4" role="region" aria-label="Assessment questions management">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-card-foreground">Assessment Questions</h3>
+          <h3 className="text-lg font-semibold text-card-foreground flex items-center gap-2">
+            Assessment Questions
+            {isQuestionsPublished ? (
+              <Badge variant="default" className="text-[10px]">Published</Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[10px] border-yellow-400 text-yellow-700 bg-yellow-50">Draft — unpublished changes</Badge>
+            )}
+          </h3>
           <p className="text-xs text-muted-foreground">{assessmentQuestions.length} questions across {pillars.length} pillars</p>
         </div>
-        <Button size="sm" onClick={() => { setShowAddForm(true); setEditingId(null); }} aria-label="Add new question">
-          <Plus className="w-4 h-4 mr-1" /> Add Question
-        </Button>
+        <div className="flex gap-2 flex-wrap">
+          <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleExcelUpload} />
+          <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} aria-label="Upload questions from Excel">
+            <Upload className="w-4 h-4 mr-1" /> Upload Excel
+          </Button>
+          <Button size="sm" onClick={() => { setShowAddForm(true); setEditingId(null); }} aria-label="Add new question">
+            <Plus className="w-4 h-4 mr-1" /> Add Question
+          </Button>
+          <Button size="sm" variant={isQuestionsPublished ? 'outline' : 'default'} onClick={handlePublish} disabled={isQuestionsPublished} aria-label="Publish questions">
+            <Send className="w-4 h-4 mr-1" /> Publish
+          </Button>
+        </div>
       </div>
 
       {showAddForm && renderForm(handleAdd, 'Add Question')}
