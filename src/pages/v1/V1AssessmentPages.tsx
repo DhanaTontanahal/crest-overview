@@ -548,17 +548,18 @@ export const V1CreateAssessmentPage: React.FC = () => {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {platforms.map(p => {
-          const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
+          const existing = assessments.find(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
           return (
             <div key={p} className="p-4 rounded-xl border border-border bg-card text-left space-y-2">
               <p className="font-semibold text-sm text-foreground">{p}</p>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                {exists ? <><CheckCircle2 className="w-3 h-3 text-primary" /> Created</> : <><Clock className="w-3 h-3" /> Not created</>}
+                {existing ? <><CheckCircle2 className="w-3 h-3 text-primary" /> {existing.status === 'published' ? 'Published' : 'Draft'}</> : <><Clock className="w-3 h-3" /> Not created</>}
               </p>
-              {!exists && (
-                <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handlePublishAssessment(p)}>
-                  Create for {p}
-                </Button>
+              {!existing && (
+                <div className="flex gap-1">
+                  <Button size="sm" variant="outline" className="flex-1 text-[10px]" onClick={() => createAssessment(p, 'draft')}>Save</Button>
+                  <Button size="sm" className="flex-1 text-[10px]" onClick={() => createAssessment(p, 'published')}>Publish</Button>
+                </div>
               )}
             </div>
           );
@@ -567,8 +568,11 @@ export const V1CreateAssessmentPage: React.FC = () => {
 
       <div className="flex gap-3 pt-2">
         <Button variant="outline" onClick={() => setStep('questions')}>← Back</Button>
+        <Button variant="outline" onClick={handleSaveAll}>
+          Save All as Draft
+        </Button>
         <Button onClick={handlePublishAll}>
-          <Send className="w-4 h-4 mr-2" /> Save & Publish to All Platforms
+          <Send className="w-4 h-4 mr-2" /> Publish to All Platforms
         </Button>
       </div>
     </div>
