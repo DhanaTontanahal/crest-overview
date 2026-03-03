@@ -4,7 +4,10 @@ import { Users } from 'lucide-react';
 import GaugeChart from '@/components/GaugeChart';
 
 const UserTPLView: React.FC = () => {
-  const { user, teams, selectedQuarter } = useAppState();
+  const {
+    user, teams, selectedQuarter,
+    maturityDimensions, performanceMetrics, stabilityDimensions, agilityDimensions,
+  } = useAppState();
 
   const userPlatform = user?.platformId ?? '';
 
@@ -13,12 +16,34 @@ const UserTPLView: React.FC = () => {
     [teams, selectedQuarter, userPlatform]
   );
 
-  const avgStability = platformTeams.length > 0
-    ? Math.round(platformTeams.reduce((s, t) => s + t.stability, 0) / platformTeams.length) : 0;
-  const avgMaturity = platformTeams.length > 0
-    ? Math.round((platformTeams.reduce((s, t) => s + t.maturity, 0) / platformTeams.length) * 10) : 0;
-  const avgPerformance = platformTeams.length > 0
-    ? Math.round((platformTeams.reduce((s, t) => s + t.performance, 0) / platformTeams.length) * 10) : 0;
+  // Use assessment-derived dimension scores when available, otherwise fall back to team data
+  const hasAssessmentData = (dims: typeof maturityDimensions) =>
+    dims.length > 0 && dims.some(d => d.average > 0);
+
+  const avgFromDimensions = (dims: typeof maturityDimensions) =>
+    dims.length > 0 ? Math.round(dims.reduce((s, d) => s + d.average, 0) / dims.length * 10) : 0;
+
+  const avgStability = hasAssessmentData(stabilityDimensions)
+    ? avgFromDimensions(stabilityDimensions)
+    : platformTeams.length > 0
+      ? Math.round(platformTeams.reduce((s, t) => s + t.stability, 0) / platformTeams.length)
+      : 0;
+
+  const avgMaturity = hasAssessmentData(maturityDimensions)
+    ? avgFromDimensions(maturityDimensions)
+    : platformTeams.length > 0
+      ? Math.round((platformTeams.reduce((s, t) => s + t.maturity, 0) / platformTeams.length) * 10)
+      : 0;
+
+  const avgPerformance = hasAssessmentData(performanceMetrics)
+    ? avgFromDimensions(performanceMetrics)
+    : platformTeams.length > 0
+      ? Math.round((platformTeams.reduce((s, t) => s + t.performance, 0) / platformTeams.length) * 10)
+      : 0;
+
+  const avgAgility = hasAssessmentData(agilityDimensions)
+    ? avgFromDimensions(agilityDimensions)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -36,11 +61,12 @@ const UserTPLView: React.FC = () => {
       </div>
 
       {/* Gauges */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { value: avgStability, title: 'Team Stability', subtitle: 'How stable are your teams?' },
           { value: avgMaturity, title: 'Overall Maturity', subtitle: 'How mature are your teams?' },
           { value: avgPerformance, title: 'Overall Performance', subtitle: 'How well are teams performing?' },
+          { value: avgAgility, title: 'Overall Agility', subtitle: 'How agile are your teams?' },
         ].map((gauge, i) => (
           <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'forwards' }}>
             <GaugeChart value={gauge.value} title={gauge.title} subtitle={gauge.subtitle} teamCount={platformTeams.length} />
