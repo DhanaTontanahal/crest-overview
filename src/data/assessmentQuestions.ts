@@ -260,6 +260,8 @@ export interface Assessment {
   reviewedAt: string | null;
   status: 'draft' | 'submitted' | 'reviewed';
   answers: AssessmentAnswer[];
+  reviewerComments?: Record<string, string>; // questionId -> reviewer comment
+  reviewerOverallComment?: string;
 }
 
 export interface AssessmentAnswer {

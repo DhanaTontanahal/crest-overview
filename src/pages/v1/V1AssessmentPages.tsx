@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Clock, FileSearch, Settings2 } from 'lucide-react';
+import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send } from 'lucide-react';
 import AdminAssessmentQuestions from '@/components/AdminAssessmentQuestions';
 
 /* ─── Tab-wise Assessment Form (shared by Create + Self-Assess) ─── */
