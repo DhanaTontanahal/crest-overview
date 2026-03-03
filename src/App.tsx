@@ -27,6 +27,12 @@ import V1LoginPage from "@/pages/v1/V1LoginPage";
 import V1DashboardLayout from "@/components/v1/V1DashboardLayout";
 import { V1CreateAssessmentPage, V1SelfAssessmentPage, V1PeerReviewPage, V1ViewAssessmentsPage } from "@/pages/v1/V1AssessmentPages";
 import V1PersonasPage from "@/pages/v1/V1PersonasPage";
+import AdminBulkUploadPage from "@/pages/v1/AdminBulkUploadPage";
+import AdminAssignReviewersPage from "@/pages/v1/AdminAssignReviewersPage";
+import AdminRegisterUsersPage from "@/pages/v1/AdminRegisterUsersPage";
+import AdminPlatformsCRUDPage from "@/pages/v1/AdminPlatformsCRUDPage";
+import AdminPillarsCRUDPage from "@/pages/v1/AdminPillarsCRUDPage";
+import V1AdminSettingsPage from "@/pages/v1/AdminSettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -87,8 +93,12 @@ const V1Routes: React.FC = () => {
         <Route path="/assessments/view" element={<V1ViewAssessmentsPage />} />
         <Route path="/assessments/review" element={<V1PeerReviewPage />} />
         <Route path="/admin/personas" element={<V1PersonasPage />} />
-        <Route path="/admin/upload" element={<AdminUploadPage />} />
-        <Route path="/admin/settings" element={<AdminSettingsPage />} />
+        <Route path="/admin/bulk-upload" element={<AdminBulkUploadPage />} />
+        <Route path="/admin/assign-reviewers" element={<AdminAssignReviewersPage />} />
+        <Route path="/admin/register-users" element={<AdminRegisterUsersPage />} />
+        <Route path="/admin/platforms" element={<AdminPlatformsCRUDPage />} />
+        <Route path="/admin/pillars" element={<AdminPillarsCRUDPage />} />
+        <Route path="/admin/settings" element={<V1AdminSettingsPage />} />
       </Route>
     </Routes>
   );
