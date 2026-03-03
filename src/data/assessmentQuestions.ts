@@ -311,6 +311,7 @@ export const sampleAssessments: Assessment[] = [
   },
   {
     id: 'assess-commercial-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Commercial',
     quarter: 'Q4 2025',
     submittedBy: 'Commercial',
@@ -346,6 +347,7 @@ export const sampleAssessments: Assessment[] = [
   },
   {
     id: 'assess-wealth-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Wealth & Investment',
     quarter: 'Q4 2025',
     submittedBy: 'Wealth & Investment',
@@ -381,6 +383,7 @@ export const sampleAssessments: Assessment[] = [
   },
   {
     id: 'assess-insurance-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Insurance',
     quarter: 'Q4 2025',
     submittedBy: 'Insurance',
