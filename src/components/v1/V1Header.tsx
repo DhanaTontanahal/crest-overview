@@ -28,6 +28,8 @@ const V1Header: React.FC = () => {
   };
 
   const isUser = user?.role === 'user';
+  const isReviewer = user?.role === 'reviewer';
+  const hideFilters = isUser || isReviewer;
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
@@ -47,7 +49,7 @@ const V1Header: React.FC = () => {
             {user?.platformId && ` — ${user.platformId}`}
           </p>
 
-          {!isUser && (
+          {!hideFilters && (
             <>
               <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
                 <SelectTrigger className="w-[120px] h-8 text-xs"><SelectValue /></SelectTrigger>

@@ -22,13 +22,8 @@ const V1Sidebar: React.FC = () => {
   const isUser = user?.role === 'user';
   const isReviewer = user?.role === 'reviewer';
 
-  // Dashboard items — only for Reviewer (hidden for Admin and User)
-  const dashboardItems = (!isAdmin && !isUser) ? [
-    { title: 'Overview', url: '/', icon: Gauge },
-    { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
-    { title: 'Trends', url: '/trends', icon: TrendingUp },
-    { title: 'Team Data', url: '/team-data', icon: Download },
-  ] : [];
+  // Dashboard items — hidden for Admin, User, and Reviewer
+  const dashboardItems: { title: string; url: string; icon: LucideIcon }[] = [];
 
   // Assessment items — role-specific
   const assessmentItems = isAdmin ? [
@@ -40,10 +35,10 @@ const V1Sidebar: React.FC = () => {
     { title: 'Save & Submit Assessment', url: '/assessments/submit', icon: ClipboardList },
     { title: 'View Submitted Assessment', url: '/assessments/view', icon: FileSearch },
     { title: 'View Reviewer Comments', url: '/assessments/review-comments', icon: Eye },
-  ] : [
-    { title: 'View Assessments', url: '/assessments/view', icon: FileSearch },
-    ...(isReviewer ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
-  ];
+  ] : isReviewer ? [
+    { title: 'View Submitted Assessments', url: '/assessments/view', icon: FileSearch },
+    { title: 'Review Assessments', url: '/assessments/review', icon: Eye },
+  ] : [];
 
   // Settings items — Admin only
   const settingsItems = isAdmin ? [
