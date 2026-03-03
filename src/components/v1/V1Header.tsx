@@ -24,7 +24,7 @@ const V1Header: React.FC = () => {
 
   const handleLogout = () => {
     setUser(null);
-    navigate('/v1');
+    navigate('/');
   };
 
   return (
