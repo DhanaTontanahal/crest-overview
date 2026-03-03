@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/sidebar';
 import {
   Gauge, BarChart3, TrendingUp, Grid3X3, CalendarCheck, Lightbulb, Download,
-  ClipboardList, FileSearch, Eye, Upload, Settings, Users,
+  ClipboardList, FileSearch, Eye, Upload, Settings, Users, type LucideIcon,
 } from 'lucide-react';
 
 const V1Sidebar: React.FC = () => {
@@ -46,7 +46,7 @@ const V1Sidebar: React.FC = () => {
 
   const isActive = (url: string) => location.pathname === url;
 
-  const renderItems = (items: { title: string; url: string; icon: React.FC<any> }[]) =>
+  const renderItems = (items: { title: string; url: string; icon: LucideIcon }[]) =>
     items.map((item) => (
       <SidebarMenuItem key={item.url}>
         <SidebarMenuButton

@@ -43,16 +43,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedPillar, setSelectedPillar] = useState<string>('All');
   const [selectedQuarter, setSelectedQuarter] = useState<string>('Q4 2025');
   const [assessments, setAssessments] = useState<Assessment[]>(() => {
-    try { const s = localStorage.getItem('assessments'); return s ? JSON.parse(s) : sampleAssessments; } catch { return sampleAssessments; }
+    try { const s = localStorage.getItem('assessments'); return s ? JSON.parse(s) : sampleAssessments; } catch (e) { console.warn('Failed to parse assessments from localStorage', e); return sampleAssessments; }
   });
   const [assessmentQuestionsState, setAssessmentQuestionsRaw] = useState<AssessmentQuestion[]>(() => {
-    try { const s = localStorage.getItem('assessmentQuestions'); return s ? JSON.parse(s) : defaultQuestions; } catch { return defaultQuestions; }
+    try { const s = localStorage.getItem('assessmentQuestions'); return s ? JSON.parse(s) : defaultQuestions; } catch (e) { console.warn('Failed to parse assessmentQuestions from localStorage', e); return defaultQuestions; }
   });
   const [publishedQuestions, setPublishedQuestions] = useState<AssessmentQuestion[]>(() => {
-    try { const s = localStorage.getItem('publishedQuestions'); return s ? JSON.parse(s) : defaultQuestions; } catch { return defaultQuestions; }
+    try { const s = localStorage.getItem('publishedQuestions'); return s ? JSON.parse(s) : defaultQuestions; } catch (e) { console.warn('Failed to parse publishedQuestions from localStorage', e); return defaultQuestions; }
   });
   const [isQuestionsPublished, setIsQuestionsPublished] = useState(() => {
-    try { const s = localStorage.getItem('isQuestionsPublished'); return s ? JSON.parse(s) : true; } catch { return true; }
+    try { const s = localStorage.getItem('isQuestionsPublished'); return s ? JSON.parse(s) : true; } catch (e) { console.warn('Failed to parse isQuestionsPublished from localStorage', e); return true; }
   });
 
   // Persist to localStorage on change

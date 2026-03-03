@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppState } from '@/context/AppContext';
-import { Assessment, AssessmentQuestion, DimensionMetric } from '@/data/assessmentQuestions';
+import { Assessment, AssessmentQuestion } from '@/data/assessmentQuestions';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,10 +19,10 @@ interface AssessmentFormProps {
   mode: 'create' | 'self-assess';
 }
 
-const DIMENSION_METRICS: DimensionMetric[] = ['Maturity', 'Performance', 'Stability', 'Agility'];
+/* Dimension metric types used by questions */
 
 const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, existingAssessment, onSubmit, mode }) => {
-  const { assessmentQuestions: allQuestions, publishedQuestions, selectedQuarter, pillars } = useAppState();
+  const { assessmentQuestions: allQuestions, publishedQuestions, selectedQuarter } = useAppState();
   // Admin sees all draft questions; users see only published
   const assessmentQuestions = mode === 'create' ? allQuestions : publishedQuestions;
   const { toast } = useToast();
@@ -86,7 +86,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, existingAsses
   };
 
   const getScoreColor = (s: number) =>
-    s >= 4 ? 'bg-green-100 text-green-800 border-green-300' : s >= 3 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : s >= 1 ? 'bg-red-100 text-red-800 border-red-300' : 'bg-muted text-muted-foreground';
+    s >= 4 ? 'bg-accent/60 text-accent-foreground border-accent' : s >= 3 ? 'bg-muted text-muted-foreground border-border' : s >= 1 ? 'bg-destructive/10 text-destructive border-destructive/30' : 'bg-muted text-muted-foreground';
 
   const renderQuestions = (questions: AssessmentQuestion[]) => (
     <div className="space-y-4">
@@ -240,7 +240,7 @@ export const V1CreateAssessmentPage: React.FC = () => {
                   className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-all text-left">
                   <p className="font-semibold text-sm text-foreground">{p}</p>
                   <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-                    {exists ? <><CheckCircle2 className="w-3 h-3 text-green-600" /> Exists</> : <><Clock className="w-3 h-3" /> Not created</>}
+                    {exists ? <><CheckCircle2 className="w-3 h-3 text-primary" /> Exists</> : <><Clock className="w-3 h-3" /> Not created</>}
                   </p>
                 </button>
               );
@@ -264,8 +264,6 @@ export const V1SelfAssessmentPage: React.FC = () => {
 
   if (user?.role !== 'user' || !user.platformId) return <p className="text-muted-foreground">Only Users can self-assess.</p>;
   if (publishedQuestions.length === 0) return <p className="text-muted-foreground">No questionnaire has been published yet. Please wait for the Admin to publish.</p>;
-
-  if (user?.role !== 'user' || !user.platformId) return <p className="text-muted-foreground">Only Users can self-assess.</p>;
 
   const existing = assessments.find(a => a.platform === user.platformId && a.quarter === selectedQuarter);
 
