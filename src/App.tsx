@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useAppState } from "@/context/AppContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import OverviewPage from "@/pages/OverviewPage";
@@ -72,6 +72,14 @@ const AppRoutes: React.FC = () => {
 };
 
 /* v1 (3-role) routes — now at root */
+const V1DefaultRedirect: React.FC = () => {
+  const { user } = useAppState();
+  const defaultPath = user?.role === 'user' ? '/assessments/submit'
+    : user?.role === 'reviewer' ? '/assessments/view'
+    : '/assessments/create';
+  return <Navigate to={defaultPath} replace />;
+};
+
 const V1Routes: React.FC = () => {
   const { user, setUser } = useAppState();
 
@@ -82,7 +90,7 @@ const V1Routes: React.FC = () => {
   return (
     <Routes>
       <Route element={<V1DashboardLayout />}>
-        <Route path="/" element={<OverviewPage />} />
+        <Route path="/" element={<V1DefaultRedirect />} />
         <Route path="/dimensions" element={<DimensionsPage />} />
         <Route path="/trends" element={<TrendsPage />} />
         <Route path="/heatmap" element={<HeatmapPage />} />
