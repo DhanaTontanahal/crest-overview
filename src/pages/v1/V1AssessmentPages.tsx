@@ -965,6 +965,16 @@ export const V1ViewAssessmentsPage: React.FC = () => {
                         )}
                         <p>Created: {a.submittedAt}{a.reviewedBy ? ` · Reviewed by ${a.reviewedBy}` : ''}</p>
                       </div>
+                      {isAdmin && a.status === 'draft' && (
+                        <div className="flex gap-1.5 pt-1">
+                          <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" onClick={() => {
+                            setAssessments(prev => prev.map(x => x.id === a.id ? { ...x, status: 'published' as const } : x));
+                            toast({ title: 'Published', description: `${a.platform} assessment published.` });
+                          }}>
+                            <Send className="w-3 h-3 mr-1" /> Publish
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
