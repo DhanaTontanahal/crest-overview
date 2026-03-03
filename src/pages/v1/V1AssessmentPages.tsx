@@ -927,6 +927,15 @@ export const V1ViewAssessmentsPage: React.FC = () => {
               {items[0].questionIds && (
                 <p className="text-[11px] text-muted-foreground">{items[0].questionIds.length} questions in this assessment</p>
               )}
+              {isAdmin && items.some(a => a.status === 'draft') && (
+                <Button size="sm" variant="outline" className="mt-1 h-7 text-[11px]" onClick={() => {
+                  const draftIds = items.filter(a => a.status === 'draft').map(a => a.id);
+                  setAssessments(prev => prev.map(a => draftIds.includes(a.id) ? { ...a, status: 'published' as const } : a));
+                  toast({ title: 'Published', description: `All draft assessments in "${name}" published.` });
+                }}>
+                  <Send className="w-3 h-3 mr-1" /> Publish All Drafts
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -965,6 +974,16 @@ export const V1ViewAssessmentsPage: React.FC = () => {
                         )}
                         <p>Created: {a.submittedAt}{a.reviewedBy ? ` · Reviewed by ${a.reviewedBy}` : ''}</p>
                       </div>
+                      {isAdmin && a.status === 'draft' && (
+                        <div className="flex gap-1.5 pt-1">
+                          <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" onClick={() => {
+                            setAssessments(prev => prev.map(x => x.id === a.id ? { ...x, status: 'published' as const } : x));
+                            toast({ title: 'Published', description: `${a.platform} assessment published.` });
+                          }}>
+                            <Send className="w-3 h-3 mr-1" /> Publish
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
