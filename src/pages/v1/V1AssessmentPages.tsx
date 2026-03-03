@@ -845,7 +845,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
           <h3 className="text-lg font-bold text-foreground">Assessments</h3>
           {totalPublished > 0 && (
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-              <CheckCircle2 className="w-3 h-3 text-green-500" /> {totalPublished} published assessment{totalPublished > 1 ? 's' : ''} for {filterQuarter}
+              <CheckCircle2 className="w-3 h-3 text-primary" /> {totalPublished} published assessment{totalPublished > 1 ? 's' : ''} for {filterQuarter}
             </p>
           )}
         </div>
