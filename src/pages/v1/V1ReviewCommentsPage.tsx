@@ -74,11 +74,19 @@ const V1ReviewCommentsPage: React.FC = () => {
                     <span>Reviewed on: {a.reviewedAt || '—'}</span>
                   </div>
 
+                  {a.reviewerOverallComment && (
+                    <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 mt-2">
+                      <p className="text-xs font-semibold text-foreground mb-1">Overall Reviewer Comment</p>
+                      <p className="text-xs text-muted-foreground">{a.reviewerOverallComment}</p>
+                    </div>
+                  )}
+
                   <div className="space-y-2 mt-3">
-                    <p className="text-xs font-semibold text-foreground">Your Answers & Scores</p>
+                    <p className="text-xs font-semibold text-foreground">Your Answers & Reviewer Feedback</p>
                     <div className="space-y-2 max-h-96 overflow-y-auto">
                       {publishedQuestions.map(q => {
                         const ans = a.answers.find(an => an.questionId === q.id);
+                        const reviewerComment = a.reviewerComments?.[q.id];
                         return (
                           <div key={q.id} className="p-3 rounded-lg bg-muted/30 border border-border/30">
                             <p className="text-xs font-medium text-foreground">{q.question}</p>
@@ -91,9 +99,15 @@ const V1ReviewCommentsPage: React.FC = () => {
                               </span>
                             </div>
                             {ans?.comments && (
-                              <p className="mt-1.5 text-xs text-muted-foreground italic">
-                                "{ans.comments}"
+                              <p className="mt-1.5 text-xs text-muted-foreground italic border-l-2 border-border pl-2">
+                                Your comment: "{ans.comments}"
                               </p>
+                            )}
+                            {reviewerComment && (
+                              <div className="mt-2 p-2 rounded bg-primary/5 border border-primary/20">
+                                <p className="text-[10px] font-semibold text-primary mb-0.5">Reviewer Feedback</p>
+                                <p className="text-xs text-foreground">{reviewerComment}</p>
+                              </div>
                             )}
                           </div>
                         );
