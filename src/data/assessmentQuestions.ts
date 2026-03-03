@@ -252,6 +252,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
 
 export interface Assessment {
   id: string;
+  name: string; // assessment name given by Admin
   platform: string;
   quarter: string;
   submittedBy: string; // platform name (acting as TPL identifier)
@@ -274,6 +275,7 @@ export interface AssessmentAnswer {
 export const sampleAssessments: Assessment[] = [
   {
     id: 'assess-consumer-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Consumer',
     quarter: 'Q4 2025',
     submittedBy: 'Consumer',
@@ -309,6 +311,7 @@ export const sampleAssessments: Assessment[] = [
   },
   {
     id: 'assess-commercial-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Commercial',
     quarter: 'Q4 2025',
     submittedBy: 'Commercial',
@@ -344,6 +347,7 @@ export const sampleAssessments: Assessment[] = [
   },
   {
     id: 'assess-wealth-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Wealth & Investment',
     quarter: 'Q4 2025',
     submittedBy: 'Wealth & Investment',
@@ -379,6 +383,7 @@ export const sampleAssessments: Assessment[] = [
   },
   {
     id: 'assess-insurance-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Insurance',
     quarter: 'Q4 2025',
     submittedBy: 'Insurance',

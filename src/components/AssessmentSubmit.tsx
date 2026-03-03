@@ -61,6 +61,7 @@ const AssessmentSubmit: React.FC<AssessmentSubmitProps> = ({ platform, onSubmit,
     }
     const assessment: Assessment = {
       id: existingAssessment?.id ?? `assess-${platform.toLowerCase().replace(/\s+/g, '-')}-${selectedQuarter.replace(' ', '')}`,
+      name: existingAssessment?.name ?? `${platform} ${selectedQuarter} Assessment`,
       platform,
       quarter: selectedQuarter,
       submittedBy: platform,
