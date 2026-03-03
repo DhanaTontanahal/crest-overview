@@ -391,7 +391,8 @@ export const V1PeerReviewPage: React.FC = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  {a.platform}
+                  <span className="font-bold">{a.name || a.platform}</span>
+                  <Badge variant="outline" className="text-[10px]">{a.platform}</Badge>
                   <Badge variant={a.status === 'reviewed' ? 'default' : 'secondary'}>
                     {a.status === 'reviewed' ? 'Reviewed' : 'Pending Review'}
                   </Badge>
@@ -406,7 +407,9 @@ export const V1PeerReviewPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span>Quarter: {a.quarter}</span>
                 <span>Submitted: {a.submittedAt}</span>
+                <span>{a.answers.length} questions</span>
                 {a.reviewedAt && <span>Reviewed: {a.reviewedAt}</span>}
                 {a.reviewedBy && <span>By: {a.reviewedBy}</span>}
               </div>
@@ -418,7 +421,7 @@ export const V1PeerReviewPage: React.FC = () => {
                 onClick={() => setExpandedId(isExpanded ? null : a.id)}
               >
                 <FileSearch className="w-3.5 h-3.5 mr-1" />
-                {isExpanded ? 'Collapse' : 'Review & Comment'} ({a.answers.filter(ans => ans.score > 0).length}/{assessmentQuestions.length})
+                {isExpanded ? 'Collapse' : `Review & Comment (${a.answers.length} questions)`}
               </Button>
 
               {isExpanded && (
