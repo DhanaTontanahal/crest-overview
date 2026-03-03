@@ -1,15 +1,15 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import V0Sidebar from './V0Sidebar';
-import V0Header from './V0Header';
+import V1Sidebar from './V1Sidebar';
+import V1Header from './V1Header';
 
-const V0DashboardLayout: React.FC = () => (
+const V1DashboardLayout: React.FC = () => (
   <div className="min-h-screen bg-background flex flex-col w-full">
-    <V0Header />
+    <V1Header />
     <SidebarProvider>
       <div className="flex flex-1 w-full">
-        <V0Sidebar />
+        <V1Sidebar />
         <main className="flex-1 overflow-auto">
           <div className="flex items-center border-b border-border px-4 h-10">
             <SidebarTrigger />
@@ -23,4 +23,4 @@ const V0DashboardLayout: React.FC = () => (
   </div>
 );
 
-export default V0DashboardLayout;
+export default V1DashboardLayout;

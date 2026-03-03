@@ -8,12 +8,12 @@ const personas = [
   { role: 'Peer Reviewer', icon: Eye, color: 'from-primary to-primary/70', description: 'Review and calibrate peer assessments.' },
 ];
 
-const V0PersonasPage: React.FC = () => {
+const V1PersonasPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
       <PageHeader
         title="Personas"
-        subtitle="The v0 3-role model that powers the assessment lifecycle."
+        subtitle="The v1 3-role model that powers the assessment lifecycle."
         infoContent={[
           'Admin: Creates assessments, manages settings, uploads data, and oversees the process.',
           'User: Completes self-assessments for their assigned platform across all pillars and dimensions.',
@@ -42,4 +42,4 @@ const V0PersonasPage: React.FC = () => {
   );
 };
 
-export default V0PersonasPage;
+export default V1PersonasPage;

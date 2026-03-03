@@ -197,7 +197,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, existingAsses
 
 /* ─── Admin: Create Assessment (picks platform) ─── */
 
-export const V0CreateAssessmentPage: React.FC = () => {
+export const V1CreateAssessmentPage: React.FC = () => {
   const { user, assessments, setAssessments, platforms, selectedQuarter } = useAppState();
   const [selectedPlatform, setSelectedPlatform] = useState('');
 
@@ -259,7 +259,7 @@ export const V0CreateAssessmentPage: React.FC = () => {
 
 /* ─── User: Self Assessment ─── */
 
-export const V0SelfAssessmentPage: React.FC = () => {
+export const V1SelfAssessmentPage: React.FC = () => {
   const { user, assessments, setAssessments, selectedQuarter, publishedQuestions } = useAppState();
 
   if (user?.role !== 'user' || !user.platformId) return <p className="text-muted-foreground">Only Users can self-assess.</p>;
@@ -286,7 +286,7 @@ export const V0SelfAssessmentPage: React.FC = () => {
 
 /* ─── Peer Review ─── */
 
-export const V0PeerReviewPage: React.FC = () => {
+export const V1PeerReviewPage: React.FC = () => {
   const { user, assessments, setAssessments, publishedQuestions: assessmentQuestions, selectedQuarter } = useAppState();
 
   if (user?.role !== 'reviewer') return <p className="text-muted-foreground">Peer Reviewers only.</p>;
@@ -357,7 +357,7 @@ export const V0PeerReviewPage: React.FC = () => {
 
 /* ─── View All Assessments ─── */
 
-export const V0ViewAssessmentsPage: React.FC = () => {
+export const V1ViewAssessmentsPage: React.FC = () => {
   const { assessments, selectedQuarter, publishedQuestions: assessmentQuestions } = useAppState();
   const filtered = assessments.filter(a => a.quarter === selectedQuarter);
 

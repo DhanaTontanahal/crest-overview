@@ -6,13 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Shield, User, Eye, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, FileSearch, ChevronLeft, ChevronRight } from 'lucide-react';
 import MindMap from '@/components/MindMap';
 
-interface V0LoginPageProps {
+interface V1LoginPageProps {
   onLogin: (profile: UserProfile) => void;
 }
 
-type V0Role = 'admin' | 'user' | 'reviewer';
+type V1Role = 'admin' | 'user' | 'reviewer';
 
-const v0Roles: { value: V0Role; label: string; icon: React.ReactNode; description: string }[] = [
+const v1Roles: { value: V1Role; label: string; icon: React.ReactNode; description: string }[] = [
   { value: 'admin', label: 'Admin', icon: <Shield className="w-5 h-5" />, description: 'Create and manage assessments, settings, and data' },
   { value: 'user', label: 'User', icon: <User className="w-5 h-5" />, description: 'Complete self-assessments for your platform' },
   { value: 'reviewer', label: 'Peer Reviewer', icon: <Eye className="w-5 h-5" />, description: 'Review and calibrate peer assessments' },
@@ -183,13 +183,13 @@ const LandingCarousel: React.FC = () => {
 };
 
 /* ── v0 Login Page ── */
-const V0LoginPage: React.FC<V0LoginPageProps> = ({ onLogin }) => {
-  const [role, setRole] = useState<V0Role | ''>('');
+const V1LoginPage: React.FC<V1LoginPageProps> = ({ onLogin }) => {
+  const [role, setRole] = useState<V1Role | ''>('');
   const [userPlatform, setUserPlatform] = useState('');
 
   const handleLogin = () => {
     if (!role) return;
-    const labels: Record<V0Role, string> = { admin: 'Admin', user: 'Platform Lead', reviewer: 'Peer Reviewer' };
+    const labels: Record<V1Role, string> = { admin: 'Admin', user: 'Platform Lead', reviewer: 'Peer Reviewer' };
     const profile: UserProfile = {
       name: labels[role],
       role: role,
@@ -198,21 +198,18 @@ const V0LoginPage: React.FC<V0LoginPageProps> = ({ onLogin }) => {
     onLogin(profile);
   };
 
-  const selected = v0Roles.find(r => r.value === role);
+  const selected = v1Roles.find(r => r.value === role);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center p-4 md:p-8 gap-6 overflow-y-auto" role="main" aria-label="Login page">
       {/* Header + Login Card */}
       <div className="w-full max-w-5xl flex flex-col md:flex-row items-center gap-6 animate-fade-in">
         <div className="flex-1 text-center md:text-left">
-          <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
+         <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center animate-scale-in" aria-hidden="true">
               <Crown className="w-6 h-6 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Platform 4.0 Maturity Measurement</h1>
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">v0 — 3-Role Model</span>
-            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Platform 4.0 Maturity Measurement</h1>
           </div>
           <p className="text-muted-foreground text-sm max-w-lg">
             A unified framework ensuring consistent understanding of capability, gaps and what 'good' looks like
@@ -223,10 +220,10 @@ const V0LoginPage: React.FC<V0LoginPageProps> = ({ onLogin }) => {
           <div className="bg-card rounded-xl p-5 shadow-lg border border-border space-y-4" role="form" aria-label="Role selection form">
             <div>
               <label id="role-label" className="text-sm font-medium text-card-foreground mb-1.5 block">Select Role</label>
-              <Select value={role} onValueChange={(v) => { setRole(v as V0Role); setUserPlatform(''); }}>
+              <Select value={role} onValueChange={(v) => { setRole(v as V1Role); setUserPlatform(''); }}>
                 <SelectTrigger aria-labelledby="role-label"><SelectValue placeholder="Choose your role" /></SelectTrigger>
                 <SelectContent>
-                  {v0Roles.map(r => (
+                  {v1Roles.map(r => (
                     <SelectItem key={r.value} value={r.value}><span className="flex items-center gap-2">{r.icon}{r.label}</span></SelectItem>
                   ))}
                 </SelectContent>
@@ -247,10 +244,6 @@ const V0LoginPage: React.FC<V0LoginPageProps> = ({ onLogin }) => {
             <Button onClick={handleLogin} className="w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" size="lg" disabled={!role || (role === 'user' && !userPlatform)} aria-label="Sign in with selected role">
               Sign In
             </Button>
-
-            <p className="text-xs text-muted-foreground text-center">
-              Need the full 5-role experience? <a href="/" className="text-primary underline hover:no-underline">Go to v1</a>
-            </p>
           </div>
         </div>
       </div>
@@ -261,4 +254,4 @@ const V0LoginPage: React.FC<V0LoginPageProps> = ({ onLogin }) => {
   );
 };
 
-export default V0LoginPage;
+export default V1LoginPage;
