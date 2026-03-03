@@ -10,7 +10,7 @@ import {
   ClipboardList, FileSearch, Eye, Upload, Settings, Users,
 } from 'lucide-react';
 
-const V0Sidebar: React.FC = () => {
+const V1Sidebar: React.FC = () => {
   const { user } = useAppState();
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,26 +22,26 @@ const V0Sidebar: React.FC = () => {
   const isReviewer = user?.role === 'reviewer';
 
   const dashboardItems = [
-    { title: 'Overview', url: '/v0', icon: Gauge },
-    { title: 'Metric Dimensions', url: '/v0/dimensions', icon: BarChart3 },
-    { title: 'Trends', url: '/v0/trends', icon: TrendingUp },
-    ...(isAdmin || isUser ? [{ title: 'Cross-Platform Analysis', url: '/v0/heatmap', icon: Grid3X3 }] : []),
-    ...(isAdmin || isUser ? [{ title: 'Quarterly Progress', url: '/v0/quarterly-progress', icon: CalendarCheck }] : []),
-    ...(isAdmin || isUser ? [{ title: 'Action Plan', url: '/v0/action-plan', icon: Lightbulb }] : []),
-    { title: 'Team Data', url: '/v0/team-data', icon: Download },
+    { title: 'Overview', url: '/v1', icon: Gauge },
+    { title: 'Metric Dimensions', url: '/v1/dimensions', icon: BarChart3 },
+    { title: 'Trends', url: '/v1/trends', icon: TrendingUp },
+    ...(isAdmin || isUser ? [{ title: 'Cross-Platform Analysis', url: '/v1/heatmap', icon: Grid3X3 }] : []),
+    ...(isAdmin || isUser ? [{ title: 'Quarterly Progress', url: '/v1/quarterly-progress', icon: CalendarCheck }] : []),
+    ...(isAdmin || isUser ? [{ title: 'Action Plan', url: '/v1/action-plan', icon: Lightbulb }] : []),
+    { title: 'Team Data', url: '/v1/team-data', icon: Download },
   ];
 
   const assessmentItems = [
-    ...(isUser ? [{ title: 'Self Assessment', url: '/v0/assessments/submit', icon: ClipboardList }] : []),
-    ...(isAdmin ? [{ title: 'Create Assessment', url: '/v0/assessments/create', icon: ClipboardList }] : []),
-    { title: 'View Assessments', url: '/v0/assessments/view', icon: FileSearch },
-    ...(isReviewer ? [{ title: 'Peer Review', url: '/v0/assessments/review', icon: Eye }] : []),
+    ...(isUser ? [{ title: 'Self Assessment', url: '/v1/assessments/submit', icon: ClipboardList }] : []),
+    ...(isAdmin ? [{ title: 'Create Assessment', url: '/v1/assessments/create', icon: ClipboardList }] : []),
+    { title: 'View Assessments', url: '/v1/assessments/view', icon: FileSearch },
+    ...(isReviewer ? [{ title: 'Peer Review', url: '/v1/assessments/review', icon: Eye }] : []),
   ];
 
   const adminItems = isAdmin ? [
-    { title: 'Personas', url: '/v0/admin/personas', icon: Users },
-    { title: 'Data Upload', url: '/v0/admin/upload', icon: Upload },
-    { title: 'Settings', url: '/v0/admin/settings', icon: Settings },
+    { title: 'Personas', url: '/v1/admin/personas', icon: Users },
+    { title: 'Data Upload', url: '/v1/admin/upload', icon: Upload },
+    { title: 'Settings', url: '/v1/admin/settings', icon: Settings },
   ] : [];
 
   const isActive = (url: string) => location.pathname === url;
@@ -90,4 +90,4 @@ const V0Sidebar: React.FC = () => {
   );
 };
 
-export default V0Sidebar;
+export default V1Sidebar;

@@ -17,14 +17,14 @@ const roleLabels: Record<string, string> = {
   reviewer: 'Peer Reviewer',
 };
 
-const V0Header: React.FC = () => {
+const V1Header: React.FC = () => {
   const { user, setUser, selectedQuarter, setSelectedQuarter, selectedPlatform, setSelectedPlatform,
     selectedPillar, setSelectedPillar, platforms, pillars, availableQuarters } = useAppState();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     setUser(null);
-    navigate('/v0');
+    navigate('/v1');
   };
 
   return (
@@ -34,7 +34,7 @@ const V0Header: React.FC = () => {
           <div>
             <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
               Platform Maturity
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">v0</span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">v1</span>
             </h1>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               {user && roleIcons[user.role]} {user && roleLabels[user.role]}
@@ -76,4 +76,4 @@ const V0Header: React.FC = () => {
   );
 };
 
-export default V0Header;
+export default V1Header;
