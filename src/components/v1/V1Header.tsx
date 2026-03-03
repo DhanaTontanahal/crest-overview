@@ -49,7 +49,7 @@ const V1Header: React.FC = () => {
             {user?.platformId && ` — ${user.platformId}`}
           </p>
 
-          {!isUser && (
+          {!hideFilters && (
             <>
               <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
                 <SelectTrigger className="w-[120px] h-8 text-xs"><SelectValue /></SelectTrigger>
