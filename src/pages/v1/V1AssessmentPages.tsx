@@ -4,10 +4,12 @@ import { Assessment, AssessmentQuestion } from '@/data/assessmentQuestions';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send } from 'lucide-react';
+import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send, Plus, ChevronDown, ChevronRight, Pencil, Save, X } from 'lucide-react';
 import AdminAssessmentQuestions from '@/components/AdminAssessmentQuestions';
 
 /* ─── Tab-wise Assessment Form (shared by Create + Self-Assess) ─── */
@@ -25,8 +27,11 @@ interface AssessmentFormProps {
 
 const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentName, assessmentQuarter, existingAssessment, onSubmit, mode }) => {
   const { assessmentQuestions: allQuestions, publishedQuestions } = useAppState();
-  // Admin sees all draft questions; users see only published
-  const assessmentQuestions = mode === 'create' ? allQuestions : publishedQuestions;
+  // Filter to only questions selected for this assessment (via questionIds), falling back to all
+  const baseQuestions = mode === 'create' ? allQuestions : publishedQuestions;
+  const assessmentQuestions = existingAssessment?.questionIds?.length
+    ? baseQuestions.filter(q => existingAssessment.questionIds!.includes(q.id))
+    : baseQuestions;
   const { toast } = useToast();
   const [tabView, setTabView] = useState<'pillar' | 'dimension'>('pillar');
 
@@ -198,95 +203,362 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentNam
   );
 };
 
-/* ─── Admin: Create Assessment (picks platform) ─── */
+/* ─── Admin: Create Assessment (stepped flow) ─── */
 
 export const V1CreateAssessmentPage: React.FC = () => {
-  const { user, assessments, setAssessments, platforms, availableQuarters } = useAppState();
-  const [selectedPlatform, setSelectedPlatform] = useState('');
+  const { user, assessments, setAssessments, platforms, availableQuarters, assessmentQuestions, setAssessmentQuestions, pillars } = useAppState();
+  const { toast } = useToast();
+
+  // Step: 'details' → 'questions' → 'platforms'
+  const [step, setStep] = useState<'details' | 'questions' | 'platforms'>('details');
   const [assessmentName, setAssessmentName] = useState('');
   const [assessmentQuarter, setAssessmentQuarter] = useState(availableQuarters[0] || 'Q4 2025');
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<Set<string>>(new Set());
+  const [expandedPillar, setExpandedPillar] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Partial<AssessmentQuestion>>({});
+  const [showInlineAdd, setShowInlineAdd] = useState<string | null>(null); // pillar name
+  const [newQ, setNewQ] = useState({ question: '', lowMaturity: '', highMaturity: '' });
 
   if (user?.role !== 'admin') return <p className="text-muted-foreground">Admin only.</p>;
 
-  const existing = selectedPlatform ? assessments.find(a => a.platform === selectedPlatform && a.quarter === assessmentQuarter) : undefined;
+  const questionsByPillar = pillars.map(pillar => ({
+    pillar,
+    questions: assessmentQuestions.filter(q => q.pillar === pillar),
+  }));
 
-  const handleSubmit = (assessment: Assessment) => {
-    setAssessments(prev => {
-      const idx = prev.findIndex(a => a.id === assessment.id);
-      if (idx >= 0) { const u = [...prev]; u[idx] = assessment; return u; }
-      return [...prev, assessment];
+  const toggleQuestion = (id: string) => {
+    setSelectedQuestionIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
     });
   };
 
+  const toggleAllInPillar = (questions: AssessmentQuestion[]) => {
+    const ids = questions.map(q => q.id);
+    const allSelected = ids.every(id => selectedQuestionIds.has(id));
+    setSelectedQuestionIds(prev => {
+      const next = new Set(prev);
+      ids.forEach(id => allSelected ? next.delete(id) : next.add(id));
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    setSelectedQuestionIds(new Set(assessmentQuestions.map(q => q.id)));
+  };
+
+  const deselectAll = () => {
+    setSelectedQuestionIds(new Set());
+  };
+
+  const handleStartEdit = (q: AssessmentQuestion) => {
+    setEditingId(q.id);
+    setEditData({ question: q.question, lowMaturity: q.lowMaturity, highMaturity: q.highMaturity });
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingId) return;
+    setAssessmentQuestions(prev =>
+      prev.map(q => q.id === editingId ? { ...q, ...editData } as AssessmentQuestion : q)
+    );
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const handleAddQuestion = (pillar: string) => {
+    if (!newQ.question.trim()) return;
+    const prefix = pillar.slice(0, 2).toLowerCase();
+    const id = `${prefix}-new-${Date.now()}`;
+    const question: AssessmentQuestion = {
+      id,
+      pillar,
+      question: newQ.question,
+      lowMaturity: newQ.lowMaturity,
+      highMaturity: newQ.highMaturity,
+      observableMetrics: '',
+      dimensionMetric: 'Maturity',
+      subMetric: 'Culture',
+    };
+    setAssessmentQuestions(prev => [...prev, question]);
+    setSelectedQuestionIds(prev => new Set(prev).add(id));
+    setNewQ({ question: '', lowMaturity: '', highMaturity: '' });
+    setShowInlineAdd(null);
+  };
+
+  const handlePublishAssessment = (platform: string) => {
+    const id = `${platform}-${assessmentQuarter}-${Date.now()}`;
+    const assessment: Assessment = {
+      id,
+      name: assessmentName,
+      platform,
+      quarter: assessmentQuarter,
+      submittedBy: 'Admin',
+      submittedAt: new Date().toISOString().split('T')[0],
+      reviewedBy: null,
+      reviewedAt: null,
+      status: 'draft',
+      questionIds: Array.from(selectedQuestionIds),
+      answers: [],
+    };
+    setAssessments(prev => [...prev, assessment]);
+    toast({ title: 'Assessment Created', description: `"${assessmentName}" created for ${platform} with ${selectedQuestionIds.size} questions.` });
+  };
+
+  const handlePublishAll = () => {
+    platforms.forEach(p => {
+      const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
+      if (!exists) handlePublishAssessment(p);
+    });
+    setStep('details');
+    setAssessmentName('');
+    setSelectedQuestionIds(new Set());
+  };
+
+  // ── Step 1: Details ──
+  if (step === 'details') {
+    return (
+      <div className="space-y-6 animate-fade-in max-w-2xl" style={{ animationFillMode: 'forwards' }}>
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Create Assessment</h3>
+          <p className="text-sm text-muted-foreground">Name the assessment and select a quarter, then add questions.</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-foreground">Assessment Name</label>
+            <Input
+              value={assessmentName}
+              onChange={e => setAssessmentName(e.target.value)}
+              placeholder="e.g. Q4 2025 Maturity Assessment"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-foreground">Quarter</label>
+            <select
+              value={assessmentQuarter}
+              onChange={e => setAssessmentQuarter(e.target.value)}
+              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => { selectAll(); setStep('questions'); }}
+          disabled={!assessmentName.trim()}
+          className="w-full sm:w-auto"
+        >
+          <Plus className="w-4 h-4 mr-2" /> Add Questions
+        </Button>
+        {!assessmentName.trim() && (
+          <p className="text-xs text-muted-foreground italic">Enter an assessment name to continue.</p>
+        )}
+      </div>
+    );
+  }
+
+  // ── Step 2: Question Picker ──
+  if (step === 'questions') {
+    return (
+      <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <Button variant="ghost" size="sm" onClick={() => setStep('details')} className="mb-1 text-xs">← Back</Button>
+            <h3 className="text-lg font-bold text-foreground">{assessmentName}</h3>
+            <p className="text-sm text-muted-foreground">
+              Select questions for this assessment · <span className="font-medium text-primary">{selectedQuestionIds.size}/{assessmentQuestions.length} selected</span> · {assessmentQuarter}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={selectAll}>Select All</Button>
+            <Button size="sm" variant="outline" onClick={deselectAll}>Deselect All</Button>
+            <Button size="sm" onClick={() => setStep('platforms')} disabled={selectedQuestionIds.size === 0}>
+              Next: Assign Platforms →
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {questionsByPillar.map(({ pillar, questions }) => {
+            const isExpanded = expandedPillar === pillar;
+            const selectedInPillar = questions.filter(q => selectedQuestionIds.has(q.id)).length;
+            const allInPillarSelected = questions.length > 0 && selectedInPillar === questions.length;
+
+            return (
+              <div key={pillar} className="border border-border/50 rounded-lg overflow-hidden">
+                <div className="flex items-center gap-2 p-3 hover:bg-muted/30 transition-colors">
+                  <Checkbox
+                    checked={allInPillarSelected}
+                    onCheckedChange={() => toggleAllInPillar(questions)}
+                    className="shrink-0"
+                  />
+                  <button
+                    className="flex-1 flex items-center justify-between text-left"
+                    onClick={() => setExpandedPillar(isExpanded ? null : pillar)}
+                  >
+                    <span className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      {pillar}
+                    </span>
+                    <Badge variant="secondary" className="text-[10px]">
+                      {selectedInPillar}/{questions.length} selected
+                    </Badge>
+                  </button>
+                </div>
+
+                {isExpanded && (
+                  <div className="border-t border-border/30 divide-y divide-border/20">
+                    {questions.map((q, idx) => (
+                      <div key={q.id} className="p-3 hover:bg-muted/10 transition-colors">
+                        {editingId === q.id ? (
+                          <div className="space-y-2 ml-6">
+                            <Textarea
+                              value={editData.question || ''}
+                              onChange={e => setEditData(d => ({ ...d, question: e.target.value }))}
+                              placeholder="Question"
+                              className="min-h-[60px] text-sm"
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <Textarea
+                                value={editData.lowMaturity || ''}
+                                onChange={e => setEditData(d => ({ ...d, lowMaturity: e.target.value }))}
+                                placeholder="Low maturity (score 1)"
+                                className="min-h-[50px] text-xs"
+                              />
+                              <Textarea
+                                value={editData.highMaturity || ''}
+                                onChange={e => setEditData(d => ({ ...d, highMaturity: e.target.value }))}
+                                placeholder="High maturity (score 5)"
+                                className="min-h-[50px] text-xs"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={handleSaveEdit}><Save className="w-3 h-3 mr-1" /> Save</Button>
+                              <Button size="sm" variant="outline" onClick={() => setEditingId(null)}><X className="w-3 h-3 mr-1" /> Cancel</Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              checked={selectedQuestionIds.has(q.id)}
+                              onCheckedChange={() => toggleQuestion(q.id)}
+                              className="mt-0.5 shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-foreground">
+                                <span className="text-muted-foreground mr-1 font-medium">{idx + 1}.</span>
+                                {q.question}
+                              </p>
+                              <div className="flex gap-4 mt-1 text-[11px] text-muted-foreground">
+                                <span>1 = {q.lowMaturity?.slice(0, 60)}…</span>
+                                <span>5 = {q.highMaturity?.slice(0, 60)}…</span>
+                              </div>
+                              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-semibold">
+                                {q.dimensionMetric} → {q.subMetric}
+                              </span>
+                            </div>
+                            <Button size="sm" variant="ghost" onClick={() => handleStartEdit(q)}>
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Inline add question */}
+                    {showInlineAdd === pillar ? (
+                      <div className="p-3 space-y-2 bg-muted/20">
+                        <Textarea
+                          value={newQ.question}
+                          onChange={e => setNewQ(q => ({ ...q, question: e.target.value }))}
+                          placeholder="New question text *"
+                          className="min-h-[50px] text-sm"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <Textarea
+                            value={newQ.lowMaturity}
+                            onChange={e => setNewQ(q => ({ ...q, lowMaturity: e.target.value }))}
+                            placeholder="Low maturity (score 1)"
+                            className="min-h-[40px] text-xs"
+                          />
+                          <Textarea
+                            value={newQ.highMaturity}
+                            onChange={e => setNewQ(q => ({ ...q, highMaturity: e.target.value }))}
+                            placeholder="High maturity (score 5)"
+                            className="min-h-[40px] text-xs"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => handleAddQuestion(pillar)} disabled={!newQ.question.trim()}>
+                            <Plus className="w-3 h-3 mr-1" /> Add
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setShowInlineAdd(null)}>Cancel</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowInlineAdd(pillar)}
+                        className="w-full p-2.5 text-xs text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Plus className="w-3 h-3" /> Add question to {pillar}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <Button variant="outline" onClick={() => setStep('details')}>← Back</Button>
+          <Button onClick={() => setStep('platforms')} disabled={selectedQuestionIds.size === 0}>
+            Next: Assign Platforms ({selectedQuestionIds.size} questions) →
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 3: Platform Assignment & Publish ──
   return (
     <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-      {selectedPlatform === '__manage__' ? (
-        <div>
-          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back</Button>
-          <AdminAssessmentQuestions />
-        </div>
-      ) : !selectedPlatform ? (
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-foreground">Create Assessment</h3>
-          <p className="text-sm text-muted-foreground">Name the assessment, select a quarter, then pick a platform.</p>
+      <Button variant="ghost" size="sm" onClick={() => setStep('questions')} className="mb-1 text-xs">← Back to Questions</Button>
+      <div>
+        <h3 className="text-lg font-bold text-foreground">{assessmentName}</h3>
+        <p className="text-sm text-muted-foreground">{selectedQuestionIds.size} questions selected · {assessmentQuarter}</p>
+      </div>
 
-          {/* Assessment Name & Quarter */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Assessment Name</label>
-              <input
-                type="text"
-                value={assessmentName}
-                onChange={e => setAssessmentName(e.target.value)}
-                placeholder="e.g. Q4 2025 Maturity Assessment"
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Quarter</label>
-              <select
-                value={assessmentQuarter}
-                onChange={e => setAssessmentQuarter(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
-              </select>
-            </div>
-          </div>
+      <p className="text-sm text-muted-foreground">Select platforms to publish this assessment to, or publish to all.</p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {/* Common for All Platforms */}
-            <button onClick={() => setSelectedPlatform('__manage__')}
-              className="p-4 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 hover:border-primary hover:bg-primary/10 transition-all text-left col-span-2 md:col-span-4">
-              <p className="font-semibold text-sm text-foreground flex items-center gap-2">
-                <Settings2 className="w-4 h-4 text-primary" /> Common for All Platforms
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {platforms.map(p => {
+          const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
+          return (
+            <div key={p} className="p-4 rounded-xl border border-border bg-card text-left space-y-2">
+              <p className="font-semibold text-sm text-foreground">{p}</p>
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                {exists ? <><CheckCircle2 className="w-3 h-3 text-primary" /> Created</> : <><Clock className="w-3 h-3" /> Not created</>}
               </p>
-              <p className="text-[11px] text-muted-foreground mt-1">Manage questionnaire — add, edit, delete, upload &amp; publish questions</p>
-            </button>
-            {platforms.map(p => {
-              const exists = assessments.some(a => a.platform === p && a.quarter === assessmentQuarter);
-              return (
-                <button key={p} onClick={() => setSelectedPlatform(p)}
-                  disabled={!assessmentName.trim()}
-                  className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed">
-                  <p className="font-semibold text-sm text-foreground">{p}</p>
-                  <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-                    {exists ? <><CheckCircle2 className="w-3 h-3 text-primary" /> Exists</> : <><Clock className="w-3 h-3" /> Not created</>}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-          {!assessmentName.trim() && (
-            <p className="text-xs text-muted-foreground italic">Enter an assessment name to enable platform selection.</p>
-          )}
-        </div>
-      ) : (
-        <div>
-          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back</Button>
-          <AssessmentForm platform={selectedPlatform} assessmentName={assessmentName} assessmentQuarter={assessmentQuarter} existingAssessment={existing} onSubmit={handleSubmit} mode="create" />
-        </div>
-      )}
+              {!exists && (
+                <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handlePublishAssessment(p)}>
+                  Create for {p}
+                </Button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex gap-3 pt-2">
+        <Button variant="outline" onClick={() => setStep('questions')}>← Back</Button>
+        <Button onClick={handlePublishAll}>
+          <Send className="w-4 h-4 mr-2" /> Save & Publish to All Platforms
+        </Button>
+      </div>
     </div>
   );
 };

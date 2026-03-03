@@ -261,6 +261,7 @@ export interface Assessment {
   reviewedAt: string | null;
   status: 'draft' | 'submitted' | 'reviewed';
   answers: AssessmentAnswer[];
+  questionIds?: string[]; // selected question IDs for this assessment
   reviewerComments?: Record<string, string>; // questionId -> reviewer comment
   reviewerOverallComment?: string;
 }
