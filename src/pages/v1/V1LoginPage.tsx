@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { UserProfile } from '@/types/maturity';
-import { defaultPlatforms } from '@/data/dummyData';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, User, Eye, Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, FileSearch, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Crown, Users, TrendingUp, MessageSquare, Clock, ClipboardList, UserCheck, CheckCircle2, FileSearch, ChevronLeft, ChevronRight, LogIn, X } from 'lucide-react';
 import MindMap from '@/components/MindMap';
 
 interface V1LoginPageProps {
   onLogin: (profile: UserProfile) => void;
 }
 
-type V1Role = 'admin' | 'user' | 'reviewer';
-
-const v1Roles: { value: V1Role; label: string; icon: React.ReactNode; description: string }[] = [
-  { value: 'admin', label: 'Admin', icon: <Shield className="w-5 h-5" />, description: 'Create and manage assessments, settings, and data' },
-  { value: 'user', label: 'User', icon: <User className="w-5 h-5" />, description: 'Complete self-assessments for your platform' },
-  { value: 'reviewer', label: 'Peer Reviewer', icon: <Eye className="w-5 h-5" />, description: 'Review and calibrate peer assessments' },
-];
+interface RegisteredUser {
+  id: string;
+  email: string;
+  fullName: string;
+  platform: string;
+  role: 'user' | 'reviewer';
+  createdAt: string;
+}
 
 /* ── Landing Carousel ── */
 const SLIDE_TITLES = ['Framework at a Glance', 'Maturity Framework', 'Assessment to Metrics'];
@@ -41,7 +42,6 @@ const LandingCarousel: React.FC = () => {
 
   return (
     <div className="w-full max-w-5xl animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
-      {/* Nav */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           {SLIDE_TITLES.map((t, i) => (
@@ -170,7 +170,6 @@ const LandingCarousel: React.FC = () => {
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="flex gap-1 mt-3">
         {[0, 1, 2].map(i => (
           <div key={i} className="flex-1 h-1 rounded-full bg-muted overflow-hidden cursor-pointer" onClick={() => goTo(i)}>
@@ -184,28 +183,49 @@ const LandingCarousel: React.FC = () => {
 
 /* ── v1 Login Page ── */
 const V1LoginPage: React.FC<V1LoginPageProps> = ({ onLogin }) => {
-  const [role, setRole] = useState<V1Role | ''>('');
-  const [userPlatform, setUserPlatform] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = () => {
-    if (!role) return;
-    const labels: Record<V1Role, string> = { admin: 'Admin', user: 'Platform Lead', reviewer: 'Peer Reviewer' };
-    const profile: UserProfile = {
-      name: labels[role],
-      role,
-      platformId: role === 'user' ? userPlatform : undefined,
-    };
-    onLogin(profile);
-  };
+    setError('');
 
-  const selected = v1Roles.find(r => r.value === role);
+    // Admin default credentials
+    if (email === 'admin' && password === 'admin') {
+      onLogin({ name: 'Admin', role: 'admin' });
+      return;
+    }
+
+    // Check against registered users
+    let registeredUsers: RegisteredUser[] = [];
+    try {
+      const s = localStorage.getItem('registeredUsers');
+      registeredUsers = s ? JSON.parse(s) : [];
+    } catch {
+      registeredUsers = [];
+    }
+
+    // For now we match email only (password stored at registration but not hashed — demo mode)
+    const found = registeredUsers.find(u => u.email === email);
+    if (!found) {
+      setError('Invalid email or password. Please check your credentials.');
+      return;
+    }
+
+    onLogin({
+      name: found.fullName,
+      role: found.role,
+      platformId: found.platform,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center p-4 md:p-8 gap-6 overflow-y-auto" role="main" aria-label="Login page">
-      {/* Header + Login Card */}
+      {/* Header + Sign In */}
       <div className="w-full max-w-5xl flex flex-col md:flex-row items-center gap-6 animate-fade-in">
         <div className="flex-1 text-center md:text-left">
-         <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
+          <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center animate-scale-in" aria-hidden="true">
               <Crown className="w-6 h-6 text-primary-foreground" />
             </div>
@@ -216,40 +236,84 @@ const V1LoginPage: React.FC<V1LoginPageProps> = ({ onLogin }) => {
           </p>
         </div>
 
-        <div className="w-full max-w-sm animate-scale-in" style={{ animationDelay: '0.15s', animationFillMode: 'both' }}>
-          <div className="bg-card rounded-xl p-5 shadow-lg border border-border space-y-4" role="form" aria-label="Role selection form">
-            <div>
-              <label id="role-label" className="text-sm font-medium text-card-foreground mb-1.5 block">Select Role</label>
-              <Select value={role} onValueChange={(v) => { setRole(v as V1Role); setUserPlatform(''); }}>
-                <SelectTrigger aria-labelledby="role-label"><SelectValue placeholder="Choose your role" /></SelectTrigger>
-                <SelectContent>
-                  {v1Roles.map(r => (
-                    <SelectItem key={r.value} value={r.value}><span className="flex items-center gap-2">{r.icon}{r.label}</span></SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selected && <p className="text-xs text-muted-foreground mt-1.5 animate-fade-in" role="status">{selected.description}</p>}
-            </div>
-
-            {role === 'user' && (
-              <div className="animate-fade-in">
-                <label id="platform-label" className="text-sm font-medium text-card-foreground mb-1.5 block">Your Platform</label>
-                <Select value={userPlatform} onValueChange={setUserPlatform}>
-                  <SelectTrigger aria-labelledby="platform-label"><SelectValue placeholder="Select your platform" /></SelectTrigger>
-                  <SelectContent>{defaultPlatforms.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <Button onClick={handleLogin} className="w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" size="lg" disabled={!role || (role === 'user' && !userPlatform)} aria-label="Sign in with selected role">
-              Sign In
-            </Button>
-          </div>
+        <div className="animate-scale-in" style={{ animationDelay: '0.15s', animationFillMode: 'both' }}>
+          <Button
+            onClick={() => setShowModal(true)}
+            size="lg"
+            className="gap-2 px-8 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+          >
+            <LogIn className="w-5 h-5" /> Sign In
+          </Button>
         </div>
       </div>
 
       {/* Carousel */}
       <LandingCarousel />
+
+      {/* Login Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in" onClick={() => setShowModal(false)}>
+          <div
+            className="w-full max-w-sm bg-card rounded-xl p-6 shadow-2xl border border-border space-y-4 animate-scale-in"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-label="Sign in"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Sign In</h2>
+                <p className="text-xs text-muted-foreground">Enter your credentials to continue</p>
+              </div>
+              <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center transition-colors">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="login-email" className="text-xs">Email</Label>
+                <Input
+                  id="login-email"
+                  type="text"
+                  value={email}
+                  onChange={e => { setEmail(e.target.value); setError(''); }}
+                  placeholder="Email or username"
+                  onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                  autoFocus
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="login-password" className="text-xs">Password</Label>
+                <Input
+                  id="login-password"
+                  type="password"
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); setError(''); }}
+                  placeholder="Password"
+                  onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                />
+              </div>
+            </div>
+
+            {error && (
+              <p className="text-xs text-destructive animate-fade-in">{error}</p>
+            )}
+
+            <Button
+              onClick={handleLogin}
+              className="w-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              size="lg"
+              disabled={!email || !password}
+            >
+              Sign In
+            </Button>
+
+            <p className="text-[10px] text-muted-foreground text-center">
+              Contact your administrator if you don't have an account
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
