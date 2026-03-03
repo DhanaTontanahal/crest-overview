@@ -39,7 +39,7 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      {/* v1 routes (existing 5-role) */}
+      {/* version_2 routes (5-role) */}
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<OverviewPage />} />
         <Route path="/org-health" element={<OrgHealthPage />} />
@@ -64,7 +64,7 @@ const AppRoutes: React.FC = () => {
   );
 };
 
-/* v1 (3-role) routes component */
+/* v1 (3-role) routes — now at root */
 const V1Routes: React.FC = () => {
   const { user, setUser } = useAppState();
 
