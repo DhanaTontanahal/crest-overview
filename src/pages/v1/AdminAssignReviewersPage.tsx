@@ -48,16 +48,6 @@ const AdminAssignReviewersPage: React.FC = () => {
 
   if (user?.role !== 'admin') return <p className="text-muted-foreground">Admin only.</p>;
 
-  // Group assessments by name
-  const grouped = useMemo(() => {
-    const map: Record<string, typeof quarterAssessments> = {};
-    quarterAssessments.forEach(a => {
-      const key = a.name || 'Untitled';
-      (map[key] ??= []).push(a);
-    });
-    return Object.entries(map);
-  }, [quarterAssessments]);
-
   const handleAssign = (assessmentId: string) => {
     const reviewerName = pendingAssignments[assessmentId];
     if (!reviewerName) return;
