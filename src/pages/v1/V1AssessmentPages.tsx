@@ -761,37 +761,104 @@ export const V1PeerReviewPage: React.FC = () => {
 /* ─── View All Assessments ─── */
 
 export const V1ViewAssessmentsPage: React.FC = () => {
-  const { assessments, selectedQuarter, publishedQuestions: assessmentQuestions } = useAppState();
-  const filtered = assessments.filter(a => a.quarter === selectedQuarter);
+  const { assessments, availableQuarters, publishedQuestions: allQuestions } = useAppState();
+  const [filterQuarter, setFilterQuarter] = useState(availableQuarters[0] || 'Q4 2025');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'submitted' | 'reviewed'>('all');
 
-  if (filtered.length === 0) return <p className="text-muted-foreground text-sm">No assessments for {selectedQuarter}.</p>;
+  const filtered = assessments.filter(a => {
+    if (a.quarter !== filterQuarter) return false;
+    if (filterStatus !== 'all' && a.status !== filterStatus) return false;
+    return true;
+  });
+
+  // Group by assessment name
+  const grouped = useMemo(() => {
+    const map: Record<string, Assessment[]> = {};
+    filtered.forEach(a => {
+      const key = a.name || 'Untitled';
+      (map[key] ??= []).push(a);
+    });
+    return Object.entries(map);
+  }, [filtered]);
+
+  const statusColor = (s: string) =>
+    s === 'reviewed' ? 'default' : s === 'submitted' ? 'secondary' : 'outline';
 
   return (
-    <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-      <h3 className="text-lg font-bold text-foreground">All Assessments — {selectedQuarter}</h3>
-      <div className="grid gap-3 md:grid-cols-2">
-        {filtered.map(a => {
-          const avg = a.answers.length > 0
-            ? (a.answers.reduce((s, ans) => s + ans.score, 0) / a.answers.length).toFixed(1)
-            : '—';
-          return (
-            <Card key={a.id}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-semibold text-foreground">{a.platform}</p>
-                  <Badge variant={a.status === 'reviewed' ? 'default' : a.status === 'submitted' ? 'secondary' : 'outline'}>
-                    {a.status}
-                  </Badge>
-                </div>
-                <div className="text-xs text-muted-foreground space-y-0.5">
-                  <p>Avg Score: {avg}/5 · Answered: {a.answers.filter(an => an.score > 0).length}/{assessmentQuestions.length}</p>
-                  <p>Submitted: {a.submittedAt} {a.reviewedBy && `· Reviewed by ${a.reviewedBy}`}</p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+    <div className="space-y-5 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h3 className="text-lg font-bold text-foreground">Assessments</h3>
+        <div className="flex gap-2">
+          <select
+            value={filterQuarter}
+            onChange={e => setFilterQuarter(e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
+          </select>
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value as any)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="all">All Statuses</option>
+            <option value="draft">Draft</option>
+            <option value="submitted">Submitted</option>
+            <option value="reviewed">Reviewed</option>
+          </select>
+        </div>
       </div>
+
+      {grouped.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <FileSearch className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">No assessments found for {filterQuarter}.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        grouped.map(([name, items]) => (
+          <Card key={name}>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">{name}</CardTitle>
+                <Badge variant="outline" className="text-[10px]">{items[0].quarter} · {items.length} platform{items.length > 1 ? 's' : ''}</Badge>
+              </div>
+              {items[0].questionIds && (
+                <p className="text-[11px] text-muted-foreground">{items[0].questionIds.length} questions in this assessment</p>
+              )}
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map(a => {
+                  const totalQ = a.questionIds?.length || allQuestions.length;
+                  const answeredCount = a.answers.filter(an => an.score > 0).length;
+                  const avg = answeredCount > 0
+                    ? (a.answers.filter(an => an.score > 0).reduce((s, an) => s + an.score, 0) / answeredCount).toFixed(1)
+                    : '—';
+
+                  return (
+                    <div key={a.id} className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <p className="font-semibold text-sm text-foreground">{a.platform}</p>
+                        <Badge variant={statusColor(a.status) as any} className="text-[10px] capitalize">{a.status}</Badge>
+                      </div>
+                      <div className="text-[11px] text-muted-foreground space-y-0.5">
+                        {answeredCount > 0 ? (
+                          <p>Avg Score: {avg}/5 · {answeredCount}/{totalQ} answered</p>
+                        ) : (
+                          <p>Not yet started · {totalQ} questions</p>
+                        )}
+                        <p>Created: {a.submittedAt}{a.reviewedBy ? ` · Reviewed by ${a.reviewedBy}` : ''}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
     </div>
   );
 };
