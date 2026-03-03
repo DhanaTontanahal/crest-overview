@@ -33,10 +33,20 @@ const AdminAssignReviewersPage: React.FC = () => {
 
   const reviewers = registeredUsers.filter(u => u.role === 'reviewer');
 
-  if (user?.role !== 'admin') return <p className="text-muted-foreground">Admin only.</p>;
-
-  // Show all assessments (draft, published, submitted, reviewed) for the quarter
+  // Show all assessments for the quarter
   const quarterAssessments = assessments.filter(a => a.quarter === selectedQuarter);
+
+  // Group assessments by name
+  const grouped = useMemo(() => {
+    const map: Record<string, typeof quarterAssessments> = {};
+    quarterAssessments.forEach(a => {
+      const key = a.name || 'Untitled';
+      (map[key] ??= []).push(a);
+    });
+    return Object.entries(map);
+  }, [quarterAssessments]);
+
+  if (user?.role !== 'admin') return <p className="text-muted-foreground">Admin only.</p>;
 
   // Group assessments by name
   const grouped = useMemo(() => {
