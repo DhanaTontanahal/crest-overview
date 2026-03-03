@@ -32,28 +32,28 @@ const AppSidebar: React.FC = () => {
   const showSupervisor = user?.role === 'supervisor';
 
   const dashboardItems = [
-    { title: 'Overview', url: '/', icon: Gauge },
-    { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
-    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Organisation Health', url: '/org-health', icon: Heart }] : []),
-    ...(isTPL ? [{ title: 'Platform vs Organisation', url: '/platform-comparison', icon: GitCompare }] : []),
-    { title: 'Trends', url: '/trends', icon: TrendingUp },
-    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
-    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
-    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
-    { title: 'Team Data', url: '/team-data', icon: Download },
+    { title: 'Overview', url: '/version_2', icon: Gauge },
+    { title: 'Metric Dimensions', url: '/version_2/dimensions', icon: BarChart3 },
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Organisation Health', url: '/version_2/org-health', icon: Heart }] : []),
+    ...(isTPL ? [{ title: 'Platform vs Organisation', url: '/version_2/platform-comparison', icon: GitCompare }] : []),
+    { title: 'Trends', url: '/version_2/trends', icon: TrendingUp },
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Cross-Platform Analysis', url: '/version_2/heatmap', icon: Grid3X3 }] : []),
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Quarterly Progress', url: '/version_2/quarterly-progress', icon: CalendarCheck }] : []),
+    ...(showDashboard || showSupervisor || isTPL ? [{ title: 'Action Plan', url: '/version_2/action-plan', icon: Lightbulb }] : []),
+    { title: 'Team Data', url: '/version_2/team-data', icon: Download },
   ];
 
   const assessmentItems = [
-    ...(isTPL ? [{ title: 'Submit Assessment', url: '/assessments/submit', icon: ClipboardList }] : []),
-    ...((isTPL || isReviewer) ? [{ title: 'View Assessments', url: '/assessments/view', icon: FileSearch }] : []),
-    ...((isTPL || isReviewer) ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
-    ...((isSuperUser || showSupervisor) ? [{ title: 'Platform Assessments', url: '/platform-assessments', icon: ClipboardList }] : []),
+    ...(isTPL ? [{ title: 'Submit Assessment', url: '/version_2/assessments/submit', icon: ClipboardList }] : []),
+    ...((isTPL || isReviewer) ? [{ title: 'View Assessments', url: '/version_2/assessments/view', icon: FileSearch }] : []),
+    ...((isTPL || isReviewer) ? [{ title: 'Peer Review', url: '/version_2/assessments/review', icon: Eye }] : []),
+    ...((isSuperUser || showSupervisor) ? [{ title: 'Platform Assessments', url: '/version_2/platform-assessments', icon: ClipboardList }] : []),
   ];
 
   const adminItems = isAdmin ? [
-    { title: 'Personas', url: '/admin/personas', icon: Users },
-    { title: 'Data Upload', url: '/admin/upload', icon: Upload },
-    { title: 'Settings', url: '/admin/settings', icon: Settings },
+    { title: 'Personas', url: '/version_2/admin/personas', icon: Users },
+    { title: 'Data Upload', url: '/version_2/admin/upload', icon: Upload },
+    { title: 'Settings', url: '/version_2/admin/settings', icon: Settings },
   ] : [];
 
   const isActive = (url: string) => location.pathname === url;
