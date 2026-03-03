@@ -7,7 +7,8 @@ import {
 } from '@/components/ui/sidebar';
 import {
   Gauge, BarChart3, TrendingUp, Grid3X3, CalendarCheck, Lightbulb, Download,
-  ClipboardList, FileSearch, Eye, Upload, Settings, Users, type LucideIcon,
+  ClipboardList, FileSearch, Eye, Upload, Settings, Users, UserPlus, UserCheck,
+  Layers, Columns3, Calculator, type LucideIcon,
 } from 'lucide-react';
 
 const V1Sidebar: React.FC = () => {
@@ -21,27 +22,40 @@ const V1Sidebar: React.FC = () => {
   const isUser = user?.role === 'user';
   const isReviewer = user?.role === 'reviewer';
 
-  const dashboardItems = [
+  // Dashboard items — hidden for Admin
+  const dashboardItems = isAdmin ? [] : [
     { title: 'Overview', url: '/', icon: Gauge },
     { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
     { title: 'Trends', url: '/trends', icon: TrendingUp },
-    ...(isAdmin || isUser ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
-    ...(isAdmin || isUser ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
-    ...(isAdmin || isUser ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
+    ...(isUser ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
+    ...(isUser ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
+    ...(isUser ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
     { title: 'Team Data', url: '/team-data', icon: Download },
   ];
 
-  const assessmentItems = [
+  // Assessment items — role-specific
+  const assessmentItems = isAdmin ? [
+    { title: 'Bulk Upload Questions', url: '/admin/bulk-upload', icon: Upload },
+    { title: 'Create Assessment', url: '/assessments/create', icon: ClipboardList },
+    { title: 'View Assessments', url: '/assessments/view', icon: FileSearch },
+    { title: 'Assign Reviewers', url: '/admin/assign-reviewers', icon: UserCheck },
+  ] : [
     ...(isUser ? [{ title: 'Self Assessment', url: '/assessments/submit', icon: ClipboardList }] : []),
-    ...(isAdmin ? [{ title: 'Create Assessment', url: '/assessments/create', icon: ClipboardList }] : []),
     { title: 'View Assessments', url: '/assessments/view', icon: FileSearch },
     ...(isReviewer ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
   ];
 
-  const adminItems = isAdmin ? [
-    { title: 'Personas', url: '/admin/personas', icon: Users },
-    { title: 'Data Upload', url: '/admin/upload', icon: Upload },
+  // Settings items — Admin only
+  const settingsItems = isAdmin ? [
+    { title: 'Register Users', url: '/admin/register-users', icon: UserPlus },
     { title: 'Settings', url: '/admin/settings', icon: Settings },
+  ] : [];
+
+  // Configuration items — Admin only
+  const configItems = isAdmin ? [
+    { title: 'Personas', url: '/admin/personas', icon: Users },
+    { title: 'Platforms', url: '/admin/platforms', icon: Layers },
+    { title: 'Pillars', url: '/admin/pillars', icon: Columns3 },
   ] : [];
 
   const isActive = (url: string) => location.pathname === url;
@@ -67,10 +81,12 @@ const V1Sidebar: React.FC = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent className="pt-24">
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>Dashboard</SidebarGroupLabel>
-          <SidebarGroupContent><SidebarMenu>{renderItems(dashboardItems)}</SidebarMenu></SidebarGroupContent>
-        </SidebarGroup>
+        {dashboardItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>Dashboard</SidebarGroupLabel>
+            <SidebarGroupContent><SidebarMenu>{renderItems(dashboardItems)}</SidebarMenu></SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {assessmentItems.length > 0 && (
           <SidebarGroup>
@@ -79,10 +95,17 @@ const V1Sidebar: React.FC = () => {
           </SidebarGroup>
         )}
 
-        {adminItems.length > 0 && (
+        {settingsItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>Admin</SidebarGroupLabel>
-            <SidebarGroupContent><SidebarMenu>{renderItems(adminItems)}</SidebarMenu></SidebarGroupContent>
+            <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>User Management</SidebarGroupLabel>
+            <SidebarGroupContent><SidebarMenu>{renderItems(settingsItems)}</SidebarMenu></SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {configItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className={collapsed ? 'sr-only' : ''}>Configuration</SidebarGroupLabel>
+            <SidebarGroupContent><SidebarMenu>{renderItems(configItems)}</SidebarMenu></SidebarGroupContent>
           </SidebarGroup>
         )}
       </SidebarContent>
