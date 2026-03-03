@@ -26,6 +26,7 @@ import LoginPage from "@/pages/LoginPage";
 import V1LoginPage from "@/pages/v1/V1LoginPage";
 import V1DashboardLayout from "@/components/v1/V1DashboardLayout";
 import { V1CreateAssessmentPage, V1SelfAssessmentPage, V1PeerReviewPage, V1ViewAssessmentsPage } from "@/pages/v1/V1AssessmentPages";
+import V1ReviewCommentsPage from "@/pages/v1/V1ReviewCommentsPage";
 import V1PersonasPage from "@/pages/v1/V1PersonasPage";
 import AdminBulkUploadPage from "@/pages/v1/AdminBulkUploadPage";
 import AdminAssignReviewersPage from "@/pages/v1/AdminAssignReviewersPage";
@@ -92,6 +93,7 @@ const V1Routes: React.FC = () => {
         <Route path="/assessments/submit" element={<V1SelfAssessmentPage />} />
         <Route path="/assessments/view" element={<V1ViewAssessmentsPage />} />
         <Route path="/assessments/review" element={<V1PeerReviewPage />} />
+        <Route path="/assessments/review-comments" element={<V1ReviewCommentsPage />} />
         <Route path="/admin/personas" element={<V1PersonasPage />} />
         <Route path="/admin/bulk-upload" element={<AdminBulkUploadPage />} />
         <Route path="/admin/assign-reviewers" element={<AdminAssignReviewersPage />} />

@@ -22,16 +22,13 @@ const V1Sidebar: React.FC = () => {
   const isUser = user?.role === 'user';
   const isReviewer = user?.role === 'reviewer';
 
-  // Dashboard items — hidden for Admin
-  const dashboardItems = isAdmin ? [] : [
+  // Dashboard items — only for Reviewer (hidden for Admin and User)
+  const dashboardItems = (!isAdmin && !isUser) ? [
     { title: 'Overview', url: '/', icon: Gauge },
     { title: 'Metric Dimensions', url: '/dimensions', icon: BarChart3 },
     { title: 'Trends', url: '/trends', icon: TrendingUp },
-    ...(isUser ? [{ title: 'Cross-Platform Analysis', url: '/heatmap', icon: Grid3X3 }] : []),
-    ...(isUser ? [{ title: 'Quarterly Progress', url: '/quarterly-progress', icon: CalendarCheck }] : []),
-    ...(isUser ? [{ title: 'Action Plan', url: '/action-plan', icon: Lightbulb }] : []),
     { title: 'Team Data', url: '/team-data', icon: Download },
-  ];
+  ] : [];
 
   // Assessment items — role-specific
   const assessmentItems = isAdmin ? [
@@ -39,8 +36,11 @@ const V1Sidebar: React.FC = () => {
     { title: 'Create Assessment', url: '/assessments/create', icon: ClipboardList },
     { title: 'View Assessments', url: '/assessments/view', icon: FileSearch },
     { title: 'Assign Reviewers', url: '/admin/assign-reviewers', icon: UserCheck },
+  ] : isUser ? [
+    { title: 'Save & Submit Assessment', url: '/assessments/submit', icon: ClipboardList },
+    { title: 'View Submitted Assessment', url: '/assessments/view', icon: FileSearch },
+    { title: 'View Reviewer Comments', url: '/assessments/review-comments', icon: Eye },
   ] : [
-    ...(isUser ? [{ title: 'Self Assessment', url: '/assessments/submit', icon: ClipboardList }] : []),
     { title: 'View Assessments', url: '/assessments/view', icon: FileSearch },
     ...(isReviewer ? [{ title: 'Peer Review', url: '/assessments/review', icon: Eye }] : []),
   ];
