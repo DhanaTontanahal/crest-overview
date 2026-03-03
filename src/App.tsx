@@ -102,8 +102,8 @@ const App: React.FC = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/v1/*" element={<V1Routes />} />
-            <Route path="/*" element={<AppRoutes />} />
+            <Route path="/version_2/*" element={<AppRoutes />} />
+            <Route path="/*" element={<V1Routes />} />
           </Routes>
         </BrowserRouter>
       </AppProvider>
