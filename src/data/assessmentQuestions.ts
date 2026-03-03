@@ -252,6 +252,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
 
 export interface Assessment {
   id: string;
+  name: string; // assessment name given by Admin
   platform: string;
   quarter: string;
   submittedBy: string; // platform name (acting as TPL identifier)

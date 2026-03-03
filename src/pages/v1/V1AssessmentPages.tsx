@@ -14,6 +14,8 @@ import AdminAssessmentQuestions from '@/components/AdminAssessmentQuestions';
 
 interface AssessmentFormProps {
   platform: string;
+  assessmentName: string;
+  assessmentQuarter: string;
   existingAssessment?: Assessment;
   onSubmit: (assessment: Assessment) => void;
   mode: 'create' | 'self-assess';
@@ -21,8 +23,8 @@ interface AssessmentFormProps {
 
 /* Dimension metric types used by questions */
 
-const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, existingAssessment, onSubmit, mode }) => {
-  const { assessmentQuestions: allQuestions, publishedQuestions, selectedQuarter } = useAppState();
+const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentName, assessmentQuarter, existingAssessment, onSubmit, mode }) => {
+  const { assessmentQuestions: allQuestions, publishedQuestions } = useAppState();
   // Admin sees all draft questions; users see only published
   const assessmentQuestions = mode === 'create' ? allQuestions : publishedQuestions;
   const { toast } = useToast();
@@ -71,9 +73,10 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, existingAsses
       return;
     }
     const assessment: Assessment = {
-      id: existingAssessment?.id || `${platform}-${selectedQuarter}-${Date.now()}`,
+      id: existingAssessment?.id || `${platform}-${assessmentQuarter}-${Date.now()}`,
+      name: existingAssessment?.name || assessmentName,
       platform,
-      quarter: selectedQuarter,
+      quarter: assessmentQuarter,
       submittedBy: mode === 'create' ? 'Admin' : platform,
       submittedAt: new Date().toISOString().split('T')[0],
       reviewedBy: null,
