@@ -614,15 +614,23 @@ export const V1SelfAssessmentPage: React.FC = () => {
 /* ─── Peer Review (with per-question commenting) ─── */
 
 export const V1PeerReviewPage: React.FC = () => {
-  const { user, assessments, setAssessments, publishedQuestions: assessmentQuestions, selectedQuarter } = useAppState();
+  const { user, assessments, setAssessments, publishedQuestions: assessmentQuestions, availableQuarters } = useAppState();
   const { toast } = useToast();
   const [reviewComments, setReviewComments] = useState<Record<string, Record<string, string>>>({});
   const [overallComments, setOverallComments] = useState<Record<string, string>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filterQuarter, setFilterQuarter] = useState(availableQuarters[0] || 'Q4 2025');
 
   if (user?.role !== 'reviewer') return <p className="text-muted-foreground">Peer Reviewers only.</p>;
 
-  const submitted = assessments.filter(a => a.quarter === selectedQuarter && (a.status === 'submitted' || a.status === 'reviewed'));
+  const reviewerName = user.name;
+
+  // All assessments assigned to this reviewer
+  const assignedAssessments = assessments.filter(a => a.quarter === filterQuarter && a.reviewedBy === reviewerName);
+
+  // Split into reviewable (submitted) and waiting (draft/published)
+  const readyForReview = assignedAssessments.filter(a => a.status === 'submitted' || a.status === 'reviewed');
+  const pendingSubmission = assignedAssessments.filter(a => a.status === 'draft' || a.status === 'published');
 
   const setQuestionComment = (assessmentId: string, questionId: string, comment: string) => {
     setReviewComments(prev => ({
@@ -637,7 +645,6 @@ export const V1PeerReviewPage: React.FC = () => {
     setAssessments(prev => prev.map(a =>
       a.id === id ? {
         ...a,
-        reviewedBy: 'Reviewer',
         reviewedAt: new Date().toISOString().split('T')[0],
         status: 'reviewed' as const,
         reviewerComments: { ...(a.reviewerComments || {}), ...comments },
@@ -647,129 +654,169 @@ export const V1PeerReviewPage: React.FC = () => {
     toast({ title: 'Review Submitted', description: `Assessment reviewed with ${Object.keys(comments).length} comment(s).` });
   };
 
-  if (submitted.length === 0) {
-    return (
-      <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-        <h3 className="text-lg font-bold text-foreground">Review Assessments</h3>
+  return (
+    <div className="space-y-5 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Review Assessments</h3>
+          <p className="text-sm text-muted-foreground">Assessments assigned to you for review.</p>
+        </div>
+        <select
+          value={filterQuarter}
+          onChange={e => setFilterQuarter(e.target.value)}
+          className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
+        </select>
+      </div>
+
+      {/* Pending user submission */}
+      {pendingSubmission.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+            <Clock className="w-4 h-4" /> Awaiting User Submission ({pendingSubmission.length})
+          </h4>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {pendingSubmission.map(a => (
+              <Card key={a.id} className="border-dashed">
+                <CardContent className="p-4 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-sm text-foreground">{a.name || a.platform}</p>
+                    <Badge variant="outline" className="text-[10px] capitalize">{a.status}</Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{a.platform} · {a.quarter}</p>
+                  <p className="text-xs text-muted-foreground italic">
+                    This assessment has been assigned to you and will be available for review once the platform lead submits it.
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Ready for review */}
+      {readyForReview.length > 0 ? (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <FileSearch className="w-4 h-4 text-primary" /> Ready for Review ({readyForReview.length})
+          </h4>
+          {readyForReview.map(a => {
+            const avgScore = a.answers.length > 0
+              ? (a.answers.reduce((s, ans) => s + ans.score, 0) / a.answers.length).toFixed(1)
+              : '—';
+            const isExpanded = expandedId === a.id;
+            const currentComments = reviewComments[a.id] || {};
+            const existingComments = a.reviewerComments || {};
+            const commentCount = Object.keys({ ...existingComments, ...currentComments }).filter(k => (currentComments[k] || existingComments[k] || '').trim()).length;
+            const questionsForAssessment = a.questionIds?.length
+              ? assessmentQuestions.filter(q => a.questionIds!.includes(q.id))
+              : assessmentQuestions;
+
+            return (
+              <Card key={a.id} className={isExpanded ? 'ring-1 ring-primary/30' : ''}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="font-bold">{a.name || a.platform}</span>
+                      <Badge variant="outline" className="text-[10px]">{a.platform}</Badge>
+                      <Badge variant={a.status === 'reviewed' ? 'default' : 'secondary'}>
+                        {a.status === 'reviewed' ? 'Reviewed' : 'Pending Review'}
+                      </Badge>
+                      {commentCount > 0 && (
+                        <Badge variant="outline" className="text-[10px] gap-1">
+                          <MessageSquare className="w-2.5 h-2.5" /> {commentCount}
+                        </Badge>
+                      )}
+                    </span>
+                    <span className="text-xs text-muted-foreground">Avg: {avgScore}/5</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span>Quarter: {a.quarter}</span>
+                    <span>Submitted: {a.submittedAt}</span>
+                    <span>{a.answers.length} questions</span>
+                    {a.reviewedAt && <span>Reviewed: {a.reviewedAt}</span>}
+                  </div>
+
+                  <Button
+                    variant={isExpanded ? 'secondary' : 'outline'}
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => setExpandedId(isExpanded ? null : a.id)}
+                  >
+                    <FileSearch className="w-3.5 h-3.5 mr-1" />
+                    {isExpanded ? 'Collapse' : `Review & Comment (${questionsForAssessment.length} questions)`}
+                  </Button>
+
+                  {isExpanded && (
+                    <div className="space-y-3 mt-2">
+                      {questionsForAssessment.map((q, idx) => {
+                        const ans = a.answers.find(an => an.questionId === q.id);
+                        const existingComment = existingComments[q.id] || '';
+                        const currentComment = currentComments[q.id] ?? existingComment;
+
+                        return (
+                          <div key={q.id} className="p-3 rounded-lg bg-muted/30 border border-border/30 space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-xs font-medium text-foreground">
+                                <span className="text-muted-foreground mr-1">{idx + 1}.</span>
+                                {q.question}
+                              </p>
+                              <Badge variant="outline" className="text-[10px] shrink-0">
+                                {ans?.score || '—'}/5
+                              </Badge>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">
+                              {q.dimensionMetric} → {q.subMetric}
+                            </p>
+                            {ans?.comments && (
+                              <p className="text-xs text-muted-foreground italic border-l-2 border-border pl-2">
+                                User comment: "{ans.comments}"
+                              </p>
+                            )}
+                            <Textarea
+                              placeholder="Add reviewer comment..."
+                              value={currentComment}
+                              onChange={e => setQuestionComment(a.id, q.id, e.target.value)}
+                              className="text-xs min-h-[50px] bg-background"
+                            />
+                          </div>
+                        );
+                      })}
+
+                      {/* Overall comment */}
+                      <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-2">
+                        <p className="text-xs font-semibold text-foreground flex items-center gap-1">
+                          <MessageSquare className="w-3.5 h-3.5 text-primary" /> Overall Review Comment
+                        </p>
+                        <Textarea
+                          placeholder="Add an overall comment for this assessment..."
+                          value={overallComments[a.id] ?? (a.reviewerOverallComment || '')}
+                          onChange={e => setOverallComments(prev => ({ ...prev, [a.id]: e.target.value }))}
+                          className="text-xs min-h-[60px] bg-background"
+                        />
+                      </div>
+
+                      <Button onClick={() => handleSubmitReview(a.id)} className="gap-1">
+                        <Send className="w-3.5 h-3.5" /> Submit Review
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      ) : pendingSubmission.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center">
             <FileSearch className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No submitted assessments to review for {selectedQuarter}.</p>
+            <p className="text-sm text-muted-foreground">No assessments assigned to you for {filterQuarter}.</p>
           </CardContent>
         </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-      <h3 className="text-lg font-bold text-foreground">Review Assessments</h3>
-      <p className="text-sm text-muted-foreground">Review and add comments to submitted assessments for {selectedQuarter}.</p>
-      {submitted.map(a => {
-        const avgScore = a.answers.length > 0
-          ? (a.answers.reduce((s, ans) => s + ans.score, 0) / a.answers.length).toFixed(1)
-          : '—';
-        const isExpanded = expandedId === a.id;
-        const currentComments = reviewComments[a.id] || {};
-        const existingComments = a.reviewerComments || {};
-        const commentCount = Object.keys({ ...existingComments, ...currentComments }).filter(k => (currentComments[k] || existingComments[k] || '').trim()).length;
-
-        return (
-          <Card key={a.id} className={isExpanded ? 'ring-1 ring-primary/30' : ''}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <span className="font-bold">{a.name || a.platform}</span>
-                  <Badge variant="outline" className="text-[10px]">{a.platform}</Badge>
-                  <Badge variant={a.status === 'reviewed' ? 'default' : 'secondary'}>
-                    {a.status === 'reviewed' ? 'Reviewed' : 'Pending Review'}
-                  </Badge>
-                  {commentCount > 0 && (
-                    <Badge variant="outline" className="text-[10px] gap-1">
-                      <MessageSquare className="w-2.5 h-2.5" /> {commentCount}
-                    </Badge>
-                  )}
-                </span>
-                <span className="text-xs text-muted-foreground">Avg: {avgScore}/5</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span>Quarter: {a.quarter}</span>
-                <span>Submitted: {a.submittedAt}</span>
-                <span>{a.answers.length} questions</span>
-                {a.reviewedAt && <span>Reviewed: {a.reviewedAt}</span>}
-                {a.reviewedBy && <span>By: {a.reviewedBy}</span>}
-              </div>
-
-              <Button
-                variant={isExpanded ? 'secondary' : 'outline'}
-                size="sm"
-                className="text-xs"
-                onClick={() => setExpandedId(isExpanded ? null : a.id)}
-              >
-                <FileSearch className="w-3.5 h-3.5 mr-1" />
-                {isExpanded ? 'Collapse' : `Review & Comment (${a.answers.length} questions)`}
-              </Button>
-
-              {isExpanded && (
-                <div className="space-y-3 mt-2">
-                  {assessmentQuestions.map((q, idx) => {
-                    const ans = a.answers.find(an => an.questionId === q.id);
-                    const existingComment = existingComments[q.id] || '';
-                    const currentComment = currentComments[q.id] ?? existingComment;
-
-                    return (
-                      <div key={q.id} className="p-3 rounded-lg bg-muted/30 border border-border/30 space-y-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-xs font-medium text-foreground">
-                            <span className="text-muted-foreground mr-1">{idx + 1}.</span>
-                            {q.question}
-                          </p>
-                          <Badge variant="outline" className="text-[10px] shrink-0">
-                            {ans?.score || '—'}/5
-                          </Badge>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground">
-                          {q.dimensionMetric} → {q.subMetric}
-                        </p>
-                        {ans?.comments && (
-                          <p className="text-xs text-muted-foreground italic border-l-2 border-border pl-2">
-                            User comment: "{ans.comments}"
-                          </p>
-                        )}
-                        <Textarea
-                          placeholder="Add reviewer comment..."
-                          value={currentComment}
-                          onChange={e => setQuestionComment(a.id, q.id, e.target.value)}
-                          className="text-xs min-h-[50px] bg-background"
-                        />
-                      </div>
-                    );
-                  })}
-
-                  {/* Overall comment */}
-                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-2">
-                    <p className="text-xs font-semibold text-foreground flex items-center gap-1">
-                      <MessageSquare className="w-3.5 h-3.5 text-primary" /> Overall Review Comment
-                    </p>
-                    <Textarea
-                      placeholder="Add an overall comment for this assessment..."
-                      value={overallComments[a.id] ?? (a.reviewerOverallComment || '')}
-                      onChange={e => setOverallComments(prev => ({ ...prev, [a.id]: e.target.value }))}
-                      className="text-xs min-h-[60px] bg-background"
-                    />
-                  </div>
-
-                  <Button onClick={() => handleSubmitReview(a.id)} className="gap-1">
-                    <Send className="w-3.5 h-3.5" /> Submit Review
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+      ) : null}
     </div>
   );
 };
