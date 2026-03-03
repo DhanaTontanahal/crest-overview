@@ -18,7 +18,7 @@ const v1Roles: { value: V1Role; label: string; icon: React.ReactNode; descriptio
   { value: 'reviewer', label: 'Peer Reviewer', icon: <Eye className="w-5 h-5" />, description: 'Review and calibrate peer assessments' },
 ];
 
-/* ── Carousel (same as v1) ── */
+/* ── Landing Carousel ── */
 const SLIDE_TITLES = ['Framework at a Glance', 'Maturity Framework', 'Assessment to Metrics'];
 
 const LandingCarousel: React.FC = () => {
@@ -182,7 +182,7 @@ const LandingCarousel: React.FC = () => {
   );
 };
 
-/* ── v0 Login Page ── */
+/* ── v1 Login Page ── */
 const V1LoginPage: React.FC<V1LoginPageProps> = ({ onLogin }) => {
   const [role, setRole] = useState<V1Role | ''>('');
   const [userPlatform, setUserPlatform] = useState('');
@@ -192,7 +192,7 @@ const V1LoginPage: React.FC<V1LoginPageProps> = ({ onLogin }) => {
     const labels: Record<V1Role, string> = { admin: 'Admin', user: 'Platform Lead', reviewer: 'Peer Reviewer' };
     const profile: UserProfile = {
       name: labels[role],
-      role: role,
+      role,
       platformId: role === 'user' ? userPlatform : undefined,
     };
     onLogin(profile);
