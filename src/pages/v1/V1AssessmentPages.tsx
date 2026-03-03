@@ -287,7 +287,7 @@ export const V1CreateAssessmentPage: React.FC = () => {
     setShowInlineAdd(null);
   };
 
-  const handlePublishAssessment = (platform: string) => {
+  const createAssessment = (platform: string, status: 'draft' | 'published') => {
     const id = `${platform}-${assessmentQuarter}-${Date.now()}`;
     const assessment: Assessment = {
       id,
@@ -298,19 +298,31 @@ export const V1CreateAssessmentPage: React.FC = () => {
       submittedAt: new Date().toISOString().split('T')[0],
       reviewedBy: null,
       reviewedAt: null,
-      status: 'draft',
+      status,
       questionIds: Array.from(selectedQuestionIds),
       answers: [],
     };
     setAssessments(prev => [...prev, assessment]);
-    toast({ title: 'Assessment Created', description: `"${assessmentName}" created for ${platform} with ${selectedQuestionIds.size} questions.` });
+    return assessment;
+  };
+
+  const handleSaveAll = () => {
+    platforms.forEach(p => {
+      const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
+      if (!exists) createAssessment(p, 'draft');
+    });
+    toast({ title: 'Saved as Draft', description: `"${assessmentName}" saved for all platforms.` });
+    setStep('details');
+    setAssessmentName('');
+    setSelectedQuestionIds(new Set());
   };
 
   const handlePublishAll = () => {
     platforms.forEach(p => {
       const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
-      if (!exists) handlePublishAssessment(p);
+      if (!exists) createAssessment(p, 'published');
     });
+    toast({ title: 'Published', description: `"${assessmentName}" published for all platforms.` });
     setStep('details');
     setAssessmentName('');
     setSelectedQuestionIds(new Set());

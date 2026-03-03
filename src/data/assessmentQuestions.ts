@@ -259,7 +259,7 @@ export interface Assessment {
   submittedAt: string;
   reviewedBy: string | null; // peer TPL platform name
   reviewedAt: string | null;
-  status: 'draft' | 'submitted' | 'reviewed';
+  status: 'draft' | 'submitted' | 'reviewed' | 'published';
   answers: AssessmentAnswer[];
   questionIds?: string[]; // selected question IDs for this assessment
   reviewerComments?: Record<string, string>; // questionId -> reviewer comment
