@@ -29,7 +29,7 @@ const V1Header: React.FC = () => {
 
   const isUser = user?.role === 'user';
   const isReviewer = user?.role === 'reviewer';
-  const hideFilters = isUser || isReviewer;
+  const hideFilters = true; // hidden for all roles; enable per-page as needed
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
