@@ -27,6 +27,8 @@ const V1Header: React.FC = () => {
     navigate('/');
   };
 
+  const isUser = user?.role === 'user';
+
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 flex-wrap">
@@ -36,36 +38,41 @@ const V1Header: React.FC = () => {
               Platform Maturity
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">v1</span>
             </h1>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {user && roleIcons[user.role]} {user && roleLabels[user.role]}
-              {user?.platformId && ` — ${user.platformId}`}
-            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-            <SelectTrigger className="w-[120px] h-8 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>{availableQuarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}</SelectContent>
-          </Select>
+          <p className="text-xs text-muted-foreground flex items-center gap-1 mr-2">
+            {user && roleIcons[user.role]} {user && roleLabels[user.role]}
+            {user?.platformId && ` — ${user.platformId}`}
+          </p>
 
-          {user?.role === 'admin' && (
-            <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-              <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Platforms</SelectItem>
-                {platforms.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-              </SelectContent>
-            </Select>
+          {!isUser && (
+            <>
+              <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
+                <SelectTrigger className="w-[120px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>{availableQuarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}</SelectContent>
+              </Select>
+
+              {user?.role === 'admin' && (
+                <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Platforms</SelectItem>
+                    {platforms.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+
+              <Select value={selectedPillar} onValueChange={setSelectedPillar}>
+                <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Pillars</SelectItem>
+                  {pillars.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </>
           )}
-
-          <Select value={selectedPillar} onValueChange={setSelectedPillar}>
-            <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All Pillars</SelectItem>
-              {pillars.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-            </SelectContent>
-          </Select>
 
           <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs gap-1">
             <LogOut className="w-3.5 h-3.5" /> Logout
