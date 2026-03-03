@@ -84,9 +84,10 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentNam
       quarter: assessmentQuarter,
       submittedBy: mode === 'create' ? 'Admin' : platform,
       submittedAt: new Date().toISOString().split('T')[0],
-      reviewedBy: null,
-      reviewedAt: null,
+      reviewedBy: existingAssessment?.reviewedBy || null,
+      reviewedAt: existingAssessment?.reviewedAt || null,
       status,
+      questionIds: existingAssessment?.questionIds,
       answers: assessmentQuestions.map(q => ({ questionId: q.id, score: answers[q.id]?.score || 0, comments: answers[q.id]?.comments || '' })),
     };
     onSubmit(assessment);
