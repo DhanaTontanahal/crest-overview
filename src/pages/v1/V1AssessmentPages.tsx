@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send, Plus, ChevronDown, ChevronRight, Pencil, Save, X } from 'lucide-react';
+import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send, Plus, ChevronDown, ChevronRight, Pencil, Save, X, Trash2 } from 'lucide-react';
 import AdminAssessmentQuestions from '@/components/AdminAssessmentQuestions';
 
 /* ─── Tab-wise Assessment Form (shared by Create + Self-Assess) ─── */
