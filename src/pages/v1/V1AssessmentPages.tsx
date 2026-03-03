@@ -287,7 +287,7 @@ export const V1CreateAssessmentPage: React.FC = () => {
     setShowInlineAdd(null);
   };
 
-  const handlePublishAssessment = (platform: string) => {
+  const createAssessment = (platform: string, status: 'draft' | 'published') => {
     const id = `${platform}-${assessmentQuarter}-${Date.now()}`;
     const assessment: Assessment = {
       id,
@@ -298,19 +298,31 @@ export const V1CreateAssessmentPage: React.FC = () => {
       submittedAt: new Date().toISOString().split('T')[0],
       reviewedBy: null,
       reviewedAt: null,
-      status: 'draft',
+      status,
       questionIds: Array.from(selectedQuestionIds),
       answers: [],
     };
     setAssessments(prev => [...prev, assessment]);
-    toast({ title: 'Assessment Created', description: `"${assessmentName}" created for ${platform} with ${selectedQuestionIds.size} questions.` });
+    return assessment;
+  };
+
+  const handleSaveAll = () => {
+    platforms.forEach(p => {
+      const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
+      if (!exists) createAssessment(p, 'draft');
+    });
+    toast({ title: 'Saved as Draft', description: `"${assessmentName}" saved for all platforms.` });
+    setStep('details');
+    setAssessmentName('');
+    setSelectedQuestionIds(new Set());
   };
 
   const handlePublishAll = () => {
     platforms.forEach(p => {
       const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
-      if (!exists) handlePublishAssessment(p);
+      if (!exists) createAssessment(p, 'published');
     });
+    toast({ title: 'Published', description: `"${assessmentName}" published for all platforms.` });
     setStep('details');
     setAssessmentName('');
     setSelectedQuestionIds(new Set());
@@ -536,17 +548,18 @@ export const V1CreateAssessmentPage: React.FC = () => {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {platforms.map(p => {
-          const exists = assessments.some(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
+          const existing = assessments.find(a => a.name === assessmentName && a.platform === p && a.quarter === assessmentQuarter);
           return (
             <div key={p} className="p-4 rounded-xl border border-border bg-card text-left space-y-2">
               <p className="font-semibold text-sm text-foreground">{p}</p>
               <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                {exists ? <><CheckCircle2 className="w-3 h-3 text-primary" /> Created</> : <><Clock className="w-3 h-3" /> Not created</>}
+                {existing ? <><CheckCircle2 className="w-3 h-3 text-primary" /> {existing.status === 'published' ? 'Published' : 'Draft'}</> : <><Clock className="w-3 h-3" /> Not created</>}
               </p>
-              {!exists && (
-                <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handlePublishAssessment(p)}>
-                  Create for {p}
-                </Button>
+              {!existing && (
+                <div className="flex gap-1">
+                  <Button size="sm" variant="outline" className="flex-1 text-[10px]" onClick={() => createAssessment(p, 'draft')}>Save</Button>
+                  <Button size="sm" className="flex-1 text-[10px]" onClick={() => createAssessment(p, 'published')}>Publish</Button>
+                </div>
               )}
             </div>
           );
@@ -555,8 +568,11 @@ export const V1CreateAssessmentPage: React.FC = () => {
 
       <div className="flex gap-3 pt-2">
         <Button variant="outline" onClick={() => setStep('questions')}>← Back</Button>
+        <Button variant="outline" onClick={handleSaveAll}>
+          Save All as Draft
+        </Button>
         <Button onClick={handlePublishAll}>
-          <Send className="w-4 h-4 mr-2" /> Save & Publish to All Platforms
+          <Send className="w-4 h-4 mr-2" /> Publish to All Platforms
         </Button>
       </div>
     </div>
@@ -764,7 +780,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
   const { user, assessments, setAssessments, availableQuarters, publishedQuestions: allQuestions } = useAppState();
   const { toast } = useToast();
   const [filterQuarter, setFilterQuarter] = useState(availableQuarters[0] || 'Q4 2025');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'submitted' | 'reviewed'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published' | 'submitted' | 'reviewed'>('all');
   const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null); // assessment id or group name prefixed with 'group:'
@@ -787,7 +803,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
   }, [filtered]);
 
   const statusColor = (s: string) =>
-    s === 'reviewed' ? 'default' : s === 'submitted' ? 'secondary' : 'outline';
+    s === 'published' ? 'default' : s === 'reviewed' ? 'default' : s === 'submitted' ? 'secondary' : 'outline';
 
   const handleDeleteSingle = (id: string) => {
     setAssessments(prev => prev.filter(a => a.id !== id));
@@ -811,17 +827,39 @@ export const V1ViewAssessmentsPage: React.FC = () => {
     toast({ title: 'Renamed', description: `Assessment renamed to "${editName.trim()}".` });
   };
 
+  // Compute per-quarter published counts for the dropdown
+  const quarterPublishedCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    availableQuarters.forEach(q => {
+      map[q] = assessments.filter(a => a.quarter === q && a.status === 'published').length;
+    });
+    return map;
+  }, [assessments, availableQuarters]);
+
+  const totalPublished = filtered.filter(a => a.status === 'published').length;
+
   return (
     <div className="space-y-5 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h3 className="text-lg font-bold text-foreground">Assessments</h3>
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Assessments</h3>
+          {totalPublished > 0 && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+              <CheckCircle2 className="w-3 h-3 text-primary" /> {totalPublished} published assessment{totalPublished > 1 ? 's' : ''} for {filterQuarter}
+            </p>
+          )}
+        </div>
         <div className="flex gap-2">
           <select
             value={filterQuarter}
             onChange={e => setFilterQuarter(e.target.value)}
             className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
-            {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
+            {availableQuarters.map(q => (
+              <option key={q} value={q}>
+                {quarterPublishedCounts[q] > 0 ? `✅ ${q} (${quarterPublishedCounts[q]})` : q}
+              </option>
+            ))}
           </select>
           <select
             value={filterStatus}
@@ -830,6 +868,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
           >
             <option value="all">All Statuses</option>
             <option value="draft">Draft</option>
+            <option value="published">Published</option>
             <option value="submitted">Submitted</option>
             <option value="reviewed">Reviewed</option>
           </select>
