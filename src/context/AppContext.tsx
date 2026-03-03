@@ -97,9 +97,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let quarterAssessments = assessments.filter(a => a.quarter === selectedQuarter && (a.status === 'submitted' || a.status === 'reviewed'));
     if (quarterAssessments.length === 0) return null;
 
-    // Filter by selected platform if not 'All'
-    if (selectedPlatform !== 'All') {
-      quarterAssessments = quarterAssessments.filter(a => a.platform === selectedPlatform);
+    // Filter by selected platform, or by user's assigned platform for TPL role
+    const effectivePlatform = selectedPlatform !== 'All'
+      ? selectedPlatform
+      : (user?.role === 'user' && user.platformId ? user.platformId : null);
+
+    if (effectivePlatform) {
+      quarterAssessments = quarterAssessments.filter(a => a.platform === effectivePlatform);
       if (quarterAssessments.length === 0) return null;
     }
 
@@ -130,7 +134,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       stability: buildScores('Stability', dummyStabilityDimensions),
       agility: buildScores('Agility', dummyAgilityDimensions),
     };
-  }, [assessments, assessmentQuestionsState, selectedQuarter, selectedPlatform]);
+  }, [assessments, assessmentQuestionsState, selectedQuarter, selectedPlatform, user]);
 
   const maturityDimensions = useMemo<DimensionScore[]>(() => {
     if (assessmentDerivedDimensions?.maturity) return assessmentDerivedDimensions.maturity;
