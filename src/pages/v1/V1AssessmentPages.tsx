@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send, Plus, ChevronDown, ChevronRight, Pencil, Save, X } from 'lucide-react';
+import { CheckCircle2, Clock, FileSearch, Settings2, MessageSquare, Send, Plus, ChevronDown, ChevronRight, Pencil, Save, X, Trash2 } from 'lucide-react';
 import AdminAssessmentQuestions from '@/components/AdminAssessmentQuestions';
 
 /* ─── Tab-wise Assessment Form (shared by Create + Self-Assess) ─── */
@@ -761,9 +761,15 @@ export const V1PeerReviewPage: React.FC = () => {
 /* ─── View All Assessments ─── */
 
 export const V1ViewAssessmentsPage: React.FC = () => {
-  const { assessments, availableQuarters, publishedQuestions: allQuestions } = useAppState();
+  const { user, assessments, setAssessments, availableQuarters, publishedQuestions: allQuestions } = useAppState();
+  const { toast } = useToast();
   const [filterQuarter, setFilterQuarter] = useState(availableQuarters[0] || 'Q4 2025');
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'submitted' | 'reviewed'>('all');
+  const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null); // assessment id or group name prefixed with 'group:'
+
+  const isAdmin = user?.role === 'admin';
 
   const filtered = assessments.filter(a => {
     if (a.quarter !== filterQuarter) return false;
@@ -771,7 +777,6 @@ export const V1ViewAssessmentsPage: React.FC = () => {
     return true;
   });
 
-  // Group by assessment name
   const grouped = useMemo(() => {
     const map: Record<string, Assessment[]> = {};
     filtered.forEach(a => {
@@ -783,6 +788,28 @@ export const V1ViewAssessmentsPage: React.FC = () => {
 
   const statusColor = (s: string) =>
     s === 'reviewed' ? 'default' : s === 'submitted' ? 'secondary' : 'outline';
+
+  const handleDeleteSingle = (id: string) => {
+    setAssessments(prev => prev.filter(a => a.id !== id));
+    setDeleteConfirm(null);
+    toast({ title: 'Deleted', description: 'Assessment removed.' });
+  };
+
+  const handleDeleteGroup = (name: string) => {
+    setAssessments(prev => prev.filter(a => !(a.name === name && a.quarter === filterQuarter)));
+    setDeleteConfirm(null);
+    toast({ title: 'Deleted', description: `All "${name}" assessments for ${filterQuarter} removed.` });
+  };
+
+  const handleRenameGroup = (oldName: string) => {
+    if (!editName.trim()) return;
+    setAssessments(prev => prev.map(a =>
+      a.name === oldName && a.quarter === filterQuarter ? { ...a, name: editName.trim() } : a
+    ));
+    setEditingGroupName(null);
+    setEditName('');
+    toast({ title: 'Renamed', description: `Assessment renamed to "${editName.trim()}".` });
+  };
 
   return (
     <div className="space-y-5 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
@@ -820,9 +847,43 @@ export const V1ViewAssessmentsPage: React.FC = () => {
         grouped.map(([name, items]) => (
           <Card key={name}>
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">{name}</CardTitle>
-                <Badge variant="outline" className="text-[10px]">{items[0].quarter} · {items.length} platform{items.length > 1 ? 's' : ''}</Badge>
+              <div className="flex items-center justify-between gap-2">
+                {editingGroupName === name ? (
+                  <div className="flex items-center gap-2 flex-1">
+                    <Input
+                      value={editName}
+                      onChange={e => setEditName(e.target.value)}
+                      className="h-8 text-sm max-w-xs"
+                      autoFocus
+                      onKeyDown={e => e.key === 'Enter' && handleRenameGroup(name)}
+                    />
+                    <Button size="sm" variant="ghost" onClick={() => handleRenameGroup(name)}><Save className="w-3.5 h-3.5" /></Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingGroupName(null)}><X className="w-3.5 h-3.5" /></Button>
+                  </div>
+                ) : (
+                  <CardTitle className="text-base">{name}</CardTitle>
+                )}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Badge variant="outline" className="text-[10px]">{items[0].quarter} · {items.length} platform{items.length > 1 ? 's' : ''}</Badge>
+                  {isAdmin && editingGroupName !== name && (
+                    <>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => { setEditingGroupName(name); setEditName(name); }}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      {deleteConfirm === `group:${name}` ? (
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-destructive">Delete all?</span>
+                          <Button size="sm" variant="destructive" className="h-6 text-[10px] px-2" onClick={() => handleDeleteGroup(name)}>Yes</Button>
+                          <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={() => setDeleteConfirm(null)}>No</Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive hover:text-destructive" onClick={() => setDeleteConfirm(`group:${name}`)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
               {items[0].questionIds && (
                 <p className="text-[11px] text-muted-foreground">{items[0].questionIds.length} questions in this assessment</p>
@@ -841,7 +902,21 @@ export const V1ViewAssessmentsPage: React.FC = () => {
                     <div key={a.id} className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1.5">
                       <div className="flex items-center justify-between">
                         <p className="font-semibold text-sm text-foreground">{a.platform}</p>
-                        <Badge variant={statusColor(a.status) as any} className="text-[10px] capitalize">{a.status}</Badge>
+                        <div className="flex items-center gap-1">
+                          <Badge variant={statusColor(a.status) as any} className="text-[10px] capitalize">{a.status}</Badge>
+                          {isAdmin && (
+                            deleteConfirm === a.id ? (
+                              <div className="flex items-center gap-0.5">
+                                <Button size="sm" variant="destructive" className="h-5 text-[9px] px-1.5" onClick={() => handleDeleteSingle(a.id)}>Yes</Button>
+                                <Button size="sm" variant="ghost" className="h-5 text-[9px] px-1.5" onClick={() => setDeleteConfirm(null)}>No</Button>
+                              </div>
+                            ) : (
+                              <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-destructive/60 hover:text-destructive" onClick={() => setDeleteConfirm(a.id)}>
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            )
+                          )}
+                        </div>
                       </div>
                       <div className="text-[11px] text-muted-foreground space-y-0.5">
                         {answeredCount > 0 ? (
