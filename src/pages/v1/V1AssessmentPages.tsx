@@ -27,8 +27,11 @@ interface AssessmentFormProps {
 
 const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentName, assessmentQuarter, existingAssessment, onSubmit, mode }) => {
   const { assessmentQuestions: allQuestions, publishedQuestions } = useAppState();
-  // Admin sees all draft questions; users see only published
-  const assessmentQuestions = mode === 'create' ? allQuestions : publishedQuestions;
+  // Filter to only questions selected for this assessment (via questionIds), falling back to all
+  const baseQuestions = mode === 'create' ? allQuestions : publishedQuestions;
+  const assessmentQuestions = existingAssessment?.questionIds?.length
+    ? baseQuestions.filter(q => existingAssessment.questionIds!.includes(q.id))
+    : baseQuestions;
   const { toast } = useToast();
   const [tabView, setTabView] = useState<'pillar' | 'dimension'>('pillar');
 
