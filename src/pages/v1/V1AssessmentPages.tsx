@@ -780,7 +780,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
   const { user, assessments, setAssessments, availableQuarters, publishedQuestions: allQuestions } = useAppState();
   const { toast } = useToast();
   const [filterQuarter, setFilterQuarter] = useState(availableQuarters[0] || 'Q4 2025');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'submitted' | 'reviewed'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published' | 'submitted' | 'reviewed'>('all');
   const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null); // assessment id or group name prefixed with 'group:'
@@ -803,7 +803,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
   }, [filtered]);
 
   const statusColor = (s: string) =>
-    s === 'reviewed' ? 'default' : s === 'submitted' ? 'secondary' : 'outline';
+    s === 'published' ? 'default' : s === 'reviewed' ? 'default' : s === 'submitted' ? 'secondary' : 'outline';
 
   const handleDeleteSingle = (id: string) => {
     setAssessments(prev => prev.filter(a => a.id !== id));
@@ -827,17 +827,39 @@ export const V1ViewAssessmentsPage: React.FC = () => {
     toast({ title: 'Renamed', description: `Assessment renamed to "${editName.trim()}".` });
   };
 
+  // Compute per-quarter published counts for the dropdown
+  const quarterPublishedCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    availableQuarters.forEach(q => {
+      map[q] = assessments.filter(a => a.quarter === q && a.status === 'published').length;
+    });
+    return map;
+  }, [assessments, availableQuarters]);
+
+  const totalPublished = filtered.filter(a => a.status === 'published').length;
+
   return (
     <div className="space-y-5 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h3 className="text-lg font-bold text-foreground">Assessments</h3>
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Assessments</h3>
+          {totalPublished > 0 && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+              <CheckCircle2 className="w-3 h-3 text-green-500" /> {totalPublished} published assessment{totalPublished > 1 ? 's' : ''} for {filterQuarter}
+            </p>
+          )}
+        </div>
         <div className="flex gap-2">
           <select
             value={filterQuarter}
             onChange={e => setFilterQuarter(e.target.value)}
             className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
-            {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
+            {availableQuarters.map(q => (
+              <option key={q} value={q}>
+                {quarterPublishedCounts[q] > 0 ? `✅ ${q} (${quarterPublishedCounts[q]})` : q}
+              </option>
+            ))}
           </select>
           <select
             value={filterStatus}
@@ -846,6 +868,7 @@ export const V1ViewAssessmentsPage: React.FC = () => {
           >
             <option value="all">All Statuses</option>
             <option value="draft">Draft</option>
+            <option value="published">Published</option>
             <option value="submitted">Submitted</option>
             <option value="reviewed">Reviewed</option>
           </select>
