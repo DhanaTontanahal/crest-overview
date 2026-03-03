@@ -108,6 +108,7 @@ const AssessmentUpload: React.FC = () => {
 
         const newAssessments: Assessment[] = Object.values(grouped).map(g => ({
           id: `assess-${g.platform.toLowerCase().replace(/\s+/g, '-')}-${g.quarter.replace(' ', '')}`,
+          name: `${g.platform} ${g.quarter} Assessment`,
           platform: g.platform,
           quarter: g.quarter,
           submittedBy: 'Admin Upload',

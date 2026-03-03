@@ -275,6 +275,7 @@ export interface AssessmentAnswer {
 export const sampleAssessments: Assessment[] = [
   {
     id: 'assess-consumer-q4',
+    name: 'Q4 2025 Maturity Assessment',
     platform: 'Consumer',
     quarter: 'Q4 2025',
     submittedBy: 'Consumer',

@@ -137,9 +137,9 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentNam
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-foreground">
-            {mode === 'create' ? 'Create Assessment' : 'Self Assessment'} — {platform}
+            {assessmentName || (mode === 'create' ? 'Create Assessment' : 'Self Assessment')} — {platform}
           </h3>
-          <p className="text-xs text-muted-foreground">{answered}/{total} answered · {selectedQuarter}</p>
+          <p className="text-xs text-muted-foreground">{answered}/{total} questions answered · {assessmentQuarter}</p>
         </div>
         <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
           <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(answered / total) * 100}%` }} />
@@ -201,12 +201,14 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({ platform, assessmentNam
 /* ─── Admin: Create Assessment (picks platform) ─── */
 
 export const V1CreateAssessmentPage: React.FC = () => {
-  const { user, assessments, setAssessments, platforms, selectedQuarter } = useAppState();
+  const { user, assessments, setAssessments, platforms, availableQuarters } = useAppState();
   const [selectedPlatform, setSelectedPlatform] = useState('');
+  const [assessmentName, setAssessmentName] = useState('');
+  const [assessmentQuarter, setAssessmentQuarter] = useState(availableQuarters[0] || 'Q4 2025');
 
   if (user?.role !== 'admin') return <p className="text-muted-foreground">Admin only.</p>;
 
-  const existing = selectedPlatform ? assessments.find(a => a.platform === selectedPlatform && a.quarter === selectedQuarter) : undefined;
+  const existing = selectedPlatform ? assessments.find(a => a.platform === selectedPlatform && a.quarter === assessmentQuarter) : undefined;
 
   const handleSubmit = (assessment: Assessment) => {
     setAssessments(prev => {
@@ -220,13 +222,38 @@ export const V1CreateAssessmentPage: React.FC = () => {
     <div className="space-y-4 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
       {selectedPlatform === '__manage__' ? (
         <div>
-          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back to platforms</Button>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back</Button>
           <AdminAssessmentQuestions />
         </div>
       ) : !selectedPlatform ? (
         <div className="space-y-4">
           <h3 className="text-lg font-bold text-foreground">Create Assessment</h3>
-          <p className="text-sm text-muted-foreground">Select a platform to create or edit its assessment for {selectedQuarter}.</p>
+          <p className="text-sm text-muted-foreground">Name the assessment, select a quarter, then pick a platform.</p>
+
+          {/* Assessment Name & Quarter */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground">Assessment Name</label>
+              <input
+                type="text"
+                value={assessmentName}
+                onChange={e => setAssessmentName(e.target.value)}
+                placeholder="e.g. Q4 2025 Maturity Assessment"
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground">Quarter</label>
+              <select
+                value={assessmentQuarter}
+                onChange={e => setAssessmentQuarter(e.target.value)}
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {availableQuarters.map(q => <option key={q} value={q}>{q}</option>)}
+              </select>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {/* Common for All Platforms */}
             <button onClick={() => setSelectedPlatform('__manage__')}
@@ -237,10 +264,11 @@ export const V1CreateAssessmentPage: React.FC = () => {
               <p className="text-[11px] text-muted-foreground mt-1">Manage questionnaire — add, edit, delete, upload &amp; publish questions</p>
             </button>
             {platforms.map(p => {
-              const exists = assessments.some(a => a.platform === p && a.quarter === selectedQuarter);
+              const exists = assessments.some(a => a.platform === p && a.quarter === assessmentQuarter);
               return (
                 <button key={p} onClick={() => setSelectedPlatform(p)}
-                  className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-all text-left">
+                  disabled={!assessmentName.trim()}
+                  className="p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed">
                   <p className="font-semibold text-sm text-foreground">{p}</p>
                   <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
                     {exists ? <><CheckCircle2 className="w-3 h-3 text-primary" /> Exists</> : <><Clock className="w-3 h-3" /> Not created</>}
@@ -249,11 +277,14 @@ export const V1CreateAssessmentPage: React.FC = () => {
               );
             })}
           </div>
+          {!assessmentName.trim() && (
+            <p className="text-xs text-muted-foreground italic">Enter an assessment name to enable platform selection.</p>
+          )}
         </div>
       ) : (
         <div>
-          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back to platforms</Button>
-          <AssessmentForm platform={selectedPlatform} existingAssessment={existing} onSubmit={handleSubmit} mode="create" />
+          <Button variant="ghost" size="sm" onClick={() => setSelectedPlatform('')} className="mb-2 text-xs">← Back</Button>
+          <AssessmentForm platform={selectedPlatform} assessmentName={assessmentName} assessmentQuarter={assessmentQuarter} existingAssessment={existing} onSubmit={handleSubmit} mode="create" />
         </div>
       )}
     </div>
@@ -280,7 +311,14 @@ export const V1SelfAssessmentPage: React.FC = () => {
 
   return (
     <div className="animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-      <AssessmentForm platform={user.platformId} existingAssessment={existing} onSubmit={handleSubmit} mode="self-assess" />
+      <AssessmentForm
+        platform={user.platformId}
+        assessmentName={existing?.name || 'Self Assessment'}
+        assessmentQuarter={selectedQuarter}
+        existingAssessment={existing}
+        onSubmit={handleSubmit}
+        mode="self-assess"
+      />
     </div>
   );
 };
